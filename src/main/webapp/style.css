@@ -7,29 +7,29 @@
 }
 
 li {
-    margin-top: 10px;
-    font-size: 30px;
-    margin-bottom: -15px;
+  margin-top: 10px;
+  font-size: 30px;
+  margin-bottom: -15px;
 }
 
-#place-container {
-   border:1px solid grey;
-   width:400px;
-   background-color: rgb(197, 235, 197);
-   margin-top: 20px;
+.place-container {
+  border: 1px solid grey;
+  width: 400px;
+  background-color: rgb(197, 235, 197);
+  margin-top: 20px;
 }
 
 #map-container {
   position: relative;
   float: left;
   margin-left: 35px;
-  margin-top: auto;  
+  margin-top: auto;
 }
 
 #feedback-box {
   border: 1px solid grey;
   width: 270px;
-  background-color:rgb(199, 232, 245);
+  background-color: rgb(199, 232, 245);
   padding: 2%;
   margin-top: auto;
   display: inline-block;

@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html>
+  <script src="script.js"></script>
   <head>
     <meta charset="UTF-8">
     <title>capstone project</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2RvKUmgsgzAyEten9CPEKwO7SdLQuz40"></script>
-    <script src="script.js"></script>
   </head>
   <body onload="">
     <div id="content">
       <h1> Food Mood's recommendation for you:</h1>
       <ol id="place">
-        <div id="place-container">
+        <div class="place-container">
         <li> Foo sushi </li> <br> 
-          <a href="https:www.fusushi"<span title = "Fu sushi">Restaurant's website</span></a> <br> 
-          <small> <a href="https:www.googlemapsfusushi"<span title = "Fu sushi on google maps">Open in google maps</span></a></small>
+          <a href="https:www.fusushi"> <span title = "Fu sushi">Restaurant's website</span> </a><br> 
+          <small> <a href="https:www.googlemapsfusushi"> <span title = "Fu sushi on google maps">Open in google maps</span> </a> </small>
         </div>
-        <div id="place-container">
+        <div class="place-container">
         <li> Sushi Moon </li> <br> 
-          <a href="https:www.zesushi"<span title = "Sushi Moon">Restaurant's website</span></a> <br> 
-          <small> <a href="https:www.googlemapssushimoon"<span title = "Sushi Moon on google maps">Open in google maps</span></a></small>
+          <a href="https:www.zesushi"> <span title = "Sushi Moon">Restaurant's website</span> </a><br> 
+          <small> <a href="https:www.googlemapssushimoon"> <span title = "Sushi Moon on google maps">Open in google maps</span> </a></small>
         </div>
-       <div id="place-container">
+       <div class="place-container">
         <li> Ze sushi </li> <br> 
-          <a href="https:www.zesushi"<span title = "Ze sushi">Restaurant's website</span></a> <br> 
-          <small> <a href="https:www.googlemapszesushi"<span title = "Ze sushi on google maps">Open in google maps</span></a></small>
+          <a href="https:www.zesushi"> <span title = "Ze sushi">Restaurant's website</span> </a> <br> 
+          <small> <a href="https:www.googlemapszesushi"> <span title = "Ze sushi on google maps">Open in google maps</span> </a></small>
         </div>
       </ol>
       <div id ="map-container"> <img src="/images/PlacesOnMap.png" alt="places on map" width="300" height="390"></div>
@@ -38,6 +37,8 @@
         </select> <br><br>
         <label for="disliking-feedback">Don't like these options? <br></label>
         <button onclick=""><b>Try again</b></button>   
+        </form>    
+      </div>
     </div>
   </body>
 </html>
