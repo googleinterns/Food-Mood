@@ -26,5 +26,5 @@ interface PlacesSorter {
    * @param unsortedPlaces: the list of places that we want to sort.
    * @return the sorted list of places.
    */
-  public List<Place> sortPlaces(List<Place> unsortedPlaces);
+  public List<Place> sort(List<Place> unsortedPlaces);
 }

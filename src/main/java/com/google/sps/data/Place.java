@@ -15,40 +15,40 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-import java.util.List;
+import java.util.Set;
 
 /**
- * Represents a place that food can be ordered from.
+ * Represents a place that food can be ordered from in the food-mood web application.
  */
 @AutoValue 
 public abstract class Place {
   
-  /* The name of the place. */
+  /** The name of the place. */
   public abstract String name();
   
-  /* The url of the place’s website. */
-  public abstract String website();
+  /** The url of the place’s website. */
+  public abstract String websiteUrl();
   
-  /* A phone number that can be used to contact the place. */
-  public abstract int phone();
+  /** A phone number that can be used to contact the place. */
+  public abstract String phone();
   
-  /* Coordinate of the physical place. */
+  /** Coordinate of the physical place. */
   public abstract Long longitude();
   
-  /* Coordinate of the physical place. */
+  /** Coordinate of the physical place. */
   public abstract Long latitude();
   
-  /* The types of cuisines the place offers. */
-  public abstract List<String> cuisines();
+  /** The types of cuisines the place offers. */
+  public abstract Set<String> cuisines();
   
-  /* A short description of the place. */
+  /** A short description of the place. */
   public abstract String description();
 
   /**
-   * Creates a new instance of the auto-value class.
+   * Creates a new Place instance.
    */
-  public static Place create(String name, String website, int phone, Long longitude, Long latitude, 
-      List<String> cuisines, String description) {
+  public static Place create(String name, String website, String phone, Long longitude, Long latitude, 
+      Set<String> cuisines, String description) {
     return new AutoValue_Place(name, website, phone, longitude, latitude, cuisines, description);
   }
 }

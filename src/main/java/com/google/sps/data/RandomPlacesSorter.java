@@ -21,9 +21,8 @@ import java.util.Collections;
  * A PlacesSorter that sorts places randomly. 
  */
 class RandomPlacesSorter implements PlacesSorter {
-
     @Override
-    public List<Place> sortPlaces(List<Place> places) {
+    public List<Place> sort(List<Place> places) {
       Collections.shuffle(places);
       return places;
     }
