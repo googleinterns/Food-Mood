@@ -21,17 +21,17 @@ li {
 
 #map-container {
   position: relative;
-  float:left;
+  float: left;
   margin-left: 35px;
   margin-top: auto;  
 }
 
 #feedback-box {
-  border:1px solid grey;
-  width:270px;
-  background-color: rgb(199, 232, 245);
+  border: 1px solid grey;
+  width: 270px;
+  background-color:rgb(199, 232, 245);
   padding: 2%;
   margin-top: auto;
-  display:inline-block;
+  display: inline-block;
   margin-left: 15px;
 }
