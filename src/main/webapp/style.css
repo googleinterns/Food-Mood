@@ -35,3 +35,14 @@ li {
   display: inline-block;
   margin-left: 15px;
 }
+
+.submit { 
+  background-color: rgb(197, 235, 197);
+}
+
+.button { 
+  width: 150px; 
+  height: 30px; 
+  padding: 5px; 
+  background-color: rgb(199, 232, 245);
+}
