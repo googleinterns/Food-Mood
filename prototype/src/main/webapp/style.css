@@ -36,17 +36,17 @@ li {
   margin-left: 15px;
 }
 
-.submit { 
+.submit {
   background-color: rgb(197, 235, 197);
-  width: 200px; 
-  height: 50px; 
-  padding: 10px; 
+  width: 200px;
+  height: 50px;
+  padding: 10px;
   font-size: 20px;
   font-family: Impact, Charcoal, sans-serif;
 }
 
-.button { 
-  width: 150px; 
-  padding: 5px; 
+.button {
+  width: 150px;
+  padding: 5px;
   background-color: rgb(199, 232, 245);
 }
