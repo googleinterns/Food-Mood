@@ -15,7 +15,6 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-import java.util.Set;
 
 /**
  * Represents a place that food can be ordered from in the food-mood web application.
@@ -32,23 +31,23 @@ public abstract class Place {
   /** A phone number that can be used to contact the place. */
   public abstract String phone();
   
+  /** The rating of the place, represented by a number between 1-5. */
+  public abstract int rating();
+  
+  /** The place’s price level, represented by a number between 0-4. */
+  public abstract int priceLevel();
+
   /** Coordinate of the physical place. */
   public abstract Long longitude();
   
   /** Coordinate of the physical place. */
   public abstract Long latitude();
-  
-  /** The types of cuisines the place offers. */
-  public abstract Set<String> cuisines();
-  
-  /** A short description of the place. */
-  public abstract String description();
-
+    
   /**
    * Creates a new Place instance.
    */
-  public static Place create(String name, String website, String phone, Long longitude, Long latitude, 
-      Set<String> cuisines, String description) {
-    return new AutoValue_Place(name, website, phone, longitude, latitude, cuisines, description);
+  public static Place create(String name, String website, String phone, int rating, int priceLevel, 
+      Long longitude, Long latitude) {
+    return new AutoValue_Place(name, website, phone, rating, priceLevel, longitude, latitude);
   }
 }

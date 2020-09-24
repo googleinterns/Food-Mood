@@ -14,16 +14,28 @@
 
 package com.google.sps.data;
 
-import java.util.List;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
-/** 
- * A PlacesSorter that sorts places randomly. 
+/**
+ * A utility class for Place objects.
  */
-class RandomPlacesSorter implements PlacesSorter {
+public class Places {
+  
+  /** 
+   * A private constructor, so the utility class can't be instanciated.
+   */
+  private Places() {}
+
+  /** 
+   * A Place comparator that compares places randomly.
+   */
+  Comparator<Place> randomComparator = new Comparator<Place>() {
     @Override
-    public List<Place> sort(List<Place> places) {
-      Collections.shuffle(places);
-      return places;
+    public int compare(Place a, Place b) {
+      Random rand = new Random();
+      return rand.nextBoolean() ? 1 : -1; //TODO: are these magic numbers, or is this ok considering
+                                          //we're implementing a comparator?
     }
+  };
 }
