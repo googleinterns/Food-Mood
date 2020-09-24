@@ -46,19 +46,19 @@ public abstract class Place {
 
   /**
    * Creates a new Place instance.
-   * @param name: The name of the place.
-   * @param websiteUrl: The url of the place’s website.
-   * @param phone: A phone number that can be used to contact the place. 
-   * @param rating: The rating of the place, represented by a number of 1-5. 
-   * @param priceLevel: The place’s price level, represented by a number od 0-4. 
-   * @param longitude: Coordinate of the physical place. 
-   * @param latitude: Coordinate of the physical place. 
+   * @param name The name of the place.
+   * @param websiteUrl The url of the place’s website.
+   * @param phone A phone number that can be used to contact the place.
+   * @param rating The rating of the place, represented by a number of 1-5.
+   * @param priceLevel The place’s price level, represented by a number od 0-4.
+   * @param longitude Coordinate of the physical place.
+   * @param latitude Coordinate of the physical place.
    * @return the new object instance.
    */
-  public static Place create(final String name, final String websiteUrl, 
-      final String phone, final int rating, final int priceLevel, 
+  public static Place create(final String name, final String websiteUrl,
+      final String phone, final int rating, final int priceLevel,
       final Long longitude, final Long latitude) {
-    return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel, 
+    return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel,
         longitude, latitude);
   }
 }
