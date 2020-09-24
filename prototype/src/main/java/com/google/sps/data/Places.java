@@ -20,22 +20,22 @@ import java.util.Random;
 /**
  * A utility class for Place objects.
  */
-public class Places {
-  
-  /** 
+public final class Places {
+
+  /**
    * A private constructor, so the utility class can't be instanciated.
    */
-  private Places() {}
+  private Places() { }
 
-  /** 
+  /**
    * A Place comparator that compares places randomly.
    */
-  Comparator<Place> randomComparator = new Comparator<Place>() {
+  public Comparator<Place> randomComparator = new Comparator<Place>() {
     @Override
-    public int compare(Place a, Place b) {
+    public int compare(final Place a, final Place b) {
       Random rand = new Random();
-      return rand.nextBoolean() ? 1 : -1; //TODO: are these magic numbers, or is this ok considering
-                                          //we're implementing a comparator?
+      return rand.nextBoolean() ? 1 : -1; //TO DO: are these magic numbers, 
+      //or is this ok considering we're implementing a comparator?
     }
   };
 }
