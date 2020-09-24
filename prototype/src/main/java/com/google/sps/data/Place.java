@@ -24,30 +24,31 @@ public abstract class Place {
   
   /** The name of the place. */
   public abstract String name();
-  
+
   /** The url of the place’s website. */
   public abstract String websiteUrl();
-  
+
   /** A phone number that can be used to contact the place. */
   public abstract String phone();
-  
+
   /** The rating of the place, represented by a number between 1-5. */
   public abstract int rating();
-  
+
   /** The place’s price level, represented by a number between 0-4. */
   public abstract int priceLevel();
 
   /** Coordinate of the physical place. */
   public abstract Long longitude();
-  
+
   /** Coordinate of the physical place. */
   public abstract Long latitude();
-    
+
   /**
    * Creates a new Place instance.
+   * @return the new object instance.
    */
-  public static Place create(String name, String website, String phone, int rating, int priceLevel, 
-      Long longitude, Long latitude) {
+  public static Place create(final String name, final String website, final String phone, 
+      final int rating, final int priceLevel, final Long longitude, final Long latitude) {
     return new AutoValue_Place(name, website, phone, rating, priceLevel, longitude, latitude);
   }
 }

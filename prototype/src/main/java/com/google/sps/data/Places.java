@@ -34,7 +34,7 @@ public final class Places {
     @Override
     public int compare(final Place a, final Place b) {
       Random rand = new Random();
-      return rand.nextBoolean() ? 1 : -1; //TO DO: are these magic numbers, 
+      return rand.nextBoolean() ? 1 : -1; //TODO: are these magic numbers, 
       //or is this ok considering we're implementing a comparator?
     }
   };
