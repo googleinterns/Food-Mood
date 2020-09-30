@@ -17,7 +17,6 @@
  */
 package com.google.sps.test;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -26,44 +25,55 @@ import com.google.sps.data.Place;
 @RunWith(JUnit4.class)
 public final class TestPlace {
 
+  /** A stub Place name. */
   private static final String NAME = "name";
+  /** A stub Place website URL. */
   private static final String WEBSITE = "website@google.com";
+  /** A stub Place phone number. */
   private static final String PHONE = "+97250-0000-000";
+  /** A valid Place rating. */
   private static final int VALID_RATING = 4;
+  /** A valid Place price level. */
   private static final int VALID_PRICE_LEVEL = 3;
+  /** A stub Place longitude. */
   private static final long LONGITUDE = 35.35;
+  /** A stub Place latitude. */
   private static final long LATITUDE = 30.30;
+  /** An invalid Place rating, that is too low. */
   private static final int INVALID_LOW_RATING = 0;
+  /** An invalid Place rating, that is too high. */
   private static final int INVALID_HIGH_RATING = 10;
+  /** An invalid Place price level, that is too low. */
   private static final int INVALID_LOW_PRICE_LEVEL = -1;
+  /** An invalid Place price level, that is too high. */
   private static final int INVALID_HIGHT_PRICE_LEVEL = 5;
 
   @Test(expected = Test.None.class /* no exception expected */)
-  public void createPlace_ValidInput_NoError() {
+  public void createPlace_validInput_noError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createPlace_InvalidLowRatingArg_RaiseArgError() {
+  public void createPlace_invalidLowRatingArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, INVALID_LOW_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createPlace_InvalidHighRatingArg_RaiseArgError() {
+  public void createPlace_invalidHighRatingArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, INVALID_HIGH_RATING,
-        VALID_PRICE_LEVEL, LONGITUDE, LATITUDE); 
+        VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createPlace_InvalidLowPriceLevelArg_RaiseArgError() {
+  public void createPlace_invalidLowPriceLevelArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
       INVALID_LOW_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void createPlace_InvalidHighPriceLevelArg_RaiseArgError() {
+  public void createPlace_invalidHighPriceLevelArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
       INVALID_HIGHT_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
