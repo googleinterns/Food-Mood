@@ -39,31 +39,31 @@ public final class TestPlace {
   private static final int INVALID_HIGHT_PRICE_LEVEL = 5;
 
   @Test(expected = Test.None.class /* no exception expected */)
-  public void testValidInput() {
+  public void createPlace_ValidInput_NoError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidLowRating() {
+  public void createPlace_InvalidLowRatingArg_RaiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, INVALID_LOW_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidHighRating() {
+  public void createPlace_InvalidHighRatingArg_RaiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, INVALID_HIGH_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE); 
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidLowPriceLevel() {
+  public void createPlace_InvalidLowPriceLevelArg_RaiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
       INVALID_LOW_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidHighPriceLevel() {
+  public void createPlace_InvalidHighPriceLevelArg_RaiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
       INVALID_HIGHT_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
