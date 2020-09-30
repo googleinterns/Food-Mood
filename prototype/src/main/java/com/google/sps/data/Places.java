@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * The package that currently holds all the java files of the food-mood project.
+ */
 package com.google.sps.data;
 
 import com.google.common.collect.ImmutableList;
@@ -24,6 +27,11 @@ import java.util.Collections;
  */
 public final class Places {
 
+  /**
+   * Sorts the given list of Places randonly.
+   * @param places the list we want to sort.
+   * @return the randomly sorted list.
+   */
   public static final ImmutableList<Place> randomSort(
         ImmutableList<Place> places) {
     List<Place> mutablePlaces = new ArrayList<>(places);
