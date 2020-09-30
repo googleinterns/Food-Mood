@@ -29,7 +29,7 @@ public abstract class Place {
 
   /** The maximal valid rating value. */
   private final static int MAX_RATING = 5;
-  /** The minimal valid rating value. */  
+  /** The minimal valid rating value. */
   private final static int MIN_RATING = 1;
   /** The maximal valid price level value. */
   private final static int MAX_PRICE_LEVEL = 4;
@@ -81,7 +81,7 @@ public abstract class Place {
    * @param longitude Coordinate of the physical place.
    * @param latitude Coordinate of the physical place.
    * @return the new object instance.
-   * @throws IllegalArgumentException if an input isn't valid 
+   * @throws IllegalArgumentException if an input isn't valid
    *                                  (rating / price level)
    */
   public static Place create(final String name, final String websiteUrl,
@@ -96,7 +96,7 @@ public abstract class Place {
           "Price level should be between %s - %s",
           MIN_PRICE_LEVEL, MAX_PRICE_LEVEL
           );
-      
+
       Preconditions.checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
           ratingError);
       Preconditions.checkArgument(priceLevel >= MIN_PRICE_LEVEL

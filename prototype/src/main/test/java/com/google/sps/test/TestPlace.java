@@ -61,7 +61,7 @@ public final class TestPlace {
   }
 
   /**
-   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * Test the Place creator: raises an IllegalArgumentException if the given
    * rating is too low.
    */
   @Test(expected = IllegalArgumentException.class)
@@ -71,7 +71,7 @@ public final class TestPlace {
   }
 
   /**
-   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * Test the Place creator: raises an IllegalArgumentException if the given
    * rating is too high.
    */
   @Test(expected = IllegalArgumentException.class)
@@ -81,7 +81,7 @@ public final class TestPlace {
   }
 
   /**
-   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * Test the Place creator: raises an IllegalArgumentException if the given
    * price level is too low.
    */
   @Test(expected = IllegalArgumentException.class)
@@ -91,7 +91,7 @@ public final class TestPlace {
   }
 
   /**
-   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * Test the Place creator: raises an IllegalArgumentException if the given
    * price level is too high.
    */
   @Test(expected = IllegalArgumentException.class)
