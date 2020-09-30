@@ -14,6 +14,9 @@
 
 /**
  * The package that currently holds all the test files of the food-mood project.
+ * @since 1.0
+ * @author karenav
+ * @version 1.1
  */
 package com.google.sps.test;
 
