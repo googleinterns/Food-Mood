@@ -26,10 +26,14 @@ import com.google.common.base.Preconditions;
  */
 @AutoValue
 public abstract class Place {
-  
+
+  /** The maximal valid rating value. */
   private final static int MAX_RATING = 5;
+  /** The minimal valid rating value. */  
   private final static int MIN_RATING = 1;
+  /** The maximal valid price level value. */
   private final static int MAX_PRICE_LEVEL = 4;
+  /** The minimal valid price level value. */
   private final static int MIN_PRICE_LEVEL = 0;
 
   /**
@@ -81,22 +85,23 @@ public abstract class Place {
    *                                  (rating / price level)
    */
   public static Place create(final String name, final String websiteUrl,
-      final String phone, int rating, int priceLevel, final Long longitude, 
-      final Long latitude) throws IllegalArgumentException {
-      
+      final String phone, final int rating, final int priceLevel,
+      final Long longitude, final Long latitude)
+      throws IllegalArgumentException {
+
       final String ratingError = String.format(
           "Rating should be between %s - %s", MIN_RATING, MAX_RATING
           );
       final String priceLevelError = String.format(
-          "Price level should be between %s - %s", 
+          "Price level should be between %s - %s",
           MIN_PRICE_LEVEL, MAX_PRICE_LEVEL
           );
       
-      Preconditions.checkArgument(rating >= MIN_RATING && rating <= MAX_RATING, 
+      Preconditions.checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
           ratingError);
-      Preconditions.checkArgument(priceLevel >= MIN_PRICE_LEVEL && 
-          priceLevel <= MAX_PRICE_LEVEL, priceLevelError);
-      
+      Preconditions.checkArgument(priceLevel >= MIN_PRICE_LEVEL
+          && priceLevel <= MAX_PRICE_LEVEL, priceLevelError);
+
       return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel,
           longitude, latitude);
   }

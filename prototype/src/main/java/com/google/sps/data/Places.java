@@ -32,8 +32,8 @@ public final class Places {
    * @param places the list we want to sort.
    * @return the randomly sorted list.
    */
-  public static final ImmutableList<Place> randomSort(
-        ImmutableList<Place> places) {
+  public static ImmutableList<Place> randomSort(
+      final ImmutableList<Place> places) {
     List<Place> mutablePlaces = new ArrayList<>(places);
     Collections.shuffle(mutablePlaces);
     return ImmutableList.copyOf(mutablePlaces);

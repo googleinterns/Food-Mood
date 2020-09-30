@@ -48,30 +48,49 @@ public final class TestPlace {
   /** An invalid Place price level, that is too high. */
   private static final int INVALID_HIGHT_PRICE_LEVEL = 5;
 
+  /**
+   * Test the Place creator: doesn't raise an error on a valid input.
+   */
   @Test(expected = Test.None.class /* no exception expected */)
   public void createPlace_validInput_noError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
+  /**
+   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * rating is too low.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void createPlace_invalidLowRatingArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, INVALID_LOW_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
+  /**
+   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * rating is too high.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void createPlace_invalidHighRatingArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, INVALID_HIGH_RATING,
         VALID_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
+  /**
+   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * price level is too low.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void createPlace_invalidLowPriceLevelArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
       INVALID_LOW_PRICE_LEVEL, LONGITUDE, LATITUDE);
   }
 
+  /**
+   * Test the Place creator: raises an IllegalArgumentException if the given 
+   * price level is too high.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void createPlace_invalidHighPriceLevelArg_raiseArgError() {
     Place validPlace = Place.create(NAME, WEBSITE, PHONE, VALID_RATING,
