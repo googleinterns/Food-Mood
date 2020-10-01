@@ -1,7 +1,0 @@
-<div *ngFor="let place of places" class=place-container>
-  <h2>{{ place.name }}</h2>
-  <a *ngIf="place.websiteURL" [title]="place.name + ' website'" [href]="place.websiteURL" target="_blank">
-    Restaurant's website
-  </a>
-  <p *ngIf="place.phone"> {{place.phone}}</p>
-</div>
