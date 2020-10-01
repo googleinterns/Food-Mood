@@ -89,18 +89,13 @@ public abstract class Place {
       final Long longitude, final Long latitude)
       throws IllegalArgumentException {
 
-      final String ratingError = String.format(
-          "Rating should be between %s - %s", MIN_RATING, MAX_RATING
-          );
-      final String priceLevelError = String.format(
-          "Price level should be between %s - %s",
-          MIN_PRICE_LEVEL, MAX_PRICE_LEVEL
-          );
-
       checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
-          ratingError);
-      checkArgument(priceLevel >= MIN_PRICE_LEVEL
-          && priceLevel <= MAX_PRICE_LEVEL, priceLevelError);
+          "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
+      
+          checkArgument(priceLevel >= MIN_PRICE_LEVEL
+          && priceLevel <= MAX_PRICE_LEVEL,
+          "Price level should be between %s-%s",
+          MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
 
       return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel,
           longitude, latitude);
