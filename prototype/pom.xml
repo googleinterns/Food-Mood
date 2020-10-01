@@ -63,6 +63,7 @@
           <!-- TODO: set project ID. -->
           <deploy.projectId>karenav-step-2020</deploy.projectId>
           <deploy.version>1</deploy.version>
+          <port>8181</port>
         </configuration>
       </plugin>
     </plugins>
