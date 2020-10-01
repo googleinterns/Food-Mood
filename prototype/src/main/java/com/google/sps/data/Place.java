@@ -18,7 +18,7 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Represents a place that food can be ordered from in the food-mood
@@ -97,9 +97,9 @@ public abstract class Place {
           MIN_PRICE_LEVEL, MAX_PRICE_LEVEL
           );
 
-      Preconditions.checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
+      checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
           ratingError);
-      Preconditions.checkArgument(priceLevel >= MIN_PRICE_LEVEL
+      checkArgument(priceLevel >= MIN_PRICE_LEVEL
           && priceLevel <= MAX_PRICE_LEVEL, priceLevelError);
 
       return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel,
