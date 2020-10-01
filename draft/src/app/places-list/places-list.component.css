@@ -1,0 +1,11 @@
+ .place-container {
+    background-image:
+     linear-gradient(
+       to right,
+       beige, #ffae80d2
+    );
+    border-radius: 25px;
+    width: 400px;
+    height: 120px;
+    padding-left: 40px;
+}

@@ -1,0 +1,52 @@
+/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
+/* Global Styles */
+
+* {
+    font-family: 'Roboto', Arial, sans-serif;
+    color: #312f2f;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  body {
+    margin: 0;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+  }
+  
+  /* Text */
+  
+  h1 {
+    font-size: 32px;
+    font-weight: bold;
+  }
+  
+  h2 {
+    font-size: 20px;
+    margin-top: 40px;
+    padding-top: 10px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+  
+  /* Hyperlink */
+  
+  a {
+    cursor: pointer;
+    color: #1976d2;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    opacity: 0.8;
+  }
+
+
+
