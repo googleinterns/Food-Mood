@@ -28,13 +28,13 @@ import com.google.common.base.Preconditions;
 public abstract class Place {
 
   /** The maximal valid rating value. */
-  private final static int MAX_RATING = 5;
+  private static final int MAX_RATING = 5;
   /** The minimal valid rating value. */
-  private final static int MIN_RATING = 1;
+  private static final int MIN_RATING = 1;
   /** The maximal valid price level value. */
-  private final static int MAX_PRICE_LEVEL = 4;
+  private static final int MAX_PRICE_LEVEL = 4;
   /** The minimal valid price level value. */
-  private final static int MIN_PRICE_LEVEL = 0;
+  private static final int MIN_PRICE_LEVEL = 0;
 
   /**
    * @return the name of the place.
