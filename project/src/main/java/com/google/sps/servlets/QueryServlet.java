@@ -19,10 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 import java.util.List;
+import java.util.Collections;
 import java.util.ArrayList;
 import com.google.gson.Gson;
-
-// import com.google.gson.Gson;
 
 /** A servlet that handles the user query. */
 @WebServlet("/query")
