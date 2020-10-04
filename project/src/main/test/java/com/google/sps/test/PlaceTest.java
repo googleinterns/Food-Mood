@@ -21,6 +21,7 @@
 package com.google.sps.test;
 
 import org.junit.Test;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.google.sps.data.Place;
@@ -43,43 +44,43 @@ public final class PlaceTest {
   /** A stub Place latitude. */
   private static final long VALID_LATITUDE = 30.30;
 
-  @Test(expected = Test.None.class /* no exception expected */)
-  public void create_validInput_noError() {
-    Place validPlace = Place.create(VALID_NAME, VALID_WEBSITE, VALID_PHONE, 
-        VALID_RATING, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
+  @Test()
   public void create_invalidLowRating_throwsIllegalArgumentException() {
     final int INVALID_LOW_RATING = 0;
 
-    Place validPlace = Place.create(VALID_NAME, VALID_WEBSITE, VALID_PHONE, 
-        INVALID_LOW_RATING, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE);
+    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
+        VALID_WEBSITE, VALID_PHONE, INVALID_LOW_RATING, VALID_PRICE_LEVEL,
+        VALID_LONGITUDE, VALID_LATITUDE));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test()
   public void create_invalidHighRating_throwsIllegalArgumentException() {
     final int INVALID_HIGH_RATING = 10;
 
-    Place validPlace = Place.create(VALID_NAME, VALID_WEBSITE, VALID_PHONE, 
-        INVALID_HIGH_RATING, VALID_PRICE_LEVEL, VALID_LONGITUDE,
-        VALID_LATITUDE);
+    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
+        VALID_WEBSITE, VALID_PHONE, INVALID_HIGH_RATING, VALID_PRICE_LEVEL,
+        VALID_LONGITUDE, VALID_LATITUDE));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test()
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
     final int INVALID_LOW_PRICE_LEVEL = -1;
 
-    Place validPlace = Place.create(VALID_NAME, VALID_WEBSITE, VALID_PHONE, 
-        VALID_RATING, INVALID_LOW_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE);
+    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
+        VALID_WEBSITE, VALID_PHONE, VALID_RATING, INVALID_LOW_PRICE_LEVEL,
+        VALID_LONGITUDE, VALID_LATITUDE));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test()
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
     final int INVALID_HIGHT_PRICE_LEVEL = 5;
 
     Place validPlace = Place.create(VALID_NAME, VALID_WEBSITE, VALID_PHONE, 
         VALID_RATING,INVALID_HIGHT_PRICE_LEVEL, VALID_LONGITUDE,
         VALID_LATITUDE);
+
+    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
+        VALID_WEBSITE, VALID_PHONE, VALID_RATING,INVALID_HIGHT_PRICE_LEVEL,
+        VALID_LONGITUDE,VALID_LATITUDE));
   }
 }
