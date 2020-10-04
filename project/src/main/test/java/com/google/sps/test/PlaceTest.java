@@ -44,7 +44,7 @@ public final class PlaceTest {
   /** A stub Place latitude. */
   private static final long VALID_LATITUDE = 30.30;
 
-  @Test()
+  @Test
   public void create_invalidLowRating_throwsIllegalArgumentException() {
     final int INVALID_LOW_RATING = 0;
 
@@ -53,7 +53,7 @@ public final class PlaceTest {
         VALID_LONGITUDE, VALID_LATITUDE));
   }
 
-  @Test()
+  @Test
   public void create_invalidHighRating_throwsIllegalArgumentException() {
     final int INVALID_HIGH_RATING = 10;
 
@@ -62,7 +62,7 @@ public final class PlaceTest {
         VALID_LONGITUDE, VALID_LATITUDE));
   }
 
-  @Test()
+  @Test
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
     final int INVALID_LOW_PRICE_LEVEL = -1;
 
@@ -71,7 +71,7 @@ public final class PlaceTest {
         VALID_LONGITUDE, VALID_LATITUDE));
   }
 
-  @Test()
+  @Test
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
     final int INVALID_HIGHT_PRICE_LEVEL = 5;
 
