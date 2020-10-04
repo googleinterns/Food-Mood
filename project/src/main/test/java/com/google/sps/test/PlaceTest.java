@@ -46,41 +46,29 @@ public final class PlaceTest {
 
   @Test
   public void create_invalidLowRating_throwsIllegalArgumentException() {
-    final int INVALID_LOW_RATING = 0;
-
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
-        VALID_WEBSITE, VALID_PHONE, INVALID_LOW_RATING, VALID_PRICE_LEVEL,
+        VALID_WEBSITE, VALID_PHONE, 0, VALID_PRICE_LEVEL,
         VALID_LONGITUDE, VALID_LATITUDE));
   }
 
   @Test
   public void create_invalidHighRating_throwsIllegalArgumentException() {
-    final int INVALID_HIGH_RATING = 10;
-
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
-        VALID_WEBSITE, VALID_PHONE, INVALID_HIGH_RATING, VALID_PRICE_LEVEL,
+        VALID_WEBSITE, VALID_PHONE, 10, VALID_PRICE_LEVEL,
         VALID_LONGITUDE, VALID_LATITUDE));
   }
 
   @Test
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
-    final int INVALID_LOW_PRICE_LEVEL = -1;
-
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
-        VALID_WEBSITE, VALID_PHONE, VALID_RATING, INVALID_LOW_PRICE_LEVEL,
+        VALID_WEBSITE, VALID_PHONE, VALID_RATING, -1,
         VALID_LONGITUDE, VALID_LATITUDE));
   }
 
   @Test
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
-    final int INVALID_HIGHT_PRICE_LEVEL = 5;
-
-    Place validPlace = Place.create(VALID_NAME, VALID_WEBSITE, VALID_PHONE, 
-        VALID_RATING,INVALID_HIGHT_PRICE_LEVEL, VALID_LONGITUDE,
-        VALID_LATITUDE);
-
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
-        VALID_WEBSITE, VALID_PHONE, VALID_RATING,INVALID_HIGHT_PRICE_LEVEL,
+        VALID_WEBSITE, VALID_PHONE, VALID_RATING,5,
         VALID_LONGITUDE,VALID_LATITUDE));
   }
 }
