@@ -1,10 +1,25 @@
-package com.google.sps.blah; 
+// importing the File class
+import java.io.File;
 
+class Main {
+  public static void main(String[] args) {
 
-public final class Foo {
-  private int MYVARIABLE;
-  public void doBar(int x){
-    this.y = x;  
+    // create a file object for the current location
+    File file = new File("newFile.txt");
+
+    try {
+
+      // trying to create a file based on the object
+      boolean value = file.createNewFile();
+      if (value) {
+        System.out.println("The new file is created.");
+      }
+      else {
+        System.out.println("The file already exists.");
+      }
+    }
+    catch(Exception e) {
+      e.getStackTrace();
+    }
   }
-
 }
