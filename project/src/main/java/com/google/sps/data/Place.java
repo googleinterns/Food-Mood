@@ -20,7 +20,7 @@ package com.google.sps.data;
 import com.google.auto.value.AutoValue;
 
 import static com.google.appengine.repackaged.
-              com.google.common.base.Preconditions.*;
+              com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Represents a place that food can be ordered from in the food-mood
