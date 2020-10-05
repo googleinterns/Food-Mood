@@ -15,27 +15,27 @@
 package com.google.sps.data;
 
 import com.google.maps.model.LatLng;
+import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
 import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
-
-import java.io.IOException;
-
 import com.google.maps.*;
 import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PlacesSearchResult;
-
+import java.util.*;
+import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import java.io.*;
 
 public final class PlacesFetcher {
 
     /**
-     * Temporary fields for initial version. In next versions those fields will be
+     * Temporary fields for M0 version. In next versions those fields will be
      * the fields of a UserPrefrences instance passed to the fetcher by the Servlet.
      */
     private static final LatLng location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
-    private static final String cuisineType = "sushi"; // TODO: change to set of types
-    private static final PriceLevel maxPriceLevel = PriceLevel.VERY_EXPENSIVE; // TODO: map int to PrivceLevel
+    private static final String cuisineType = "sushi"; // TODO (talbarnahor): change to set of types
+    private static final PriceLevel maxPriceLevel = PriceLevel.MODERATE; // TODO: map int from form to PrivceLevel
     private static final boolean openNow = true;
 
     /**
@@ -46,15 +46,15 @@ public final class PlacesFetcher {
     /**
      * The search radius for places
      */
-    private static int SEARCH_RADIUS = 5000; //TODO (M1): check at least 10 results, and if less extend radius 
+    private static final int SEARCH_RADIUS = 5000; // TODO (M1): check at least 10 results, and if less extend radius
 
     /**
      * The entry point for a Google GEO API request
      */
-    private static GeoApiContext context = new GeoApiContext.Builder()
-        .apiKey("AIza...")
+    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
+        .apiKey("AIza...") // TODO : save key in a file where it can be accessed and pushed to github
         .build();
-
+   
     /**
      * Builds a query and requests it from Google Places API.
      * 
@@ -63,21 +63,43 @@ public final class PlacesFetcher {
      * @throws InterruptedException
      * @throws ApiException
      */
-    public static PlacesSearchResult[] fetch() throws IOException, InterruptedException, ApiException {
+    public static List<Place> fetch() throws IOException, InterruptedException, ApiException { // TODO (talbarnahor): add exception handling and testing
         PlacesSearchResponse results = 
-            PlacesApi.textSearchQuery(context, cuisineType, location)
+            PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
                 .radius(SEARCH_RADIUS)
                 .maxPrice(maxPriceLevel)
                 .openNow(openNow)
                 .type(TYPE)
                 .await();
-        context.shutdown();
-        return results.results;
-   }
+        return createPlacesList(results.results);
+    }
 
     /**
-     * A private constructor so instances are disallowed.
-    */
+     * Creates a Place out of each PlacesSearchResult and returns a list of those
+     * Places
+     * 
+     * @param searchResultsArr An array of maximum 20 PlacesSearchResults
+     * @return An immutable list of Places
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ApiException
+     */
+    private static List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
+            throws ApiException, InterruptedException, IOException {
+        List<Place> placesSet = new ArrayList<Place>();
+        for (PlacesSearchResult searchResult: searchResultsArr) {
+            PlaceDetails placeDetails = 
+                PlacesApi.placeDetails(CONTEXT, searchResult.placeId).await();
+                System.out.println(placeDetails.priceLevel.toString());
+            Place place = Place.create(
+                placeDetails.name, placeDetails.website, placeDetails.formattedPhoneNumber,
+                placeDetails.rating, Integer.parseInt(placeDetails.priceLevel.toString()),
+                placeDetails.geometry.location);
+            placesSet.add(place);
+        }
+        return ImmutableList.copyOf(placesSet);
+   }
+
     public PlacesFetcher() { }
 
 }
