@@ -35,8 +35,9 @@
     </dependency>
     <dependency>
       <groupId>com.google.auto.value</groupId>
-      <artifactId>auto-value-annotations</artifactId>
+      <artifactId>auto-value</artifactId>
       <version>1.7.4</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.auto.value</groupId>
