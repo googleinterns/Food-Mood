@@ -18,9 +18,7 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-
-import static com.google.appengine.repackaged.
-              com.google.common.base.Preconditions.checkArgument;
+import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Represents a place that food can be ordered from in the food-mood
@@ -89,15 +87,12 @@ public abstract class Place {
   public static Place create(String name, String websiteUrl, String phone,
       int rating, int priceLevel, Long longitude, Long latitude)
       throws IllegalArgumentException {
-
       checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
           "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
-
       checkArgument(priceLevel >= MIN_PRICE_LEVEL
       && priceLevel <= MAX_PRICE_LEVEL,
       "Price level should be between %s-%s",
       MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
-
       return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel,
           longitude, latitude);
   }

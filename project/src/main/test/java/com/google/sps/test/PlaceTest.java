@@ -45,7 +45,7 @@ public final class PlaceTest {
 
   @Test
   public void create_invalidLowRating_throwsIllegalArgumentException() {
-    final int invalidLowRating = 0;
+    int invalidLowRating = 0;
 
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
         VALID_WEBSITE, VALID_PHONE, invalidLowRating, VALID_PRICE_LEVEL,
@@ -54,7 +54,7 @@ public final class PlaceTest {
 
   @Test
   public void create_invalidHighRating_throwsIllegalArgumentException() {
-    final int invalidHighRating = 10;
+    int invalidHighRating = 10;
 
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
         VALID_WEBSITE, VALID_PHONE, invalidHighRating, VALID_PRICE_LEVEL,
@@ -63,7 +63,7 @@ public final class PlaceTest {
 
   @Test
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
-    final int invalidLowPriceLevel = -1;
+    int invalidLowPriceLevel = -1;
 
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
         VALID_WEBSITE, VALID_PHONE, VALID_RATING, invalidLowPriceLevel,
@@ -72,7 +72,7 @@ public final class PlaceTest {
 
   @Test
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
-    final int invalidHighPriceLevel = 5;
+    int invalidHighPriceLevel = 5;
 
     assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME,
         VALID_WEBSITE, VALID_PHONE, VALID_RATING, invalidHighPriceLevel,
