@@ -17,11 +17,9 @@
  */
 function fetchFromQuery() { 
   
-  //TODO: redirect to results page
-  
+  window.location.href = "/results";
   let placesDiv = document.getElementById("place");
   fetch('/query').then(response => response.json()).then((places) => {
-    let numPlaces = places.length;
     places.forEach((singlePlace) => {
       placesDiv.appendChild(createPlaceElement(singlePlace));
     });
