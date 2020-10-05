@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * The package that currently holds all the test files of the food-mood project.
- * @since 1.0
- * @author karenav
- * @version 1.1
- */
 package com.google.sps.test;
 
 import org.junit.Test;
@@ -39,9 +33,9 @@ public final class PlaceTest {
   /** A valid Place price level. */
   private static final int VALID_PRICE_LEVEL = 3;
   /** A stub Place longitude. */
-  private static final long VALID_LONGITUDE = 35.35;
+  private static final Double VALID_LONGITUDE = 35.35;
   /** A stub Place latitude. */
-  private static final long VALID_LATITUDE = 30.30;
+  private static final Double VALID_LATITUDE = 30.30;
 
   @Test
   public void create_invalidLowRating_throwsIllegalArgumentException() {

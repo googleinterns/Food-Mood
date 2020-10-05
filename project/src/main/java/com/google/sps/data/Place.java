@@ -64,12 +64,12 @@ public abstract class Place {
   /**
    * @return Coordinate of the physical place.
    */
-  public abstract Long longitude();
+  public abstract double longitude();
 
   /**
    * @return Coordinate of the physical place.
   */
-  public abstract Long latitude();
+  public abstract double latitude();
 
   /**
    * Creates a new Place instance.
@@ -84,7 +84,7 @@ public abstract class Place {
    * @throws IllegalArgumentException if an input isn't valid (rating / price level)
    */
   public static Place create(String name, String websiteUrl, String phone,
-      int rating, int priceLevel, Long longitude, Long latitude)
+      int rating, int priceLevel, double longitude, double latitude)
       throws IllegalArgumentException {
       checkArgument(rating >= MIN_RATING && rating <= MAX_RATING, "Rating should be between %s-%s",
           MIN_RATING, MAX_RATING);
