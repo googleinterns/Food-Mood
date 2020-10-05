@@ -17,7 +17,9 @@ package com.google.sps.test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import static org.junit.Assert.assertThrows;
 import com.google.sps.data.Place;
+
 
 @RunWith(JUnit4.class)
 public final class PlaceTest {
@@ -41,7 +43,7 @@ public final class PlaceTest {
   public void create_invalidLowRating_throwsIllegalArgumentException() {
     int invalidLowRating = 0;
 
-    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME, VALID_WEBSITE,
+    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
         VALID_PHONE, invalidLowRating, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE));
   }
 
@@ -49,7 +51,7 @@ public final class PlaceTest {
   public void create_invalidHighRating_throwsIllegalArgumentException() {
     int invalidHighRating = 10;
 
-    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME, VALID_WEBSITE,
+    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
         VALID_PHONE, invalidHighRating, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE));
   }
 
@@ -57,7 +59,7 @@ public final class PlaceTest {
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
     int invalidLowPriceLevel = -1;
 
-    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME, VALID_WEBSITE,
+    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
         VALID_PHONE, VALID_RATING, invalidLowPriceLevel, VALID_LONGITUDE, VALID_LATITUDE));
   }
 
@@ -65,7 +67,7 @@ public final class PlaceTest {
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
     int invalidHighPriceLevel = 5;
 
-    assertThrows(IllegalArgumentException.class, Place.create(VALID_NAME, VALID_WEBSITE,
+    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
         VALID_PHONE, VALID_RATING, invalidHighPriceLevel, VALID_LONGITUDE, VALID_LATITUDE));
   }
 }

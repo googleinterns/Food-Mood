@@ -19,6 +19,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
+import static org.junit.Assert.assertTrue;
+
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 
 @RunWith(JUnit4.class)
@@ -37,7 +39,7 @@ public final class PlacesTest {
   public void randomSort_keepsAllItems() {
     ImmutableList<Place> result = Places.randomSort(ImmutableList.of(VALID_PLACE_1, VALID_PLACE_2));
 
-    assertTrue(result.g(VALID_PLACE_1));
+    assertTrue(result.contains(VALID_PLACE_1));
     assertTrue(result.contains(VALID_PLACE_2));
   }
 }
