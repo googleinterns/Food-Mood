@@ -16,13 +16,17 @@
  * Fetch information from the 'query' servlet.
  */
 function fetchFromQuery() { 
-  
-  window.location.href = "/results";
   let placesDiv = document.getElementById("place");
-  fetch('/query').then(response => response.json()).then((places) => {
-    places.forEach((singlePlace) => {
-      placesDiv.appendChild(createPlaceElement(singlePlace));
-    });
+  // fetch('/query').then(response => response.json()).then((places) => {
+  //   places.forEach((singlePlace) => {
+  //     placesDiv.appendChild(createPlaceElement(singlePlace));
+  //   });
+  // });
+  let places = [{name: "Place1", website: "google.com", phone: "+972520000000"}, 
+                {name: "Place2", website: "google.com", phone: "+972520000000"}, 
+                {name: "Place3", website: "google.com", phone: "+972520000000"}];
+  places.forEach((singlePlace) => {
+    placesDiv.appendChild(createPlaceElement(singlePlace));
   });
 }
 
@@ -30,9 +34,24 @@ function fetchFromQuery() {
  * Creates a record in a table. 
  */
 function createPlaceElement(place) {
-  const placeElement = document.createElement('tr');
+  const placeElement = document.createElement('div');
+  placeElement.class = "place-container";
 
-  //TODO: update the element with all the info
+  let name = document.createElement('li');
+  name.innerText = place.name; 
+  placeElement.appendChild(name);
+  placeElement.appendChild(document.createElement("br"));
+
+  let websiteLink = document.createElement('a');
+  websiteLink.href = place.website;
+  websiteLink.title = place.website;
+  websiteLink.innerHTML = "Restaurant's website";
+  placeElement.appendChild(websiteLink);
+  placeElement.appendChild(document.createElement("br"));
+  
+  let phone = document.createTextNode("Phone number:" + place.phone); 
+  placeElement.appendChild(phone);
+  placeElement.appendChild(document.createElement("br"));
 
   return placeElement;
 }
