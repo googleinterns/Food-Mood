@@ -37,7 +37,7 @@ public final class PlacesTest {
   public void randomSort_keepsAllItems() {
     ImmutableList<Place> result = Places.randomSort(ImmutableList.of(VALID_PLACE_1, VALID_PLACE_2));
 
-    assertTrue(result.contains(VALID_PLACE_1));
+    assertTrue(result.g(VALID_PLACE_1));
     assertTrue(result.contains(VALID_PLACE_2));
   }
 }
