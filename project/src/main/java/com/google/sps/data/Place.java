@@ -81,19 +81,15 @@ public abstract class Place {
    * @param longitude Coordinate of the physical place.
    * @param latitude Coordinate of the physical place.
    * @return the new object instance.
-   * @throws IllegalArgumentException if an input isn't valid
-   *                                  (rating / price level)
+   * @throws IllegalArgumentException if an input isn't valid (rating / price level)
    */
   public static Place create(String name, String websiteUrl, String phone,
       int rating, int priceLevel, Long longitude, Long latitude)
       throws IllegalArgumentException {
-      checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
-          "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
-      checkArgument(priceLevel >= MIN_PRICE_LEVEL
-      && priceLevel <= MAX_PRICE_LEVEL,
-      "Price level should be between %s-%s",
-      MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
-      return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel,
-          longitude, latitude);
+      checkArgument(rating >= MIN_RATING && rating <= MAX_RATING, "Rating should be between %s-%s",
+          MIN_RATING, MAX_RATING);
+      checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
+      "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
+      return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel, longitude, latitude);
   }
 }
