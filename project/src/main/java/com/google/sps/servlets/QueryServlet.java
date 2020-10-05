@@ -21,20 +21,23 @@ import java.util.Set;
 import java.util.List;
 import java.util.Collections;
 import java.util.ArrayList;
+
+import com.google.appengine.repackaged.com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 
 /** A servlet that handles the user query. */
 @WebServlet("/query")
 public final class QueryServlet extends HttpServlet {
 
+
   @Override
   public void doGet(final HttpServletRequest request, 
       final HttpServletResponse response) throws IOException {
-    final int NUM_PLACES_TO_RECOMMEND = 3;
-    final Set<Place> fetchedPlaces = new PlacesFetcher().fetch();
+    final int numPlacesToRecommend = 3;
+    final ImmutableSet<Place> fetchedPlaces = PlacesFetcher.fetch();
     final List<Place> sortedPlaces = new ArrayList<Place>(fetchedPlaces);
     Collections.sort(sortedPlaces, Places.randomComparator);
-    final int numOfPlacesToShow = Math.min(NUM_PLACES_TO_RECOMMEND, 
+    final int numOfPlacesToShow = Math.min(numPlacesToRecommend, 
         sortedPlaces.size());
     response.setContentType("application/json");
     for (int i = 0; i < numOfPlacesToShow; ++i) {
