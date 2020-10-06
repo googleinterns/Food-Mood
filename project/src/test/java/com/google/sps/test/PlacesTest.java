@@ -30,7 +30,7 @@ public final class PlacesTest {
   private static final Place PLACE_1 = Place.create(/*name*/ "name1", /*websiteURL*/
       "website@google.com", /*phone number*/ "+97250-0000-000",  /*rating*/ 4, /*price level*/ 3,
       /*longituta*/ 35.35, /*latitude*/ 30.30);
-  
+
   /** A valid Place object with name "name2". */
   private static final Place PLACE_2 = Place.create(/*name*/ "name2", /*websiteURL*/
       "website@google.com", /*phone number*/ "+97250-0000-000", /*rating*/ 4, /*price level*/ 3,
