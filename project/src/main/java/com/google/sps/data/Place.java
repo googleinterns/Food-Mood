@@ -89,7 +89,7 @@ public abstract class Place {
       checkArgument(rating >= MIN_RATING && rating <= MAX_RATING, "Rating should be between %s-%s",
           MIN_RATING, MAX_RATING);
       checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
-      "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
+          "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
       return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel, longitude, latitude);
   }
 }
