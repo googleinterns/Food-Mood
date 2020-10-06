@@ -62,12 +62,12 @@ public abstract class Place {
   public abstract int priceLevel();
 
   /**
-   * @return Coordinate of the physical place.
+   * @return coordinate of the physical place.
    */
   public abstract double longitude();
 
   /**
-   * @return Coordinate of the physical place.
+   * @return coordinate of the physical place.
   */
   public abstract double latitude();
 

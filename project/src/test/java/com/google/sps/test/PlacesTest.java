@@ -27,20 +27,20 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 public final class PlacesTest {
 
   /** A valid Place object with name "name1". */
-  private static final Place VALID_PLACE_1 = Place.builder().setName("name1")
+  private static final Place PLACE_1 = Place.builder().setName("name1")
       .setWebsiteUrl("website@google.com").setPhone("+97250-0000-000").setRating(4).setPriceLevel(3)
       .setLongitude(35.35).setLatitude(30.30).build();
 
   /** A valid Place object with name "name2". */
-  private static final Place VALID_PLACE_2 = Place.builder().setName("name2")
+  private static final Place PLACE_2 = Place.builder().setName("name2")
       .setWebsiteUrl("website@google.com").setPhone("+97250-0000-000").setRating(4).setPriceLevel(3)
       .setLongitude(35.35).setLatitude(30.30).build();
 
   @Test
   public void randomSort_keepsAllItems() {
-    ImmutableList<Place> result = Places.randomSort(ImmutableList.of(VALID_PLACE_1, VALID_PLACE_2));
+    ImmutableList<Place> result = Places.randomSort(ImmutableList.of(PLACE_1, PLACE_2));
 
-    assertTrue(result.contains(VALID_PLACE_1));
-    assertTrue(result.contains(VALID_PLACE_2));
+    assertTrue(result.contains(PLACE_1));
+    assertTrue(result.contains(PLACE_2));
   }
 }
