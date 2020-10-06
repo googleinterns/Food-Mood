@@ -75,53 +75,60 @@ public abstract class Place {
     return new AutoValue_Place.Builder();
   }
 
+  /**
+   * A builder class for creating Place objects.
+   */
   @AutoValue.Builder
   public abstract static class Builder {
     /**
-     * @param name the name of the place. 
+     * @param name the name of the place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setName(String name);
-    
+  
     /**
-     * @param websiteUrl the url of the place’s website 
+     * @param websiteUrl the url of the place’s website
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setWebsiteUrl(String websiteUrl);
-    
+  
     /**
-     * @param phone a phone number that can be used to contact the place. 
+     * @param phone a phone number that can be used to contact the place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setPhone(String phone);
-    
+  
     /**
-     * @param longitude coordinate of the physical place. 
+     * @param longitude coordinate of the physical place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setLongitude(double longitude);
-    
+  
     /**
-     * @param latitude coordinate of the physical place. 
+     * @param latitude coordinate of the physical place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setLatitude(double latitude);
-    
+  
     /**
-     * @param rating the rating of the place, represented by a number of 1-5. 
+     * @param rating the rating of the place, represented by a number of 1-5
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setRating(double rating);
-    
+  
     /**
-     * @param priceLevel the place’s price level, represented by a number od 0-4. 
+     * @param priceLevel the place’s price level, represented by a number od 0-4.
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setPriceLevel(int priceLevel);
-
     
+    /**
+     * Builds the Place object according to the data that was set so far.
+     * 
+     * @return the object that was built
+     */
     abstract Place autoBuild();
- 
+
     /**
      * Concludes the building of a new Place instance.
      * @return the new instance.
