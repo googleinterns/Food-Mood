@@ -52,7 +52,7 @@ public abstract class Place {
   public abstract String phone();
 
   /**
-   * @return The rating of the place, represented by a number between 1-5.
+   * @return the rating of the place, represented by a number between 1-5.
    */
   public abstract double rating();
 
@@ -77,17 +77,56 @@ public abstract class Place {
 
   @AutoValue.Builder
   public abstract static class Builder {
+    /**
+     * @param name the name of the place. 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setName(String name);
+    
+    /**
+     * @param websiteUrl the url of the place’s website 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setWebsiteUrl(String websiteUrl);
+    
+    /**
+     * @param phone a phone number that can be used to contact the place. 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setPhone(String phone);
+    
+    /**
+     * @param longitude coordinate of the physical place. 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setLongitude(double longitude);
+    
+    /**
+     * @param latitude coordinate of the physical place. 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setLatitude(double latitude);
+    
+    /**
+     * @param rating the rating of the place, represented by a number of 1-5. 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setRating(double rating);
+    
+    /**
+     * @param priceLevel the place’s price level, represented by a number od 0-4. 
+     * @return a Place builder that enables to continue building
+     */
     public abstract Builder setPriceLevel(int priceLevel);
 
     
     abstract Place autoBuild();
-
+ 
+    /**
+     * Concludes the building of a new Place instance.
+     * @return the new instance.
+     * @throws IllegalArgumentException if an input isn't valid (rating / price level)
+     */
     public Place build() throws IllegalArgumentException {
       Place place = autoBuild();
       checkArgument(place.rating() >= MIN_RATING && place.rating() <= MAX_RATING, 
