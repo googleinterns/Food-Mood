@@ -19,7 +19,6 @@ package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
 import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
-import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkState;
 
 /**
  * Represents a place that food can be ordered from in the food-mood
@@ -71,28 +70,6 @@ public abstract class Place {
    * @return Coordinate of the physical place.
   */
   public abstract double latitude();
-
-  // /**
-  //  * Creates a new Place instance.
-  //  * @param name The name of the place.
-  //  * @param websiteUrl The url of the place’s website.
-  //  * @param phone A phone number that can be used to contact the place.
-  //  * @param rating The rating of the place, represented by a number of 1-5.
-  //  * @param priceLevel The place’s price level, represented by a number od 0-4.
-  //  * @param longitude Coordinate of the physical place.
-  //  * @param latitude Coordinate of the physical place.
-  //  * @return the new object instance.
-  //  * @throws IllegalArgumentException if an input isn't valid (rating / price level)
-  //  */
-  // public static Place create(String name, String websiteUrl, String phone,
-  //     double rating, int priceLevel, double longitude, double latitude)
-  //     throws IllegalArgumentException {
-  //     checkArgument(rating >= MIN_RATING && rating <= MAX_RATING, "Rating should be between %s-%s",
-  //         MIN_RATING, MAX_RATING);
-  //     checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
-  //     "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
-  //     return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel, longitude, latitude);
-  // }
 
   public static Builder builder() {
     return new AutoValue_Place.Builder();
