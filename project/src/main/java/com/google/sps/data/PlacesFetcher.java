@@ -16,13 +16,11 @@ package com.google.sps.data;
 
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
-import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
 import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
-import com.google.maps.*;
-import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PlacesSearchResult;
+import com.google.maps.PlacesApi;
 import java.util.*;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import java.io.*;
@@ -38,15 +36,6 @@ public final class PlacesFetcher {
     private static final PriceLevel maxPriceLevel = PriceLevel.MODERATE; // TODO: map int from form to PrivceLevel
     private static final boolean openNow = true;
 
-    /**
-     * The type of places that will be searched
-     */
-    private static final PlaceType TYPE = PlaceType.RESTAURANT;
-
-    /**
-     * The search radius for places
-     */
-    private static final int SEARCH_RADIUS = 5000; // TODO (M1): check at least 10 results, and if less extend radius
 
     /**
      * The entry point for a Google GEO API request
@@ -64,14 +53,9 @@ public final class PlacesFetcher {
      * @throws ApiException
      */
     public static List<Place> fetch() throws IOException, InterruptedException, ApiException { // TODO (talbarnahor): add exception handling and testing
-        PlacesSearchResponse results = 
-            PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
-                .radius(SEARCH_RADIUS)
-                .maxPrice(maxPriceLevel)
-                .openNow(openNow)
-                .type(TYPE)
-                .await();
-        return createPlacesList(results.results);
+        PlacesSearchResult results[] = new PlacesAPIBridge()
+            .getPlacesSearchResponse(CONTEXT, cuisineType, location, maxPriceLevel, openNow);
+        return createPlacesList(results);
     }
 
     /**
@@ -90,7 +74,6 @@ public final class PlacesFetcher {
         for (PlacesSearchResult searchResult: searchResultsArr) {
             PlaceDetails placeDetails = 
                 PlacesApi.placeDetails(CONTEXT, searchResult.placeId).await();
-                System.out.println(placeDetails.priceLevel.toString());
             Place place = Place.create(
                 placeDetails.name, placeDetails.website, placeDetails.formattedPhoneNumber,
                 placeDetails.rating, Integer.parseInt(placeDetails.priceLevel.toString()),
@@ -98,8 +81,8 @@ public final class PlacesFetcher {
             placesSet.add(place);
         }
         return ImmutableList.copyOf(placesSet);
-   }
+    }
 
-    public PlacesFetcher() { }
+    private PlacesFetcher() { }
 
 }
