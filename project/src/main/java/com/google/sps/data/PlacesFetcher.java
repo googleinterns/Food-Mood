@@ -16,8 +16,11 @@ package com.google.sps.data;
 
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
+import com.google.maps.model.PlaceType;
+import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PriceLevel;
 import com.google.maps.GeoApiContext;
+import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
@@ -25,16 +28,22 @@ import java.util.*;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import java.io.*;
 
-public final class PlacesFetcher {
+public class PlacesFetcher {
+
+    private final LatLng location;
+    private final String cuisineType;
+    private final PriceLevel maxPriceLevel;
+    private final boolean openNow;
+
+   /**
+     * The type of places that will be searched
+     */
+    private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
     /**
-     * Temporary fields for M0 version. In next versions those fields will be
-     * the fields of a UserPrefrences instance passed to the fetcher by the Servlet.
+     * The search radius for places
      */
-    private static final LatLng location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
-    private static final String cuisineType = "sushi"; // TODO (talbarnahor): change to set of types
-    private static final PriceLevel maxPriceLevel = PriceLevel.MODERATE; // TODO: map int from form to PrivceLevel
-    private static final boolean openNow = true;
+    private static final int SEARCH_RADIUS = 5000; // TODO (M1): check at least 10 results, and if less extend radius
 
 
     /**
@@ -44,6 +53,18 @@ public final class PlacesFetcher {
         .apiKey("AIza...") // TODO : save key in a file where it can be accessed and pushed to github
         .build();
    
+
+    /**
+     * Fields are temporaraly hard coded for M0 version. In next versions those fields will be
+     * the fields of a UserPrefrences instance passed to the PlacesFetcher constructor by the Servlet.
+     */
+    public PlacesFetcher() {
+        this.location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
+        this.cuisineType = "sushi"; // TODO (talbarnahor): change to set of types
+        this.maxPriceLevel = PriceLevel.MODERATE; // TODO: map int from form to PrivceLevel
+        this.openNow = true;
+    }
+
     /**
      * Builds a query and requests it from Google Places API.
      * 
@@ -52,10 +73,34 @@ public final class PlacesFetcher {
      * @throws InterruptedException
      * @throws ApiException
      */
-    public static List<Place> fetch() throws IOException, InterruptedException, ApiException { // TODO (talbarnahor): add exception handling and testing
-        PlacesSearchResult results[] = new PlacesAPIBridge()
-            .getPlacesSearchResponse(CONTEXT, cuisineType, location, maxPriceLevel, openNow);
+    public List<Place> fetch() throws IOException, InterruptedException, ApiException { // TODO (talbarnahor): add exception handling and testing
+        PlacesSearchResult results[] = getPlacesSearchResults();
+        System.out.println(results.length);
         return createPlacesList(results);
+    }
+
+    /**
+     * Queries Google Places API according to given params. In M1 they will be passed as UserPrefrences fields.
+     * 
+     * @param context The entry point for a Google GEO API request
+     * @param cuisineType
+     * @param location
+     * @param maxPriceLevel
+     * @param openNow
+     * @return A PlacesSearchResponse which contains the search results 
+     * @throws ApiException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public PlacesSearchResult[] getPlacesSearchResults() throws ApiException, InterruptedException, IOException {
+        PlacesSearchResponse results = 
+        PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
+            .radius(SEARCH_RADIUS)
+            .maxPrice(maxPriceLevel)
+            .openNow(openNow)
+            .type(TYPE)
+            .await();
+        return results.results;
     }
 
     /**
@@ -68,12 +113,11 @@ public final class PlacesFetcher {
      * @throws InterruptedException
      * @throws ApiException
      */
-    private static List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
+    private List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
             throws ApiException, InterruptedException, IOException {
         List<Place> placesSet = new ArrayList<Place>();
         for (PlacesSearchResult searchResult: searchResultsArr) {
-            PlaceDetails placeDetails = 
-                PlacesApi.placeDetails(CONTEXT, searchResult.placeId).await();
+            PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
             Place place = Place.create(
                 placeDetails.name, placeDetails.website, placeDetails.formattedPhoneNumber,
                 placeDetails.rating, Integer.parseInt(placeDetails.priceLevel.toString()),
@@ -83,6 +127,16 @@ public final class PlacesFetcher {
         return ImmutableList.copyOf(placesSet);
     }
 
-    private PlacesFetcher() { }
+    public PlaceDetails getPlaceDetails(String placeId) throws ApiException, InterruptedException, IOException {
+        return PlacesApi.placeDetails(CONTEXT, placeId)
+        .fields(
+            PlaceDetailsRequest.FieldMask.NAME,
+            PlaceDetailsRequest.FieldMask.URL,
+            PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+            PlaceDetailsRequest.FieldMask.RATING,
+            PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+            PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
+        .await();
+    }
 
 }
