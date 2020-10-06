@@ -22,16 +22,19 @@ import com.google.sps.data.Places;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 
-/** A servlet that handles the user query. */
+/** 
+ * A servlet that handles the user query. Currently accepts no input, and responds with a list of 
+ * recommended places (in Json format). 
+ */
 @WebServlet("/query")
 public class QueryServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    int numPlacesToRecommend = 3;
+    int maxNumPlacesToRecommend = 3;
     ImmutableList<Place> fetchedPlaces = PlacesFetcher.fetch();
     ImmutableList<Place> sortedPlaces = Places.randomSort(fetchedPlaces);
-    int numPlacesToDisplay = Math.min(numPlacesToRecommend, sortedPlaces.size());
+    int numPlacesToDisplay = Math.min(maxNumPlacesToRecommend, sortedPlaces.size());
     response.setContentType("application/json");
     for (int i = 0; i < numPlacesToDisplay; ++i) {
       response.getWriter().write(new Gson().toJson(sortedPlaces.get(i)));
