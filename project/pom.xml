@@ -45,8 +45,9 @@
     </dependency>
     <dependency>
       <groupId>com.google.auto.value</groupId>
-      <artifactId>auto-value-annotations</artifactId>
+      <artifactId>auto-value</artifactId>
       <version>1.7.4</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.google.auto.value</groupId>
@@ -61,9 +62,9 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
-      <version>3.4.4</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -77,11 +78,15 @@
         <artifactId>appengine-maven-plugin</artifactId>
         <version>2.2.0</version>
         <configuration>
-          <!-- TODO: set project ID. -->
           <deploy.projectId>karenav-step-2020</deploy.projectId>
           <deploy.version>1</deploy.version>
           <port>8181</port>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
       </plugin>
     </plugins>
   </build>
