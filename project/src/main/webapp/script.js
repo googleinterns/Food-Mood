@@ -13,45 +13,42 @@
 // limitations under the License.import java.io.IOException;
 
 /**
- * Fetch information from the 'query' servlet.
+ * Fetch recommended places from the 'query' servlet, and display them to the user.
  */
 function fetchFromQuery() { 
   let placesDiv = document.getElementById("place");
-  // fetch('/query').then(response => response.json()).then((places) => {
-  //   places.forEach((singlePlace) => {
-  //     placesDiv.appendChild(createPlaceElement(singlePlace));
-  //   });
-  // });
-  let places = [{name: "Place1", website: "google.com", phone: "+972520000000"}, 
-                {name: "Place2", website: "google.com", phone: "+972520000000"}, 
-                {name: "Place3", website: "google.com", phone: "+972520000000"}];
-  places.forEach((singlePlace) => {
-    placesDiv.appendChild(createPlaceElement(singlePlace));
+  fetch('/query').then(response => response.json()).then((places) => {
+    places.forEach((singlePlace) => {
+      placesDiv.appendChild(createPlaceElement(singlePlace));
+    });
   });
 }
 
 /** 
- * Creates a record in a table. 
+ * Create a record in a table. 
  */
 function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = "place-container";
-
+ 
+  // Add name
   let name = document.createElement('li');
   name.innerText = place.name; 
   placeElement.appendChild(name);
   placeElement.appendChild(document.createElement("br"));
-
+ 
+  // Add link to website
   let websiteLink = document.createElement('a');
   websiteLink.href = place.website;
   websiteLink.title = place.website;
   websiteLink.innerHTML = "Restaurant's website";
   placeElement.appendChild(websiteLink);
   placeElement.appendChild(document.createElement("br"));
-  
+ 
+  // Add phone number
   let phone = document.createTextNode("Phone number:" + place.phone); 
   placeElement.appendChild(phone);
   placeElement.appendChild(document.createElement("br"));
-
+  
   return placeElement;
 }
