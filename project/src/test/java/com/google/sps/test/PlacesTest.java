@@ -27,13 +27,14 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 public final class PlacesTest {
 
   /** A valid Place object with name "name1". */
-  private static final Place VALID_PLACE_1 = Place.create(/*name*/ "name1", /*websiteURL*/
-      "website@google.com", /*phone number*/ "+97250-0000-000",  /*rating*/ 4, /*price level*/ 3,
-      /*longituta*/ 35.35, /*latitude*/ 30.30);
+  private static final Place VALID_PLACE_1 = Place.builder().setName("name1")
+      .setWebsiteUrl("website@google.com").setPhone("+97250-0000-000").setRating(4).setPriceLevel(3)
+      .setLongitude(35.35).setLatitude(30.30).build();
+
   /** A valid Place object with name "name2". */
-  private static final Place VALID_PLACE_2 = Place.create(/*name*/ "name2", /*websiteURL*/
-      "website@google.com", /*phone number*/ "+97250-0000-000",  /*rating*/ 4, /*price level*/ 3,
-      /*longituta*/ 35.35, /*latitude*/ 30.30);
+  private static final Place VALID_PLACE_2 = Place.builder().setName("name2")
+      .setWebsiteUrl("website@google.com").setPhone("+97250-0000-000").setRating(4).setPriceLevel(3)
+      .setLongitude(35.35).setLatitude(30.30).build();
 
   @Test
   public void randomSort_keepsAllItems() {

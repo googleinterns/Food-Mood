@@ -43,31 +43,43 @@ public final class PlaceTest {
   public void create_invalidLowRating_throwsIllegalArgumentException() {
     int invalidLowRating = 0;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, invalidLowRating, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE));
+    assertThrows(IllegalArgumentException.class, () -> {
+      Place.builder().setName(VALID_NAME).setWebsiteUrl(VALID_WEBSITE).setPhone(VALID_PHONE)
+                     .setRating(invalidLowRating).setPriceLevel(VALID_PRICE_LEVEL)
+                     .setLongitude(VALID_LONGITUDE).setLatitude(VALID_LATITUDE).build();
+    });    
   }
 
   @Test
   public void create_invalidHighRating_throwsIllegalArgumentException() {
     int invalidHighRating = 10;
-
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, invalidHighRating, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE));
+ 
+    assertThrows(IllegalArgumentException.class, () -> {
+      Place.builder().setName(VALID_NAME).setWebsiteUrl(VALID_WEBSITE).setPhone(VALID_PHONE)
+                     .setRating(invalidHighRating).setPriceLevel(VALID_PRICE_LEVEL)
+                     .setLongitude(VALID_LONGITUDE).setLatitude(VALID_LATITUDE).build();
+    });
   }
 
   @Test
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
     int invalidLowPriceLevel = -1;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, VALID_RATING, invalidLowPriceLevel, VALID_LONGITUDE, VALID_LATITUDE));
+    assertThrows(IllegalArgumentException.class, () -> {
+      Place.builder().setName(VALID_NAME).setWebsiteUrl(VALID_WEBSITE).setPhone(VALID_PHONE)
+                     .setRating(VALID_RATING).setPriceLevel(invalidLowPriceLevel)
+                     .setLongitude(VALID_LONGITUDE).setLatitude(VALID_LATITUDE).build();
+    });
   }
 
   @Test
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
     int invalidHighPriceLevel = 5;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, VALID_RATING, invalidHighPriceLevel, VALID_LONGITUDE, VALID_LATITUDE));
+    assertThrows(IllegalArgumentException.class, () -> {
+      Place.builder().setName(VALID_NAME).setWebsiteUrl(VALID_WEBSITE).setPhone(VALID_PHONE)
+                     .setRating(VALID_RATING).setPriceLevel(invalidHighPriceLevel)
+                     .setLongitude(VALID_LONGITUDE).setLatitude(VALID_LATITUDE).build();
+    });
   }
 }

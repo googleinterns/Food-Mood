@@ -77,14 +77,15 @@ public abstract class Place {
 
   @AutoValue.Builder
   public abstract static class Builder {
-    abstract Builder setName(String name);
-    abstract Builder setWebsiteUrl(String websiteUrl);
-    abstract Builder setPhone(String phone);
-    abstract Builder setLongitude(double longitude);
-    abstract Builder setLatitude(double latitude);
-    abstract Builder setRating(double rating);
-    abstract Builder setPriceLevel(int priceLevel);
+    public abstract Builder setName(String name);
+    public abstract Builder setWebsiteUrl(String websiteUrl);
+    public abstract Builder setPhone(String phone);
+    public abstract Builder setLongitude(double longitude);
+    public abstract Builder setLatitude(double latitude);
+    public abstract Builder setRating(double rating);
+    public abstract Builder setPriceLevel(int priceLevel);
 
+    
     abstract Place autoBuild();
 
     public Place build() throws IllegalArgumentException {
