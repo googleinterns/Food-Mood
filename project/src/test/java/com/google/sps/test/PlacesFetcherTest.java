@@ -15,7 +15,6 @@
 package com.google.sps.test;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
-import com.google.maps.errors.ApiException;
 import com.google.maps.model.Geometry;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
@@ -23,10 +22,12 @@ import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.model.PriceLevel;
 import com.google.sps.data.Place;
 import com.google.sps.data.PlacesFetcher;
-import java.io.IOException;
+import com.google.sps.data.errors.FetcherException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -80,17 +81,27 @@ public final class PlacesFetcherTest {
       .setLocation(LOCATION)
       .build();
 
-  /** placeId for a valid PlacesSearchResult used in tests. */
+  /** A valid placeId for a  PlacesSearchResult used in tests. */
   private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
 
-  /** placeId for a valid PlacesSearchResult used in tests. */
+  /** A valid placeId for a valid PlacesSearchResult used in tests. */
   private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
-  /** A valid PlacesSearchResult with placeId "PLACEID_1". */
-  private static final PlacesSearchResult SEARCH_RESULT_1 = createTestPlacesSearchResult(PLACEID_1);
+  /** An invalid placeId for an ivalid PlacesSearchResult used in tests. */
+  private static final String PLACEID_INVALID= "abc";
 
-  /** A valid PlacesSearchResult with placeId "PLACEID_2". */
-  private static final PlacesSearchResult SEARCH_RESULT_2 = createTestPlacesSearchResult(PLACEID_2);
+  /** A PlacesSearchResult with placeId "PLACEID_1" and other fields are null. */
+  private static final PlacesSearchResult SEARCH_RESULT_1 =
+      createTestPlacesSearchResult(PLACEID_1);
+
+  /** A PlacesSearchResult with placeId "PLACEID_2"  and other fields are null. */
+  private static final PlacesSearchResult SEARCH_RESULT_2 =
+      createTestPlacesSearchResult(PLACEID_2);
+
+  /** An invalid PlacesSearchResult with placeId "PLACEID_INVALID". */
+  private static final PlacesSearchResult SEARCH_RESULT_INVALID =
+  createTestPlacesSearchResult(PLACEID_INVALID);
+
 
   /** An array of valid PlacesSearchResults. */
   private static final PlacesSearchResult[] SEARCH_RESULT_ARR = {SEARCH_RESULT_1, SEARCH_RESULT_2};
@@ -165,13 +176,21 @@ public final class PlacesFetcherTest {
   }
 
   @Test
-  public void fetch_validSearchResults_returnsListOfPlaces()
-      throws ApiException, InterruptedException, IOException {
+  public void fetch_validSearchResults_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     doReturn(PLACE_DETAILS_1).when(spiedFetcher).getPlaceDetails(PLACEID_1);
     doReturn(PLACE_DETAILS_2).when(spiedFetcher).getPlaceDetails(PLACEID_2);
     doReturn(SEARCH_RESULT_ARR).when(spiedFetcher).getPlacesSearchResults();
     ImmutableList<Place> expectedOutput = ImmutableList.of(PLACE_1, PLACE_2);
     assertEquals(expectedOutput, spiedFetcher.fetch());
+  }
+
+  @Test
+  public void fetch_PlaceDetailsQueryFails_throwsFetcherException()
+      throws FetcherException {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doReturn(new PlacesSearchResult[] {SEARCH_RESULT_INVALID})
+        .when(spiedFetcher).getPlacesSearchResults();
+    assertThrows(FetcherException.class, () -> spiedFetcher.fetch());
   }
 }

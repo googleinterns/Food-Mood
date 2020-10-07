@@ -73,7 +73,6 @@ public class PlacesFetcher {
         this.openNow = true;
     }
 
-    // TODO (talbarnahor): add exception handling and testing
     /**
      * Builds a query and requests it from Google Places API.
      *
@@ -159,4 +158,3 @@ public class PlacesFetcher {
         }
     }
 }
-
