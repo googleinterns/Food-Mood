@@ -81,27 +81,27 @@ public final class PlacesFetcherTest {
       .build();
 
   /** placeId for a valid PlacesSearchResult used in tests. */
-  private static final String placeId_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+  private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
 
   /** placeId for a valid PlacesSearchResult used in tests. */
-  private static final String placeId_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
+  private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
-  /** A valid PlacesSearchResult with placeId "placeId_1". */
-  private static PlacesSearchResult SEARCH_RESULT_1 = createTestPlacesSearchResult(placeId_1);
+  /** A valid PlacesSearchResult with placeId "PLACEID_1". */
+  private static final PlacesSearchResult SEARCH_RESULT_1 = createTestPlacesSearchResult(PLACEID_1);
 
-  /** A valid PlacesSearchResult with placeId "placeId_2". */
-  private static PlacesSearchResult SEARCH_RESULT_2 = createTestPlacesSearchResult(placeId_2);
+  /** A valid PlacesSearchResult with placeId "PLACEID_2". */
+  private static final PlacesSearchResult SEARCH_RESULT_2 = createTestPlacesSearchResult(PLACEID_2);
 
   /** An array of valid PlacesSearchResults. */
-  private static final PlacesSearchResult[] SEARCH_RESULT_ARR = { SEARCH_RESULT_1, SEARCH_RESULT_2 };
+  private static final PlacesSearchResult[] SEARCH_RESULT_ARR = {SEARCH_RESULT_1, SEARCH_RESULT_2};
 
   /** Valid PlaceDetails for PLACE_1. */
-  private static final PlaceDetails PLACE_DETAILS_1 = createTestPlaceDetails("name1", URL, PHONE, RATING, PRICELEVEL,
-      LOCATION);
+  private static final PlaceDetails PLACE_DETAILS_1 =
+    createTestPlaceDetails("name1", URL, PHONE, RATING, PRICELEVEL, LOCATION);
 
   /** Valid PlaceDetails for PLACE_2. */
-  private static final PlaceDetails PLACE_DETAILS_2 = createTestPlaceDetails("name2", URL, PHONE, RATING, PRICELEVEL,
-      LOCATION);
+  private static final PlaceDetails PLACE_DETAILS_2 =
+    createTestPlaceDetails("name2", URL, PHONE, RATING, PRICELEVEL, LOCATION);
 
   /**
    * creates URL from String for PlaceDetails used in tests.
@@ -109,7 +109,7 @@ public final class PlacesFetcherTest {
    * @param s The string representing the URL
    * @return A URL
    */
-  private static final URL createTestURL(String s) {
+  private static URL createTestURL(String s) {
     try {
       return new URL(s);
     } catch (MalformedURLException e) {
@@ -129,8 +129,8 @@ public final class PlacesFetcherTest {
    * @param location The location of the Place
    * @return The PlacesDetails according to the given params
    */
-  private static final PlaceDetails createTestPlaceDetails(String name, URL url, String phone,
-    float rating, PriceLevel priceLevel, LatLng location) {
+  private static PlaceDetails createTestPlaceDetails(String name, URL url, String phone,
+      float rating, PriceLevel priceLevel, LatLng location) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
     placeDetails.website = url;
@@ -147,7 +147,7 @@ public final class PlacesFetcherTest {
    * @param placeId The place Id of the created PlaceSearchResult
    * @return PlacesSearchResult with placeId as it's Id
    */
-  private static final PlacesSearchResult createTestPlacesSearchResult(String placeId) {
+  private static PlacesSearchResult createTestPlacesSearchResult(String placeId) {
     PlacesSearchResult searchResult = new PlacesSearchResult();
     searchResult.placeId = placeId;
     return searchResult;
@@ -165,10 +165,11 @@ public final class PlacesFetcherTest {
   }
 
   @Test
-  public void fetch_validSearchResults_returnsListOfPlaces() throws ApiException, InterruptedException, IOException {
+  public void fetch_validSearchResults_returnsListOfPlaces()
+      throws ApiException, InterruptedException, IOException {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(PLACE_DETAILS_1).when(spiedFetcher).getPlaceDetails(placeId_1);
-    doReturn(PLACE_DETAILS_2).when(spiedFetcher).getPlaceDetails(placeId_2);
+    doReturn(PLACE_DETAILS_1).when(spiedFetcher).getPlaceDetails(PLACEID_1);
+    doReturn(PLACE_DETAILS_2).when(spiedFetcher).getPlaceDetails(PLACEID_2);
     doReturn(SEARCH_RESULT_ARR).when(spiedFetcher).getPlacesSearchResults();
     ImmutableList<Place> expectedOutput = ImmutableList.of(PLACE_1, PLACE_2);
     assertEquals(expectedOutput, spiedFetcher.fetch());

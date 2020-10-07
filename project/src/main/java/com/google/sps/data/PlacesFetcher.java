@@ -40,7 +40,7 @@ public class PlacesFetcher {
     /** The cuisine types of the places that are fetched. */
     private final String cuisineType;
 
-    /** The maximum price level as identified in Google Places of the places that will be fetched. */
+    /** The maximum price level as identified in Google Places of the fetched places. */
     private final PriceLevel maxPriceLevel;
 
     /** Specifies if the fetched places must be open at the time of fetching. */
@@ -59,8 +59,9 @@ public class PlacesFetcher {
         .build();
 
     /**
-     * Fields are temporaraly hard coded for M0 version. In next versions those same fields will be
-     * the fields of a UserPrefrences instance passed to the PlacesFetcher constructor by the Servlet.
+     * Fields are temporaraly hard coded for M0 version.
+     * In next versions those same fields will be the fields of a UserPrefrences
+     * instance passed to the PlacesFetcher constructor by the Servlet.
      */
     public PlacesFetcher() {
         this.location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
@@ -79,7 +80,7 @@ public class PlacesFetcher {
      * @throws ApiException
      */
     public List<Place> fetch() throws IOException, InterruptedException, ApiException {
-        PlacesSearchResult results[] = getPlacesSearchResults();
+        PlacesSearchResult[] results = getPlacesSearchResults();
         return createPlacesList(results);
     }
 
