@@ -59,10 +59,26 @@ public final class PlacesFetcherTest {
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE;
 
   /** A valid Place object with name "name1". */
-  private static final Place PLACE_1 = Place.create("name1", URL_STRING, PHONE, RATING, PRICELEVEL_INT, LOCATION);
+  private static final Place PLACE_1 =
+    Place.builder()
+      .setName("name1")
+      .setWebsiteUrl(URL_STRING)
+      .setPhone(PHONE)
+      .setRating(RATING)
+      .setPriceLevel(PRICELEVEL_INT)
+      .setLocation(LOCATION)
+      .build();
 
   /** A valid Place object with name "name2". */
-  private static final Place PLACE_2 = Place.create("name2", URL_STRING, PHONE, RATING, PRICELEVEL_INT, LOCATION);
+  private static final Place PLACE_2 =
+    Place.builder()
+      .setName("name2")
+      .setWebsiteUrl(URL_STRING)
+      .setPhone(PHONE)
+      .setRating(RATING)
+      .setPriceLevel(PRICELEVEL_INT)
+      .setLocation(LOCATION)
+      .build();
 
   /** placeId for a valid PlacesSearchResult used in tests. */
   private static final String placeId_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";

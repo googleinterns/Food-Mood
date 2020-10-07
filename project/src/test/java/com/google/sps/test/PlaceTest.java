@@ -26,48 +26,52 @@ import com.google.sps.data.Place;
 @RunWith(JUnit4.class)
 public final class PlaceTest {
 
-  /** A stub Place name. */
-  private static final String VALID_NAME = "name";
-  /** A stub Place website URL. */
-  private static final String VALID_WEBSITE = "website@google.com";
-  /** A stub Place phone number. */
-  private static final String VALID_PHONE = "+97250-0000-000";
-  /** A valid Place rating. */
-  private static final int VALID_RATING = 4;
-  /** A valid Place price level. */
-  private static final int VALID_PRICE_LEVEL = 3;
-  /** A stub Place location. */
-  private static final LatLng VALID_LOCATION = new LatLng(35.35, 30.30);
-
   @Test
   public void create_invalidLowRating_throwsIllegalArgumentException() {
     int invalidLowRating = 0;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, invalidLowRating, VALID_PRICE_LEVEL, VALID_LOCATION));
+    assertThrows(IllegalArgumentException.class, () -> {
+      getValidPlaceBuilder().setRating(invalidLowRating).build();
+    });
   }
 
   @Test
   public void create_invalidHighRating_throwsIllegalArgumentException() {
     int invalidHighRating = 10;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, invalidHighRating, VALID_PRICE_LEVEL, VALID_LOCATION));
+    assertThrows(IllegalArgumentException.class, () -> {
+      getValidPlaceBuilder().setRating(invalidHighRating).build();
+    });
   }
 
   @Test
   public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
     int invalidLowPriceLevel = -1;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, VALID_RATING, invalidLowPriceLevel, VALID_LOCATION));
+    assertThrows(IllegalArgumentException.class, () -> {
+      getValidPlaceBuilder().setPriceLevel(invalidLowPriceLevel).build();
+    });
   }
 
   @Test
   public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
     int invalidHighPriceLevel = 5;
 
-    assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, VALID_RATING, invalidHighPriceLevel, VALID_LOCATION));
+    assertThrows(IllegalArgumentException.class, () -> {
+      getValidPlaceBuilder().setPriceLevel(invalidHighPriceLevel).build();
+    });
+  }
+
+  /**
+   * @return a Place builder that has valid values of all attributes
+   */
+  private Place.Builder getValidPlaceBuilder() {
+    return Place.builder()
+        .setName("name")
+        .setWebsiteUrl("website@google.com")
+        .setPhone("+97250-0000-000")
+        .setRating(4)
+        .setPriceLevel(3)
+        .setLocation(new LatLng(35.35, 30.30));
   }
 }

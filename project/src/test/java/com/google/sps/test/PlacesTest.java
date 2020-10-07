@@ -28,14 +28,26 @@ import com.google.maps.model.LatLng;
 public final class PlacesTest {
 
   /** A valid Place object with name "name1". */
-  private static final Place PLACE_1 = Place.create(/*name*/ "name1", /*websiteURL*/
-      "website@google.com", /*phone number*/ "+97250-0000-000",  /*rating*/ 4, /*price level*/ 3,
-     /*location*/ new LatLng(35.35, 30.30));
+  private static final Place PLACE_1 =
+      Place.builder()
+          .setName("name1")
+          .setWebsiteUrl("website@google.com")
+          .setPhone("+97250-0000-000")
+          .setRating(4)
+          .setPriceLevel(3)
+          .setLocation(new LatLng(35.35, 30.30))
+          .build();
 
   /** A valid Place object with name "name2". */
-  private static final Place PLACE_2 = Place.create(/*name*/ "name2", /*websiteURL*/
-      "website@google.com", /*phone number*/ "+97250-0000-000", /*rating*/ 4, /*price level*/ 3,
-      /*location*/ new LatLng(35.35, 30.30));
+  private static final Place PLACE_2 =
+      Place.builder()
+          .setName("name2")
+          .setWebsiteUrl("website@google.com")
+          .setPhone("+97250-0000-000")
+          .setRating(4)
+          .setPriceLevel(3)
+          .setLocation(new LatLng(35.35, 30.30))
+          .build();
 
   @Test
   public void randomSort_keepsAllItems() {

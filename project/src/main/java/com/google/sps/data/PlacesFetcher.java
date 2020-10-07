@@ -119,14 +119,15 @@ public class PlacesFetcher {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult: searchResultsArr) {
             PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
-            Place place = Place.create(
-                placeDetails.name,
-                placeDetails.website.toString(),
-                placeDetails.formattedPhoneNumber,
-                placeDetails.rating,
-                Integer.parseInt(placeDetails.priceLevel.toString()),
-                placeDetails.geometry.location);
-            places.add(place);
+            places.add(
+                Place.builder()
+                    .setName(placeDetails.name)
+                    .setWebsiteUrl(placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber)
+                    .setRating(placeDetails.rating)
+                    .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
+                    .setLocation(placeDetails.geometry.location)
+                    .build());
         }
         return ImmutableList.copyOf(places);
     }
