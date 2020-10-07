@@ -6,24 +6,25 @@
     <title>food-mood</title>
     <link rel="stylesheet" href="style.css">
   </head>
-  <body onload="">
+  <body class="text-content">
     <h1> FoodMood - your food order helper!</h1>
-    <form action="/results.html">
-      <label for="cuisine" class="text-content">Select cuisines:</label>
-      <select name="cuisine" id="cuisine" multiple size="7">
-        <option value="all">all cuisines</option>
-        <option value="Italian">Italian</option>
-        <option value="Asian">Asian</option>
-        <option value="Sushi">Sushi</option>
-        <option value="Hamburger">Hamburger</option>
-        <option value="Salad">Salad</option>
-        <option value="Homemade">Homemade</option>
-      </select>
-      <br><br>
+    <div id="query-form" class="query-form">
+      <form>
+        <p>Select cuisines:</p>
+        <input type="checkbox" name="all-cuisines" value="all">all cuisines</option>
+        <input type="checkbox" name="cuisine" value="Italian">Italian</option>
+        <input type="checkbox" name="cuisine" value="Asian">Asian</option>
+        <input type="checkbox" name="cuisine" value="Sushi">Sushi</option>
+        <input type="checkbox" name="cuisine" value="Hamburger">Hamburger</option>
+        <input type="checkbox" name="cuisine" value="Salad">Salad</option>
+        <input type="checkbox" name="cuisine" value="Homemade">Homemade</option>
+      </form>
+      <br>
       <label for="rating" class="text-content">Min rating:</label>
       <select class="button" name="rating" id="rating">
+        <option value="0" selected="selected">I don't mind</option>
         <option value="5">5 stars out of 5</option>
-        <option value="4" selected="selected">4 stars out of 5</option>
+        <option value="4">4 stars out of 5</option>
         <option value="3">3 stars out of 5</option>
         <option value="2">2 stars out of 5</option>
         <option value="1">1 stars out of 5</option>
@@ -31,16 +32,33 @@
       <br><br>
       <label for="price" class="text-content">price range:</label>
       <select class="button" name="price" id="price">
-        <option value="low">low budget</option>
-        <option value="normal" selected="selected">normal</option>
-        <option value="high">wiiling to spend a little extra</option>
-        <option value="very high">no budget limit</option>
+        <option value="5" selected="selected">I don't mind</option>
+        <option value="0">low budget</option>
+        <option value="1"">normal</option>
+        <option value="2">wiiling to spend a little extra</option>
+        <option value="3">no budget limit</option>
       </select>
-      <br><br> 
-      <label for="location" class="text-content">Location:</label> 
-      <input class="button" type="text" id="location" name="location"> 
-      <br><br>      
-      <input class="submit" type="submit" value="Decide for me!">
-    </form>
+      <br><br>
+      <label for="location" class="text-content">Location:</label>
+      <input class="button" type="text" id="location" name="location">
+      <br><br>
+      <input class="submit" type="submit" value="Decide for me!" onclick="fetchFromQuery()">
+    </div>
+    <div id="results" style="display: none">
+      <h2>Our recommendation:</h2>
+      <ol id="place"> </ol>
+      <div id ="map-container"> </div>
+      <div id = "feedback-box">
+        <label for="liking-feedback">Like these options?<br> Let us know what you chose: <br></label>
+        <select class="button" name="feedback" id="feedback">
+        <option value="1">First option</option>
+        <option value="2">Second option</option>
+        <option value="3">Third option</option>
+        </select>
+        <br><br>
+        <label for="disliking-feedback">Don't like these options? <br></label>
+        <button onclick="tryAgain()"><b>Try again</b></button>
+      </div>
+    </div>
   </body>
 </html>

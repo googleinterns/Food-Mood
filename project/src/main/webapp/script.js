@@ -13,9 +13,12 @@
 // limitations under the License.import java.io.IOException;
 
 /**
- * Fetch recommended places from the 'query' servlet, and display them to the user.
+ * Fetches recommended places from the 'query' servlet, and switches from the query form to the
+ * results elements in order to display them to the user.
  */
-function fetchFromQuery() { 
+function fetchFromQuery() {
+  document.getElementById("query-form").style.display = "none";
+  document.getElementById("results").style.display = "block";
   let placesDiv = document.getElementById("place");
   fetch('/query').then(response => response.json()).then((places) => {
     places.forEach((singlePlace) => {
@@ -24,19 +27,19 @@ function fetchFromQuery() {
   });
 }
 
-/** 
- * Create a record in a table. 
+/**
+ * Creates a place element.
  */
 function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = "place-container";
- 
+
   // Add name
   let name = document.createElement('li');
-  name.innerText = place.name; 
+  name.innerText = place.name;
   placeElement.appendChild(name);
   placeElement.appendChild(document.createElement("br"));
- 
+
   // Add link to website
   let websiteLink = document.createElement('a');
   websiteLink.href = place.website;
@@ -44,11 +47,21 @@ function createPlaceElement(place) {
   websiteLink.innerHTML = "Restaurant's website";
   placeElement.appendChild(websiteLink);
   placeElement.appendChild(document.createElement("br"));
- 
+
   // Add phone number
-  let phone = document.createTextNode("Phone number:" + place.phone); 
+  let phone = document.createTextNode("Phone number:" + place.phone);
   placeElement.appendChild(phone);
   placeElement.appendChild(document.createElement("br"));
-  
+
   return placeElement;
+}
+
+/**
+ * Displays the query form to the user and hides the results, so that the user can try again with a
+ * different query.
+ */
+function tryAgain() {
+  document.getElementById("query-form").style.display = "block";
+  document.getElementById("results").style.display = "none";
+  document.getElementById("place").innerHTML = "";
 }
