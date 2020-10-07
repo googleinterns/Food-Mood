@@ -28,9 +28,9 @@ import static com.google.appengine.repackaged.com.google.common.base.Preconditio
 public abstract class Place {
 
   /** The maximal valid rating value. */
-  private static final double MAX_RATING = 5.0;
+  private static final float MAX_RATING = 5.0f;
   /** The minimal valid rating value. */
-  private static final double MIN_RATING = 1.0;
+  private static final float MIN_RATING = 1.0f;
   /** The maximal valid price level value. */
   private static final int MAX_PRICE_LEVEL = 4;
   /** The minimal valid price level value. */
@@ -54,7 +54,7 @@ public abstract class Place {
   /**
    * @return the rating of the place, represented by a number between 1-5.
    */
-  public abstract double rating();
+  public abstract float rating();
 
   /**
    * @return the place’s price level, represented by a number between 0-4.
@@ -71,6 +71,9 @@ public abstract class Place {
   */
   public abstract double latitude();
 
+  /**
+   * @return a builder that enables to build a new Place object
+   */
   public static Builder builder() {
     return new AutoValue_Place.Builder();
   }
@@ -85,46 +88,46 @@ public abstract class Place {
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setName(String name);
-  
+
     /**
      * @param websiteUrl the url of the place’s website
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setWebsiteUrl(String websiteUrl);
-  
+
     /**
      * @param phone a phone number that can be used to contact the place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setPhone(String phone);
-  
+
     /**
      * @param longitude coordinate of the physical place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setLongitude(double longitude);
-  
+
     /**
      * @param latitude coordinate of the physical place
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setLatitude(double latitude);
-  
+
     /**
      * @param rating the rating of the place, represented by a number of 1-5
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setRating(double rating);
-  
+    public abstract Builder setRating(float rating);
+
     /**
      * @param priceLevel the place’s price level, represented by a number od 0-4.
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setPriceLevel(int priceLevel);
-    
+  
     /**
      * Builds the Place object according to the data that was set so far.
-     * 
+     *
      * @return the object that was built
      */
     abstract Place autoBuild();
@@ -136,7 +139,7 @@ public abstract class Place {
      */
     public Place build() throws IllegalArgumentException {
       Place place = autoBuild();
-      checkArgument(place.rating() >= MIN_RATING && place.rating() <= MAX_RATING, 
+      checkArgument(place.rating() >= MIN_RATING && place.rating() <= MAX_RATING,
           "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
       checkArgument(place.priceLevel() >= MIN_PRICE_LEVEL && place.priceLevel() <= MAX_PRICE_LEVEL,
           "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
