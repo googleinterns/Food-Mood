@@ -64,13 +64,13 @@ public final class PlaceTest {
    * @return a Place builder that has valid values of all attributes
    */
   private Place.Builder getValidPlaceBuilder() {
-  return Place.builder()
-      .setName("name")
-      .setWebsiteUrl("website@google.com")
-      .setPhone("+97250-0000-000")
-      .setRating(4)
-      .setPriceLevel(3)
-      .setLongitude(35.35)
-      .setLatitude(30.30);
+    return Place.builder()
+        .setName("name")
+        .setWebsiteUrl("website@google.com")
+        .setPhone("+97250-0000-000")
+        .setRating(4)
+        .setPriceLevel(3)
+        .setLongitude(35.35)
+        .setLatitude(30.30);
   }
 }

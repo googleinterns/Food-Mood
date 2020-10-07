@@ -124,7 +124,7 @@ public abstract class Place {
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setPriceLevel(int priceLevel);
-  
+
     /**
      * Builds the Place object according to the data that was set so far.
      *
