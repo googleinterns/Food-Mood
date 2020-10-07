@@ -95,10 +95,10 @@ public class PlacesFetcher {
     public PlacesSearchResult[] getPlacesSearchResults()
             throws ApiException, InterruptedException, IOException {
         TextSearchRequest query =
-        PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
-            .radius(SEARCH_RADIUS)
-            .maxPrice(maxPriceLevel)
-            .type(TYPE);
+            PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
+                .radius(SEARCH_RADIUS)
+                .maxPrice(maxPriceLevel)
+                .type(TYPE);
         if (openNow) {
             query.openNow(openNow);
         }
