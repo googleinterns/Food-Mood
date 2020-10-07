@@ -27,7 +27,7 @@ import com.google.gson.Gson;
  * recommended places (in Json format).
  */
 @WebServlet("/query")
-public class QueryServlet extends HttpServlet {
+public final class QueryServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
