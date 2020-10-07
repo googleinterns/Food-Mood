@@ -19,7 +19,7 @@
 function fetchFromQuery() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
-  let placesDiv = document.getElementById('place');
+  const placesDiv = document.getElementById('place');
   fetch('/query').then(response => response.json()).then((places) => {
     places.forEach((singlePlace) => {
       placesDiv.appendChild(createPlaceElement(singlePlace));
