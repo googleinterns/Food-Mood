@@ -72,7 +72,7 @@ public abstract class Place {
   /**
    * Creates a new Place instance.
    * @param name The name of the place.
-   * @param website The url of the place’s website.
+   * @param websiteUrl The url of the place’s website.
    * @param phone A phone number that can be used to contact the place.
    * @param rating The rating of the place, represented by a number of 1-5.
    * @param priceLevel The place’s price level, represented by a number of 0-4.
