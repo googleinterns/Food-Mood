@@ -19,6 +19,7 @@ import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PriceLevel;
+import com.google.sps.data.errors.FetcherException;
 import com.google.maps.GeoApiContext;
 import com.google.maps.TextSearchRequest;
 import com.google.maps.PlaceDetailsRequest;
@@ -40,7 +41,9 @@ public class PlacesFetcher {
     /** The cuisine types of the places that are fetched. */
     private final String cuisineType;
 
-    /** The maximum price level as identified in Google Places of the fetched places. */
+    /**
+     * The maximum price level as identified in Google Places of the fetched places.
+     */
     private final PriceLevel maxPriceLevel;
 
     /** Specifies if the fetched places must be open at the time of fetching. */
@@ -55,13 +58,13 @@ public class PlacesFetcher {
 
     /** The entry point for a Google GEO API request. */
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
-        .apiKey("AIza...") // TODO : save key in a file that can be accessed and pushed to github
+        .apiKey("AIza..") // TODO : save key in a file that can be accessed and pushed to github
         .build();
 
     /**
-     * Fields are temporaraly hard coded for M0 version.
-     * In next versions those same fields will be the fields of a UserPrefrences
-     * instance passed to the PlacesFetcher constructor by the Servlet.
+     * Fields are temporaraly hard coded for M0 version. In next versions those same
+     * fields will be the fields of a UserPrefrences instance passed to the
+     * PlacesFetcher constructor by the Servlet.
      */
     public PlacesFetcher() {
         this.location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
@@ -75,11 +78,9 @@ public class PlacesFetcher {
      * Builds a query and requests it from Google Places API.
      *
      * @return list of places that supply the query.
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ApiException
+     * @throws FetcherException
      */
-    public List<Place> fetch() throws IOException, InterruptedException, ApiException {
+    public List<Place> fetch() throws FetcherException {
         PlacesSearchResult[] results = getPlacesSearchResults();
         return createPlacesList(results);
     }
@@ -88,12 +89,9 @@ public class PlacesFetcher {
      * Queries Google Places API according to given params.
      *
      * @return A PlacesSearchResponse which contains the search results
-     * @throws ApiException
-     * @throws InterruptedException
-     * @throws IOException
+     * @throws FetcherException
      */
-    public PlacesSearchResult[] getPlacesSearchResults()
-            throws ApiException, InterruptedException, IOException {
+    public PlacesSearchResult[] getPlacesSearchResults() throws FetcherException {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
                 .radius(SEARCH_RADIUS)
@@ -102,21 +100,25 @@ public class PlacesFetcher {
         if (openNow) {
             query.openNow(openNow);
         }
-        PlacesSearchResponse results = query.await();
+        PlacesSearchResponse results;
+        try {
+            results = query.await();
+        } catch (ApiException | InterruptedException | IOException e) {
+            throw new FetcherException(e.getMessage());
+        }
         return results.results;
     }
 
     /**
-     * Creates a Place out of each PlacesSearchResult and returns a list of those Places.
+     * Creates a Place out of each PlacesSearchResult and returns a list of those
+     * Places.
      *
      * @param searchResultsArr An array of maximum 20 PlacesSearchResults
      * @return An immutable list of Places
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ApiException
+     * @throws FetcherException
      */
     private List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
-            throws ApiException, InterruptedException, IOException {
+            throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult: searchResultsArr) {
             PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
@@ -136,22 +138,25 @@ public class PlacesFetcher {
     /**
      * Queries Google Places API to recieve details about a certain place.
      *
-     * @param placeId The Google Places placeId of the place that his details will be queried
+     * @param placeId The Google Places placeId of the place that his details will
+     *                be queried
      * @return PlacesDetails containig certain details about the place
-     * @throws ApiException
-     * @throws InterruptedException
-     * @throws IOException
+     * @throws FetcherException
      */
-    public PlaceDetails getPlaceDetails(String placeId)
-            throws ApiException, InterruptedException, IOException {
-        return PlacesApi.placeDetails(CONTEXT, placeId)
-            .fields(
-                PlaceDetailsRequest.FieldMask.NAME,
-                PlaceDetailsRequest.FieldMask.WEBSITE,
-                PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
-                PlaceDetailsRequest.FieldMask.RATING,
-                PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
-            .await();
+    public PlaceDetails getPlaceDetails(String placeId) throws FetcherException {
+        try {
+            return PlacesApi.placeDetails(CONTEXT, placeId)
+                    .fields(
+                        PlaceDetailsRequest.FieldMask.NAME,
+                        PlaceDetailsRequest.FieldMask.WEBSITE,
+                        PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+                        PlaceDetailsRequest.FieldMask.RATING,
+                        PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+                        PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
+                    .await();
+        } catch (ApiException | InterruptedException | IOException e) {
+            throw new FetcherException(e.getMessage());
+        }
     }
 }
+
