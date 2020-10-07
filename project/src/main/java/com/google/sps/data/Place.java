@@ -22,7 +22,6 @@ import com.google.maps.model.LatLng;
 
 import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
 
-import java.net.URL;
 
 /**
  * Represents a place that food can be ordered from in the food-mood
@@ -48,7 +47,7 @@ public abstract class Place {
   /**
    * @return the url of the place’s website.
    */
-  public abstract URL websiteUrl();
+  public abstract String websiteUrl();
 
   /**
    * @return a phone number that can be used to contact the place.
@@ -81,13 +80,13 @@ public abstract class Place {
    * @return the new object instance.
    * @throws IllegalArgumentException if an input isn't valid (rating / price level)
    */
-  public static Place create(String name, URL website, String phone,
+  public static Place create(String name, String websiteUrl, String phone,
       float rating, int priceLevel, LatLng location)
       throws IllegalArgumentException {
       checkArgument(rating >= MIN_RATING && rating <= MAX_RATING, "Rating should be between %s-%s",
           MIN_RATING, MAX_RATING);
       checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
       "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
-      return new AutoValue_Place(name, website, phone, rating, priceLevel, location);
+      return new AutoValue_Place(name, websiteUrl, phone, rating, priceLevel, location);
   }
 }

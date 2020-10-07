@@ -22,6 +22,7 @@ import com.google.sps.data.Places;
 import static org.junit.Assert.assertTrue;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
 public final class PlacesTest {
@@ -29,12 +30,12 @@ public final class PlacesTest {
   /** A valid Place object with name "name1". */
   private static final Place PLACE_1 = Place.create(/*name*/ "name1", /*websiteURL*/
       "website@google.com", /*phone number*/ "+97250-0000-000",  /*rating*/ 4, /*price level*/ 3,
-      /*longituta*/ 35.35, /*latitude*/ 30.30);
+     /*location*/ new LatLng(35.35, 30.30));
 
   /** A valid Place object with name "name2". */
   private static final Place PLACE_2 = Place.create(/*name*/ "name2", /*websiteURL*/
       "website@google.com", /*phone number*/ "+97250-0000-000", /*rating*/ 4, /*price level*/ 3,
-      /*longituta*/ 35.35, /*latitude*/ 30.30);
+      /*location*/ new LatLng(35.35, 30.30));
 
   @Test
   public void randomSort_keepsAllItems() {

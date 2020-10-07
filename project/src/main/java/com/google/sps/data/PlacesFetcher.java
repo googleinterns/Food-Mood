@@ -20,6 +20,7 @@ import com.google.maps.model.PlaceType;
 import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PriceLevel;
 import com.google.maps.GeoApiContext;
+import com.google.maps.TextSearchRequest;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
@@ -30,38 +31,37 @@ import java.io.*;
 
 public class PlacesFetcher {
 
+    /** Places will be fetched within a ceratain radius from this location */
     private final LatLng location;
+
+    /** The cuisine types of the places that are fetched */
     private final String cuisineType;
+
+    /** The maximum price level as identified in Google Places of the places that will be fetched */
     private final PriceLevel maxPriceLevel;
+
+    /** Specifies if the fetched places must be open at the time of fetching */  
     private final boolean openNow;
 
-   /**
-     * The type of places that will be searched
-     */
+    /** The type of places that will be searched */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /**
-     * The search radius for places
-     */
+    /** The search radius for place */
     private static final int SEARCH_RADIUS = 5000; // TODO (M1): check at least 10 results, and if less extend radius
 
-
-    /**
-     * The entry point for a Google GEO API request
-     */
+    /** The entry point for a Google GEO API request */
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
         .apiKey("AIza...") // TODO : save key in a file where it can be accessed and pushed to github
         .build();
-   
-
+    
     /**
-     * Fields are temporaraly hard coded for M0 version. In next versions those fields will be
+     * Fields are temporaraly hard coded for M0 version. In next versions those same fields will be
      * the fields of a UserPrefrences instance passed to the PlacesFetcher constructor by the Servlet.
      */
     public PlacesFetcher() {
         this.location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
         this.cuisineType = "sushi"; // TODO (talbarnahor): change to set of types
-        this.maxPriceLevel = PriceLevel.MODERATE; // TODO: map int from form to PrivceLevel
+        this.maxPriceLevel = PriceLevel.values()[2];
         this.openNow = true;
     }
 
@@ -80,32 +80,29 @@ public class PlacesFetcher {
     }
 
     /**
-     * Queries Google Places API according to given params. In M1 they will be passed as UserPrefrences fields.
+     * Queries Google Places API according to given params.
      * 
-     * @param context The entry point for a Google GEO API request
-     * @param cuisineType
-     * @param location
-     * @param maxPriceLevel
-     * @param openNow
      * @return A PlacesSearchResponse which contains the search results 
      * @throws ApiException
      * @throws InterruptedException
      * @throws IOException
      */
-    public PlacesSearchResult[] getPlacesSearchResults() throws ApiException, InterruptedException, IOException {
-        PlacesSearchResponse results = 
+    public PlacesSearchResult[] getPlacesSearchResults()
+            throws ApiException, InterruptedException, IOException {
+        TextSearchRequest query = 
         PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
             .radius(SEARCH_RADIUS)
             .maxPrice(maxPriceLevel)
-            .openNow(openNow)
-            .type(TYPE)
-            .await();
+            .type(TYPE);
+        if (openNow) {
+            query.openNow(openNow);
+        }
+        PlacesSearchResponse results = query.await();
         return results.results;
     }
 
     /**
-     * Creates a Place out of each PlacesSearchResult and returns a list of those
-     * Places
+     * Creates a Place out of each PlacesSearchResult and returns a list of those Places.
      * 
      * @param searchResultsArr An array of maximum 20 PlacesSearchResults
      * @return An immutable list of Places
@@ -115,28 +112,38 @@ public class PlacesFetcher {
      */
     private List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
             throws ApiException, InterruptedException, IOException {
-        List<Place> placesSet = new ArrayList<Place>();
+        List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult: searchResultsArr) {
             PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
             Place place = Place.create(
-                placeDetails.name, placeDetails.website, placeDetails.formattedPhoneNumber,
+                placeDetails.name, placeDetails.website.toString(), placeDetails.formattedPhoneNumber,
                 placeDetails.rating, Integer.parseInt(placeDetails.priceLevel.toString()),
                 placeDetails.geometry.location);
-            placesSet.add(place);
+            places.add(place);
         }
-        return ImmutableList.copyOf(placesSet);
+        return ImmutableList.copyOf(places);
     }
 
-    public PlaceDetails getPlaceDetails(String placeId) throws ApiException, InterruptedException, IOException {
+    /**
+     * Queries Google Places API to recieve details about a certain place.
+     * 
+     * @param placeId The Google Places placeId of the place that his details will be queried
+     * @return PlacesDetails containig certain details about the place
+     * @throws ApiException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public PlaceDetails getPlaceDetails(String placeId)
+            throws ApiException, InterruptedException, IOException {
         return PlacesApi.placeDetails(CONTEXT, placeId)
-        .fields(
-            PlaceDetailsRequest.FieldMask.NAME,
-            PlaceDetailsRequest.FieldMask.URL,
-            PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
-            PlaceDetailsRequest.FieldMask.RATING,
-            PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-            PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
-        .await();
+            .fields(
+                PlaceDetailsRequest.FieldMask.NAME,
+                PlaceDetailsRequest.FieldMask.WEBSITE,
+                PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+                PlaceDetailsRequest.FieldMask.RATING,
+                PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
+            .await();
     }
 
 }

@@ -18,6 +18,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import static org.junit.Assert.assertThrows;
+
+import com.google.maps.model.LatLng;
 import com.google.sps.data.Place;
 
 
@@ -34,17 +36,15 @@ public final class PlaceTest {
   private static final int VALID_RATING = 4;
   /** A valid Place price level. */
   private static final int VALID_PRICE_LEVEL = 3;
-  /** A stub Place longitude. */
-  private static final Double VALID_LONGITUDE = 35.35;
-  /** A stub Place latitude. */
-  private static final Double VALID_LATITUDE = 30.30;
+  /** A stub Place location. */
+  private static final LatLng VALID_LOCATION = new LatLng(35.35, 30.30);
 
   @Test
   public void create_invalidLowRating_throwsIllegalArgumentException() {
     int invalidLowRating = 0;
 
     assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, invalidLowRating, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE));
+        VALID_PHONE, invalidLowRating, VALID_PRICE_LEVEL, VALID_LOCATION));
   }
 
   @Test
@@ -52,7 +52,7 @@ public final class PlaceTest {
     int invalidHighRating = 10;
 
     assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, invalidHighRating, VALID_PRICE_LEVEL, VALID_LONGITUDE, VALID_LATITUDE));
+        VALID_PHONE, invalidHighRating, VALID_PRICE_LEVEL, VALID_LOCATION));
   }
 
   @Test
@@ -60,7 +60,7 @@ public final class PlaceTest {
     int invalidLowPriceLevel = -1;
 
     assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, VALID_RATING, invalidLowPriceLevel, VALID_LONGITUDE, VALID_LATITUDE));
+        VALID_PHONE, VALID_RATING, invalidLowPriceLevel, VALID_LOCATION));
   }
 
   @Test
@@ -68,6 +68,6 @@ public final class PlaceTest {
     int invalidHighPriceLevel = 5;
 
     assertThrows(IllegalArgumentException.class, () -> Place.create(VALID_NAME, VALID_WEBSITE,
-        VALID_PHONE, VALID_RATING, invalidHighPriceLevel, VALID_LONGITUDE, VALID_LATITUDE));
+        VALID_PHONE, VALID_RATING, invalidHighPriceLevel, VALID_LOCATION));
   }
 }
