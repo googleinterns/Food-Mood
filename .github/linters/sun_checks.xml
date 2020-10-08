@@ -90,9 +90,12 @@
     </module>
     <module name="JavadocType"/>
     <module name="JavadocVariable"/>
+      <property name="excludeScope" value="private"/>
+    </module>
     <module name="JavadocStyle"/>
     <module name="MissingJavadocMethod">
       <property name="allowedAnnotations" value="Override, Test"/>
+      <property name="excludeScope" value="private"/>
     </module>
 
 
@@ -106,7 +109,7 @@
     <module name="MemberName"/>
     <module name="MethodName">
        <property name="format" value="^[a-z](_?[a-zA-Z0-9]+)*$"/>
-    </module>             
+    </module>
     <module name="PackageName"/>
     <module name="ParameterName"/>
     <module name="StaticVariableName"/>
