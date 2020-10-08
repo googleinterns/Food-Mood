@@ -33,12 +33,11 @@ import java.util.List;
 public class PlacesFetcher {
 
     /**
-     * Those constants are temporaraly hardcoded for M0 version.
-     * In next versions those same constants will be the fields of a UserPrefrences
-     * instance passed to the PlacesFetcher constructor by the Servlet.
+     * Those constants are temporaraly hardcoded for M0. In next versions those same constants
+     * will be fields of a UserPrefrences instance passed to fetch() by the Servlet.
      */
     private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final String CUISINES ="sushi"; // TODO(M0): change to set of types;
+    private static final String CUISINES = "sushi"; // TODO(M0): change to set of types;
     private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
     private static final boolean OPEN_NOW = true;
 
@@ -69,9 +68,7 @@ public class PlacesFetcher {
      * @throws ApiException
      */
     public List<Place> fetch() throws IOException, InterruptedException, ApiException {
-        PlacesSearchResult[] results = getPlacesSearchResults();
-        createPlacesList(results);
-        return createPlacesList(results);
+        return createPlacesList(getPlacesSearchResults());
     }
 
     /**
@@ -96,25 +93,16 @@ public class PlacesFetcher {
         return results.results;
     }
 
-    /**
-     * Creates a Place out of each PlacesSearchResult and returns a list of those Places.
-     *
-     * @param searchResultsArr An array of maximum 20 PlacesSearchResults
-     * @return An immutable list of Places
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ApiException
-     */
     private List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
             throws ApiException, InterruptedException, IOException {
         List<Place> places = new ArrayList<Place>();
-        for (PlacesSearchResult searchResult: searchResultsArr) {
+        for (PlacesSearchResult searchResult : searchResultsArr) {
           PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl((placeDetails.website == null) ?
-                            "" :placeDetails.website.toString())
+                    .setWebsiteUrl((placeDetails.website == null)
+                            ? "" : placeDetails.website.toString())
                     .setPhone(placeDetails.formattedPhoneNumber)
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
