@@ -93,7 +93,7 @@ public class PlacesFetcher {
         return results.results;
     }
 
-    private List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
+    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
             throws ApiException, InterruptedException, IOException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {

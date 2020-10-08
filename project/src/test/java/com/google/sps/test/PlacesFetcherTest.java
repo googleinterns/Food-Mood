@@ -26,13 +26,13 @@ import com.google.sps.data.PlacesFetcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 @RunWith(JUnit4.class)
 public final class PlacesFetcherTest {
@@ -120,8 +120,7 @@ public final class PlacesFetcherTest {
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     doReturn(new PlacesSearchResult[0]).when(spiedFetcher).getPlacesSearchResults();
-    ImmutableList<Place> expectedOutput = ImmutableList.of();
-    assertEquals(expectedOutput, spiedFetcher.fetch());
+    assertEquals(ImmutableList.of(), spiedFetcher.fetch());
   }
 
   @Test
@@ -131,7 +130,6 @@ public final class PlacesFetcherTest {
     doReturn(PLACE_DETAILS_1).when(spiedFetcher).getPlaceDetails(PLACEID_1);
     doReturn(PLACE_DETAILS_2).when(spiedFetcher).getPlaceDetails(PLACEID_2);
     doReturn(SEARCH_RESULT_ARR).when(spiedFetcher).getPlacesSearchResults();
-    ImmutableList<Place> expectedOutput = ImmutableList.of(PLACE_1, PLACE_2);
-    assertEquals(expectedOutput, spiedFetcher.fetch());
+    assertEquals(ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch());
   }
 }
