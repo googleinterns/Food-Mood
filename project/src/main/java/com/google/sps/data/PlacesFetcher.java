@@ -44,7 +44,9 @@ public class PlacesFetcher {
     /** Specifies if the fetched places must be open at the time of fetching. */
     private final boolean openNow;
 
-    /** The type of places that will be searched. */
+    /** The type of places that will be searched is RESTAURANT. Since most places
+     * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
+     * rather as "RESTAURANT" this is the most suitable type to search for. */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
     /** The search radius for place. */
