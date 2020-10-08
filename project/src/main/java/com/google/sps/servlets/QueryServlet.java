@@ -32,7 +32,7 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     int maxNumPlacesToRecommend = 3;
-    ImmutableList<Place> fetchedPlaces = PlacesFetcher.fetch();
+    ImmutableList<Place> fetchedPlaces = new PlacesFetcher.fetch();
     ImmutableList<Place> sortedPlaces = Places.randomSort(fetchedPlaces);
     int numPlacesToDisplay = Math.min(maxNumPlacesToRecommend, sortedPlaces.size());
     response.setContentType("application/json");

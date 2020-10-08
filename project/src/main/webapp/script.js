@@ -41,11 +41,16 @@ function createPlaceElement(place) {
   placeElement.appendChild(document.createElement('br'));
 
   // Add link to website
-  const websiteLink = document.createElement('a');
-  websiteLink.href = place.website;
-  websiteLink.title = place.website;
-  websiteLink.innerHTML = 'Restaurant\'s website';
-  placeElement.appendChild(websiteLink);
+  if (place.website) {
+    const websiteLink = document.createElement('a');
+    websiteLink.href = place.website;
+    websiteLink.title = place.website;
+    websiteLink.innerHTML = 'Restaurant\'s website';
+    placeElement.appendChild(websiteLink);
+  } else {
+    const noSite = document.createTextNode('We don\'t have a link to the restaurant\'s website.');
+    placeElement.appendChild(noSite);
+  }
   placeElement.appendChild(document.createElement('br'));
 
   // Add phone number
