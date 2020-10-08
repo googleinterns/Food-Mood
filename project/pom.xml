@@ -38,6 +38,8 @@
         <artifactId>google-maps-services</artifactId>
         <version>0.15.0</version>
     </dependency>
+    <!-- A dependency on the Simple Logging Facade for Java (SLF4J)
+        for the use of google-maps-services -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
