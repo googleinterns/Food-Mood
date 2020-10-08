@@ -13,6 +13,8 @@
 // limitations under the License.import java.io.IOException;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,11 +35,13 @@ public final class QueryServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     int maxNumPlacesToRecommend = 3;
     ImmutableList<Place> fetchedPlaces = new PlacesFetcher.fetch();
+    //TODO(M1): add call to filterer
     ImmutableList<Place> sortedPlaces = Places.randomSort(fetchedPlaces);
     int numPlacesToDisplay = Math.min(maxNumPlacesToRecommend, sortedPlaces.size());
+    List<Place> placesToDisplay = sortedPlaces.stream()
+        .limit(numPlacesToDisplay)
+        .collect(Collectors.toList());
     response.setContentType("application/json");
-    for (int i = 0; i < numPlacesToDisplay; ++i) {
-      response.getWriter().write(new Gson().toJson(sortedPlaces.get(i)));
-    }
+    response.getWriter().write(new Gson().toJson(placesToDisplay));
   }
 }
