@@ -32,24 +32,22 @@ import java.util.List;
 
 public class PlacesFetcher {
 
-    /** Places will be fetched within a ceratain radius from this location. */
-    private final LatLng location;
-
-    /** The cuisine types of the places that are fetched. */
-    private final String cuisineType;
-
-    /** The maximum price level as identified in Google Places of the fetched places. */
-    private final PriceLevel maxPriceLevel;
-
-    /** Specifies if the fetched places must be open at the time of fetching. */
-    private final boolean openNow;
+    /**
+     * Those constants are temporaraly hardcoded for M0 version.
+     * In next versions those same constants will be the fields of a UserPrefrences
+     * instance passed to the PlacesFetcher constructor by the Servlet.
+     */
+    private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
+    private static final String CUISINES ="sushi"; // TODO(M0): change to set of types;
+    private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
+    private static final boolean OPEN_NOW = true;
 
     /** The type of places that will be searched is RESTAURANT. Since most places
      * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
      * rather as "RESTAURANT" this is the most suitable type to search for. */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** The search radius for place. */
+    /** In this radius around "LOCATION" places will be searched. */
     private static final int SEARCH_RADIUS = 5000;
     // TODO(M1): check at least 10 results, and if less extend radius
 
@@ -58,16 +56,7 @@ public class PlacesFetcher {
         .apiKey(System.getenv("API_KEY"))
         .build();
 
-    /**
-     * Fields are temporaraly hard coded for M0 version.
-     * In next versions those same fields will be the fields of a UserPrefrences
-     * instance passed to the PlacesFetcher constructor by the Servlet.
-     */
     public PlacesFetcher() {
-        this.location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
-        this.cuisineType = "sushi"; // TODO(M0): change to set of types
-        this.maxPriceLevel = PriceLevel.MODERATE;
-        this.openNow = true;
     }
 
     // TODO(M0): add exception handling and testing
@@ -96,12 +85,12 @@ public class PlacesFetcher {
     public PlacesSearchResult[] getPlacesSearchResults()
             throws ApiException, InterruptedException, IOException {
         TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
+            PlacesApi.textSearchQuery(CONTEXT, CUISINES, LOCATION)
                 .radius(SEARCH_RADIUS)
-                .maxPrice(maxPriceLevel)
+                .maxPrice(MAX_PRICE_LEVEL)
                 .type(TYPE);
-        if (openNow) {
-            query.openNow(openNow);
+        if (OPEN_NOW) {
+            query.openNow(OPEN_NOW);
         }
         PlacesSearchResponse results = query.await();
         return results.results;
