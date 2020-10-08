@@ -31,7 +31,7 @@ function fetchFromQuery() {
  * Creates a place element.
  */
 function createPlaceElement(place) {
-  const placeElement = document.createElement('div');
+  const placeElement = (document.createElement('div'));;
   placeElement.class = 'place-container';
 
   // Add name
