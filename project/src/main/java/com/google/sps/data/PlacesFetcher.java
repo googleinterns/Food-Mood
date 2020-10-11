@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
@@ -54,19 +55,16 @@ public class PlacesFetcher {
         .apiKey(System.getenv("API_KEY"))
         .build();
 
-    public PlacesFetcher() {
-    }
-
     // TODO(M0): add exception handling and testing
     /**
      * Builds a query and requests it from Google Places API.
      *
-     * @return list of places that supply the query.
+     * @return an immutable list of places that supply the query.
      * @throws IOException
      * @throws InterruptedException
      * @throws ApiException
      */
-    public List<Place> fetch() throws IOException, InterruptedException, ApiException {
+    public ImmutableList<Place> fetch() throws IOException, InterruptedException, ApiException {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(CONTEXT, CUISINES, LOCATION)
                 .radius(SEARCH_RADIUS)
@@ -87,7 +85,8 @@ public class PlacesFetcher {
      * @throws InterruptedException
      * @throws IOException
      */
-    public PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
+    @VisibleForTesting
+	public PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
             throws ApiException, InterruptedException, IOException {
         return query.await().results;
     }
@@ -101,10 +100,10 @@ public class PlacesFetcher {
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl((placeDetails.website == null)
-                            ? "" : placeDetails.website.toString())
-                    .setPhone((placeDetails.formattedPhoneNumber == null)
-                            ? "" : placeDetails.formattedPhoneNumber.toString())
+                    .setWebsiteUrl(placeDetails.website == null ?
+                            "" : placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber == null ?
+                            "" : placeDetails.formattedPhoneNumber.toString())
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
@@ -133,7 +132,8 @@ public class PlacesFetcher {
      * @throws InterruptedException
      * @throws IOException
      */
-    public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+    @VisibleForTesting
+	public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
             throws ApiException, InterruptedException, IOException {
         return request.await();
     }
