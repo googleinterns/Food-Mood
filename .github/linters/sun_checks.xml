@@ -90,12 +90,11 @@
     </module>
     <module name="JavadocType"/>
     <module name="JavadocVariable">
-      <property name="excludeScope" value="private"/>
+      <property name="scope" value="public"/>
     </module>
     <module name="JavadocStyle"/>
     <module name="MissingJavadocMethod">
       <property name="allowedAnnotations" value="Override, Test"/>
-      <property name="excludeScope" value="private"/>
     </module>
 
 
