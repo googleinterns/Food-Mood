@@ -37,7 +37,7 @@ public class PlacesFetcher {
      * will be fields of a UserPrefrences instance passed to fetch() by the Servlet.
      */
     private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final String CUISINES = "sushi"; // TODO(M0): change to set of types;
+    private static final List<String> CUISINES_LIST = new ArrayList<>(List.of("sushi", "burger"));
     private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
     private static final boolean OPEN_NOW = true;
 
@@ -66,7 +66,7 @@ public class PlacesFetcher {
      */
     public ImmutableList<Place> fetch() throws IOException, InterruptedException, ApiException {
         TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, CUISINES, LOCATION)
+            PlacesApi.textSearchQuery(CONTEXT, genCuisinesStr(CUISINES_LIST), LOCATION)
                 .radius(SEARCH_RADIUS)
                 .maxPrice(MAX_PRICE_LEVEL)
                 .type(TYPE);
@@ -133,8 +133,19 @@ public class PlacesFetcher {
      * @throws IOException
      */
     @VisibleForTesting
-    public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+   public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
             throws ApiException, InterruptedException, IOException {
         return request.await();
+    }
+
+    private String genCuisinesStr(List<String> cuisineLst) {
+        String cuisineStr = "";
+        for (int i = 0; i < cuisineLst.size(); i++) {
+            cuisineStr += cuisineLst.get(i);
+            if (i != cuisineLst.size() - 1) {
+                cuisineStr += "|";
+            }
+        }
+        return cuisineStr;
     }
 }
