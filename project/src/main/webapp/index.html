@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <script src="script.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY"></script>
   <head>
     <meta charset="UTF-8">
     <title>food-mood</title>
@@ -42,13 +43,16 @@
       <label for="location" class="text-content">Location:</label>
       <input class="button" type="text" id="location" name="location">
       <br><br>
+      <input class="button" id="get-user-location" value="Find my location!"
+          onclick="addUserLocationToMap()">
+      <div id="user-location-map"></div>
       <input class="submit" type="submit" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">
       <h2>Our recommendation:</h2>
       <ol id="place"> </ol>
-      <div id ="map-container"> </div>
-      <div id = "feedback-box">
+      <div id="map-container"> </div>
+      <div id="feedback-box">
         <label for="liking-feedback">Like these options?<br> Let us know what you chose: <br></label>
         <select class="button" name="feedback" id="feedback">
         <option value="1">First option</option>

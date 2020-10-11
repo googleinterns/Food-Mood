@@ -70,3 +70,49 @@ function tryAgain() {
   document.getElementById('results').style.display = 'none';
   document.getElementById('place').innerHTML = '';
 }
+
+/**
+ * creates a map that the given coordinates are in it's center, and places it in the given element
+ * (according to element ID).
+ */
+function getNewMap(latLong, elementId) {
+  const MEDIUM_ZOOM_LEVEL = 7;
+  return new google.maps.Map(
+      document.getElementById(elementId), {
+        zoom: MEDIUM_ZOOM_LEVEL,
+        center: latLong
+      });
+}
+
+/**
+ * Prompts the user with a request to get his location, and adds the location map to the
+ * query page.
+ */
+function addUserLocationToMap() {
+  if (!navigator.geolocation) { // Browser doesn't support Geolocation
+    handleLocationError("Error: Your browser doesn't support geolocation.");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const userPosition = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      const userLocationMap = getNewMap(userPosition, 'user-location-map');
+      infoWindow = new google.maps.InfoWindow({
+        content: 'My location',
+        position: userPosition
+      });
+      infoWindow.open(userLocationMap);
+    },
+    () => {
+      // In case of error
+      handleLocationError("Error: The Geolocation service failed.");
+    }
+  );
+}
+
+function handleLocationError(errorMessage) {
+  //TODO: decide what we want to de if there is an error
+}
