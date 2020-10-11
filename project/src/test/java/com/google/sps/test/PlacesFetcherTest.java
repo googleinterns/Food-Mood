@@ -15,6 +15,8 @@
 package com.google.sps.test;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.TextSearchRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.Geometry;
 import com.google.maps.model.LatLng;
@@ -31,6 +33,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -119,7 +122,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(new PlacesSearchResult[0]).when(spiedFetcher).getPlacesSearchResults();
+    doReturn(new PlacesSearchResult[0])
+        .when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(ImmutableList.of(), spiedFetcher.fetch());
   }
 
@@ -127,9 +131,10 @@ public final class PlacesFetcherTest {
   public void fetch_validSearchResults_returnsListOfPlaces()
       throws ApiException, InterruptedException, IOException {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(PLACE_DETAILS_1).when(spiedFetcher).getPlaceDetails(PLACEID_1);
-    doReturn(PLACE_DETAILS_2).when(spiedFetcher).getPlaceDetails(PLACEID_2);
-    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher).getPlacesSearchResults();
+    doReturn(PLACE_DETAILS_1).doReturn(PLACE_DETAILS_2)
+        .when(spiedFetcher).getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR)
+        .when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch());
   }
 }

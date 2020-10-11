@@ -18,7 +18,6 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
-import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PriceLevel;
 import com.google.maps.GeoApiContext;
 import com.google.maps.TextSearchRequest;
@@ -68,19 +67,6 @@ public class PlacesFetcher {
      * @throws ApiException
      */
     public List<Place> fetch() throws IOException, InterruptedException, ApiException {
-        return createPlacesList(getPlacesSearchResults());
-    }
-
-    /**
-     * Queries Google Places API according to given params.
-     *
-     * @return A PlacesSearchResponse which contains the search results
-     * @throws ApiException
-     * @throws InterruptedException
-     * @throws IOException
-     */
-    public PlacesSearchResult[] getPlacesSearchResults()
-            throws ApiException, InterruptedException, IOException {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(CONTEXT, CUISINES, LOCATION)
                 .radius(SEARCH_RADIUS)
@@ -89,21 +75,36 @@ public class PlacesFetcher {
         if (OPEN_NOW) {
             query.openNow(OPEN_NOW);
         }
-        PlacesSearchResponse results = query.await();
-        return results.results;
+        return createPlacesList(getPlacesSearchResults(query));
+    }
+
+    /**
+     * Queries Google Places API according to given query.
+     *
+     * @param query A TextSearchRequest with all params to query on
+     * @return A PlacesSearchResponse which contains the search results
+     * @throws ApiException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
+            throws ApiException, InterruptedException, IOException {
+        return query.await().results;
     }
 
     private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
             throws ApiException, InterruptedException, IOException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {
-          PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
+            PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
+            PlaceDetails placeDetails = getPlaceDetails(detailsRequest);
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
                     .setWebsiteUrl((placeDetails.website == null)
                             ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber)
+                    .setPhone((placeDetails.formattedPhoneNumber == null)
+                            ? "" : placeDetails.formattedPhoneNumber.toString())
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
@@ -112,17 +113,7 @@ public class PlacesFetcher {
         return ImmutableList.copyOf(places);
     }
 
-    /**
-     * Queries Google Places API to recieve details about a certain place.
-     *
-     * @param placeId The Google Places placeId of the place that his details will be queried
-     * @return PlacesDetails containig certain details about the place
-     * @throws ApiException
-     * @throws InterruptedException
-     * @throws IOException
-     */
-    public PlaceDetails getPlaceDetails(String placeId)
-            throws ApiException, InterruptedException, IOException {
+    private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
         return PlacesApi.placeDetails(CONTEXT, placeId)
             .fields(
                 PlaceDetailsRequest.FieldMask.NAME,
@@ -130,7 +121,20 @@ public class PlacesFetcher {
                 PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
                 PlaceDetailsRequest.FieldMask.RATING,
                 PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
-            .await();
+                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
+    }
+
+    /**
+     * Queries Google Places API to recieve requested details about a certain place.
+     *
+     * @param request A PlaceDetailsRequest to query certain details on a certain place
+     * @return PlacesDetails containig requested details about the place
+     * @throws ApiException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+            throws ApiException, InterruptedException, IOException {
+        return request.await();
     }
 }
