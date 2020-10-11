@@ -133,7 +133,7 @@ public class PlacesFetcher {
      * @throws IOException
      */
     @VisibleForTesting
-	public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+    public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
             throws ApiException, InterruptedException, IOException {
         return request.await();
     }
