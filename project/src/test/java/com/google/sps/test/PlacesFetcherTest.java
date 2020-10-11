@@ -87,7 +87,6 @@ public final class PlacesFetcherTest {
   private static final PlaceDetails PLACE_DETAILS_2 =
     createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
 
-  /** Creates URL from String for PlaceDetails used in tests. */
   private static URL createTestURL(String s) {
     try {
       return new URL(s);

@@ -86,7 +86,7 @@ public class PlacesFetcher {
      * @throws IOException
      */
     @VisibleForTesting
-	public PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
+    public PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
             throws ApiException, InterruptedException, IOException {
         return query.await().results;
     }
@@ -100,10 +100,10 @@ public class PlacesFetcher {
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null ?
-                            "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null ?
-                            "" : placeDetails.formattedPhoneNumber.toString())
+                    .setWebsiteUrl(placeDetails.website == null
+                            ? "" : placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber == null
+                            ? "" : placeDetails.formattedPhoneNumber.toString())
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
