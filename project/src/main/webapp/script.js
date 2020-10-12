@@ -19,10 +19,12 @@
 function fetchFromQuery() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
+  const map = createMap();
   const placesDiv = document.getElementById('place');
   fetch('/query').then(response => response.json()).then((places) => {
     places.forEach((singlePlace) => {
       placesDiv.appendChild(createPlaceElement(singlePlace));
+      addPlaceMarker(map, singlePlace);
     });
   });
 }
@@ -69,4 +71,34 @@ function tryAgain() {
   document.getElementById('query-form').style.display = 'block';
   document.getElementById('results').style.display = 'none';
   document.getElementById('place').innerHTML = '';
+}
+
+
+/**
+ *  Creates a map and adds it to the page.
+ */
+function createMap() {
+  const GIVATAYIM = { lat: 32.08, lng: 34.80 };
+  var map = new google.maps.Map(document.getElementById("map-container"), {
+    center: GIVATAYIM,
+    zoom: 14,
+  });
+  return map;
+}
+
+/**
+ * Adds to the map a place's marker.
+ */
+function addPlaceMarker(map, place) {
+  const marker = new google.maps.Marker({
+      title: place.name,
+      position: place.location,
+      map: map
+  });
+  if (place.website) {
+    const infoWindow = new google.maps.InfoWindow({content: place.details});
+    marker.addListener('click', () => {
+        infoWindow.open(map, marker);
+    });
+  }
 }

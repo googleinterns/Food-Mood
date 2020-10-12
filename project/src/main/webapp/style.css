@@ -21,10 +21,9 @@ li {
 }
 
 #map-container {
-  position: relative;
-  float: left;
-  margin-left: 35px;
-  margin-top: auto;
+  border: thin solid black;
+  height: 400px;
+  width: 350px;
 }
 
 #feedback-box {
@@ -32,7 +31,7 @@ li {
   width: 270px;
   background-color: rgb(199, 232, 245);
   padding: 2%;
-  margin-top: auto;
+  margin-top: 20px;
   display: inline-block;
   margin-left: 15px;
 }
