@@ -19,15 +19,15 @@
 function fetchFromQuery() {
   try {
     const params = [
-      `quisines=${getQuisines()}`,
-      `rating=${getRating()}`,
-      `price=${getPrice()}`,
-      `location=${getLocation()}`
+      `quisines=${getQuisinesFromUserUi()}`,
+      `rating=${getRatingFromUserUi()}`,
+      `price=${getPriceFromUserUi()}`,
+      `location=${getLocationFromUserUi()}`
     ].join('&');
     const placesDiv = document.getElementById('place');
     fetch('/query?' + params).then(response => response.json()).then((places) => {
       places.forEach((singlePlace) => {
-        placesDiv.appendChild(createPlaceElement(singlePlace));
+        placesDiv.appendChild(getPlaceUiElement(singlePlace));
       });
     });
     document.getElementById('query-form').style.display = 'none';
@@ -38,7 +38,7 @@ function fetchFromQuery() {
   }
 }
 
-function getQuisines() {
+function getQuisinesFromUserUi() {
   // const quisines = document.forms[0];
   const quisines = document.getElementById('quisines-form').elements;
   let result = "";
@@ -55,7 +55,7 @@ function getQuisines() {
   result = result.endsWith(",") ? result.substring(0, result.length - 1) : result;
 }
 
-function getRating() {
+function getRatingFromUserUi() {
   const rating = document.getElementById('rating-form').elements;
   for (i = 0; i < rating.length; i++) {
     if (rating[i].checked) {
@@ -65,7 +65,7 @@ function getRating() {
   throw "Rating input error: user must choose exactly one rating.";
 }
 
-function getPrice() {
+function getPriceFromUserUi() {
   const price = document.getElementById('price-form').elements;
   for (i = 0; i < price.length; i++) {
     if (price[i].checked) {
@@ -75,15 +75,12 @@ function getPrice() {
   throw "Price input error: user must choose exactly one price level.";
 }
 
-function getLocation() {
+function getLocationFromUserUi() {
   //TODO this is a hard-coded location, need to return the real location
   return '32.070058,34.794347';
 }
 
-/**
- * Creates a place element.
- */
-function createPlaceElement(place) {
+function getPlaceUiElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = 'place-container';
 
