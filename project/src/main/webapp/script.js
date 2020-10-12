@@ -17,20 +17,25 @@
  * results elements in order to display them to the user.
  */
 function fetchFromQuery() {
-  document.getElementById('query-form').style.display = 'none';
-  document.getElementById('results').style.display = 'block';
-  const placesDiv = document.getElementById('place');
-  const params = [
-    `quisines=${getQuisines()}`,
-    `rating=${getRating()}`,
-    `price=${getPrice()}`,
-    `location=${getLocation()}`
-  ].join('&');
-  fetch('/query?' + params).then(response => response.json()).then((places) => {
-    places.forEach((singlePlace) => {
-      placesDiv.appendChild(createPlaceElement(singlePlace));
+  try {
+    const params = [
+      `quisines=${getQuisines()}`,
+      `rating=${getRating()}`,
+      `price=${getPrice()}`,
+      `location=${getLocation()}`
+    ].join('&');
+    const placesDiv = document.getElementById('place');
+    fetch('/query?' + params).then(response => response.json()).then((places) => {
+      places.forEach((singlePlace) => {
+        placesDiv.appendChild(createPlaceElement(singlePlace));
+      });
     });
-  });
+    document.getElementById('query-form').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+  }
+  catch(error) {
+    // TODO: define what we want when there is an error
+  }
 }
 
 function getQuisines() {
@@ -44,7 +49,8 @@ function getQuisines() {
     }
   }
   if (result === "") {
-      alert("You must choose at least one quisine type!");
+    alert("You must choose at least one quisine type!");
+    throw "Quisines input error: user must choose at least one quisine.";
   }
   result = result.endsWith(",") ? result.substring(0, result.length - 1) : result;
 }
@@ -56,7 +62,7 @@ function getRating() {
       return rating[i].value;
     }
   }
-// TODO: error if we get here and didn't return yet? (not currently possible)
+  throw "Rating input error: user must choose exactly one rating.";
 }
 
 function getPrice() {
@@ -66,7 +72,7 @@ function getPrice() {
       return price[i].value;
     }
   }
-  // TODO: error if we get here and didn't return yet? (not currently possible)
+  throw "Price input error: user must choose exactly one price level.";
 }
 
 function getLocation() {
@@ -147,7 +153,6 @@ function addUserLocationToMap() {
       timeout: FIVE_SECONDS,
     }
   );
-
   document.getElementById('map').style.display = 'block';
   document.getElementById('submit-query').style.display = 'block';
 }
@@ -168,12 +173,12 @@ function addMapWithWindow(elementId, latLong) {
 }
 
 function handleLocationError(errorMessage) {
-  //TODO(M2?): Take user location in other ways.
-  //DEVELOPEMENT MODE: cloud top doesn't enable to take it's location, we display a default location
+  //TODO(M2?): Take user location in other ways. DEVELOPEMENT MODE: cloud top doesn't enable to take
+  //it's location, so we display a default location for developement purposes.
   const GOOGLE_OFFICE_COORDINATES = {lat: 32.070058, lng:34.794347};
   addMapWithWindow('map', GOOGLE_OFFICE_COORDINATES);
+
   const mapElement = document.getElementById('map');
-  const errorText = 'We had trouble getting yout location. ' + errorMessage +
-      " Using default location";
-  mapElement.appendChild(document.createTextNode(errorText));
+  mapElement.appendChild(document.createTextNode('We had trouble getting yout location. ' +
+      errorMessage + " Using default location"));
 }
