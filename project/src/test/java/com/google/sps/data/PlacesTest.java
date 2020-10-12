@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.test;
+package com.google.sps.data;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.google.sps.data.Place;
-import com.google.sps.data.Places;
 import static org.junit.Assert.assertTrue;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
