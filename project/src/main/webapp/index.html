@@ -11,39 +11,54 @@
   <body class="text-content">
     <h1> FoodMood - your food order helper!</h1>
     <div id="query-form" class="query-form">
-      <form id="quisines-form">
-        <label>Select cuisines:</label>
-        <input type="checkbox" name="cuisine" value="Italian" checked>Italian
-        <input type="checkbox" name="cuisine" value="Asian" checked>Asian
-        <input type="checkbox" name="cuisine" value="Sushi" checked>Sushi
-        <input type="checkbox" name="cuisine" value="Hamburger" checked>Hamburger
-        <input type="checkbox" name="cuisine" value="Salad" checked>Salad
-        <input type="checkbox" name="cuisine" value="Homemade" checked>Homemade
+      <form id="quisines-form" class="form-element-toolbar">
+        <p>Select cuisines:</p>
+        <input type="checkbox" id="cuisine-italian" name="cuisine" value="italian" checked>
+        <label for="cuisine-italian">Italian</label>
+        <input type="checkbox" id="cuisine-asian" name="cuisine" value="asian" checked>
+        <label for="cuisine-asian">Asian</label>
+        <input type="checkbox" id="cuisine-sushi" name="cuisine" value="sushi" checked>
+        <label for="cuisine-sushi">Sushi</label>
+        <input type="checkbox" id="cuisine-hamburger" name="cuisine" value="hamburger" checked>
+        <label for="cuisine-hamburger">Hamburger</label>
+        <input type="checkbox" id="cuisine-salad" name="cuisine" value="salad" checked>
+        <label for="cuisine-salad">Salad</label>
+        <input type="checkbox" id="cuisine-homemade" name="cuisine" value="homemade" checked>
+        <label for="cuisine-homemade">Homemade</label>
+      </form>
+      <form id="rating-form" class="form-element-toolbar">
+        Min rating (out of 5):
+        <input type="radio" id="rating-0" name="rating" value="0" checked="checked">
+        <label for="rating-0">I don't mind</label>
+        <input type="radio" id="rating-1" name="rating" value="1">
+        <label for="rating-1">1 star</label>
+        <input type="radio" id="rating-2" name="rating" value="2">
+        <label for="rating-2">2 star</label>
+        <input type="radio" id="rating-3" name="rating" value="3">
+        <label for="rating-3">3 star</label>
+        <input type="radio" id="rating-4" name="rating" value="4">
+        <label for="rating-4">4 star</label>
+        <input type="radio" id="rating-5" name="rating" value="5">
+        <label for="rating-5">5 star</label>
+      </form>
+      <form id="price-form" class="form-element-toolbar">
+        Max price level:
+        <input type="radio" id="price-all" name="price" value="4" checked="checked">
+        <label for="price-all">I don't mind</label>
+        <input type="radio" id="price-1" name="price" value="1">
+        <label for="price-1">Inexpensive</label>
+        <input type="radio" id="price-2" name="price" value="2">
+        <label for="price-2">Moderate</label>
+        <input type="radio" id="price-3" name="price" value="3">
+        <label for="price-3">Expensive</label>
+        <input type="radio" id="price-4" name="price" value="4">
+        <label for="price-4">Very Expensive</label>
       </form>
       <br>
-      <form id="rating-form">
-        <label>Min rating (out of 5):</label>
-        <input type="radio" name="rating" value="0" checked="checked">I don't mind
-        <input type="radio" name="rating" value="1">1 star
-        <input type="radio" name="rating" value="2">2 stars
-        <input type="radio" name="rating" value="3">3 stars
-        <input type="radio" name="rating" value="4">4 stars
-        <input type="radio" name="rating" value="5">5 stars
-      </form>
-      <br>
-      <form id="price-form">
-        <label>Max price level:</label>
-        <input type="radio" name="price" value="4" checked="checked">I don't mind
-        <input type="radio" name="price" value="1">Inexpensive
-        <input type="radio" name="price" value="2">Moderate
-        <input type="radio" name="price" value="3">Expensive
-        <input type="radio" name="price" value="4">Very Expensive
-      </form>
-      <br>
-      <input class="button" id="get-user-location" value="Find my location!"
+      <input class="form-button" id="get-user-location" value="Find my location!"
           onclick="addUserLocationToMap()">
       <div id="map" style="display: none"></div>
-      <input class="submit" id="submit-query" value="Decide for me!" style="display: none"
+      <input class="form-button" id="submit-query" value="Decide for me!" style="display: none"
           onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">

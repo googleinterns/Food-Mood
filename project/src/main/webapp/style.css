@@ -37,21 +37,6 @@ li {
   margin-left: 15px;
 }
 
-.submit {
-  background-color: rgb(197, 235, 197);
-  width: 200px;
-  height: 50px;
-  padding: 10px;
-  font-size: 20px;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
-.button {
-  width: 150px;
-  padding: 5px;
-  background-color: rgb(199, 232, 245);
-}
-
 #map {
   height: 300px;
   width: 400px;
@@ -60,7 +45,48 @@ li {
   display: 'none';
 }
 
-input[type="radio"] {
-  border-style: solid;
+.form-element-toolbar {
+  margin: 10px;
+}
+
+.form-element-toolbar input[type="radio"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+
+.form-element-toolbar label {
+    display: inline-block;
+    background-color: #ddd;
+    padding: 8px 15px;
+    font-family: sans-serif, Arial;
+    font-size: 16px;
+    border: 2px solid #444;
+    border-radius: 4px;
+    margin:2px;
+}
+
+.form-element-toolbar label:hover {
+  background-color: rgb(219, 246, 248);
+}
+
+.form-element-toolbar input[type="radio"]:checked + label {
+  background-color: rgb(144, 214, 226);
   border-color: #287EC7;
+}
+
+.form-element-toolbar input[type="checkbox"]:checked + label {
+  background-color: rgb(144, 214, 226);
+  border-color: #287EC7;
+}
+
+.form-button {
+  background-color: rgb(144, 178, 243);
+  width: 200px;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.form-button:hover {
+  background-color: rgb(78, 136, 243);
 }
