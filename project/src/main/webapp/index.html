@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
+  </script>
   <script src="script.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY"></script>
   <head>
     <meta charset="UTF-8">
     <title>food-mood</title>
@@ -10,43 +11,40 @@
   <body class="text-content">
     <h1> FoodMood - your food order helper!</h1>
     <div id="query-form" class="query-form">
-      <form>
-        <p>Select cuisines:</p>
-        <input type="checkbox" name="all-cuisines" value="all">all cuisines
-        <input type="checkbox" name="cuisine" value="Italian">Italian
-        <input type="checkbox" name="cuisine" value="Asian">Asian
-        <input type="checkbox" name="cuisine" value="Sushi">Sushi
-        <input type="checkbox" name="cuisine" value="Hamburger">Hamburger
-        <input type="checkbox" name="cuisine" value="Salad">Salad
-        <input type="checkbox" name="cuisine" value="Homemade">Homemade
+      <form id="quisines-form">
+        <label>Select cuisines:</label>
+        <input type="checkbox" name="cuisine" value="Italian" checked>Italian
+        <input type="checkbox" name="cuisine" value="Asian" checked>Asian
+        <input type="checkbox" name="cuisine" value="Sushi" checked>Sushi
+        <input type="checkbox" name="cuisine" value="Hamburger" checked>Hamburger
+        <input type="checkbox" name="cuisine" value="Salad" checked>Salad
+        <input type="checkbox" name="cuisine" value="Homemade" checked>Homemade
       </form>
       <br>
-      <label for="rating" class="text-content">Min rating:</label>
-      <select class="button" name="rating" id="rating">
-        <option value="0" selected="selected">I don't mind</option>
-        <option value="5">5 stars out of 5</option>
-        <option value="4">4 stars out of 5</option>
-        <option value="3">3 stars out of 5</option>
-        <option value="2">2 stars out of 5</option>
-        <option value="1">1 stars out of 5</option>
-      </select>
-      <br><br>
-      <label for="price" class="text-content">price range:</label>
-      <select class="button" name="price" id="price">
-        <option value="5" selected="selected">I don't mind</option>
-        <option value="0">low budget</option>
-        <option value="1">normal</option>
-        <option value="2">wiiling to spend a little extra</option>
-        <option value="3">no budget limit</option>
-      </select>
-      <br><br>
-      <label for="location" class="text-content">Location:</label>
-      <input class="button" type="text" id="location" name="location">
-      <br><br>
+      <form id="rating-form">
+        <label>Min rating (out of 5):</label>
+        <input type="radio" name="rating" value="0" checked="checked">I don't mind
+        <input type="radio" name="rating" value="1">1 star
+        <input type="radio" name="rating" value="2">2 stars
+        <input type="radio" name="rating" value="3">3 stars
+        <input type="radio" name="rating" value="4">4 stars
+        <input type="radio" name="rating" value="5">5 stars
+      </form>
+      <br>
+      <form id="price-form">
+        <label>Max price level:</label>
+        <input type="radio" name="price" value="4" checked="checked">I don't mind
+        <input type="radio" name="price" value="1">Inexpensive
+        <input type="radio" name="price" value="2">Moderate
+        <input type="radio" name="price" value="3">Expensive
+        <input type="radio" name="price" value="4">Very Expensive
+      </form>
+      <br>
       <input class="button" id="get-user-location" value="Find my location!"
           onclick="addUserLocationToMap()">
-      <div id="user-location-map"></div>
-      <input class="submit" type="submit" value="Decide for me!" onclick="fetchFromQuery()">
+      <div id="map" style="display: none"></div>
+      <input class="submit" id="submit-query" value="Decide for me!" style="display: none"
+          onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">
       <h2>Our recommendation:</h2>

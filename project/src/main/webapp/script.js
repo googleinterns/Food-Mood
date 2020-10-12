@@ -20,11 +20,58 @@ function fetchFromQuery() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
   const placesDiv = document.getElementById('place');
-  fetch('/query').then(response => response.json()).then((places) => {
+  const params = [
+    `quisines=${getQuisines()}`,
+    `rating=${getRating()}`,
+    `price=${getPrice()}`,
+    `location=${getLocation()}`
+  ].join('&');
+  fetch('/query?' + params).then(response => response.json()).then((places) => {
     places.forEach((singlePlace) => {
       placesDiv.appendChild(createPlaceElement(singlePlace));
     });
   });
+}
+
+function getQuisines() {
+  // const quisines = document.forms[0];
+  const quisines = document.getElementById('quisines-form').elements;
+  let result = "";
+  let i;
+  for (i = 0; i < quisines.length; i++) {
+    if (quisines[i].checked) {
+      result = result + quisines[i].value + ",";
+    }
+  }
+  if (result === "") {
+      alert("You must choose at least one quisine type!");
+  }
+  result = result.endsWith(",") ? result.substring(0, result.length - 1) : result;
+}
+
+function getRating() {
+  const rating = document.getElementById('rating-form').elements;
+  for (i = 0; i < rating.length; i++) {
+    if (rating[i].checked) {
+      return rating[i].value;
+    }
+  }
+// TODO: error if we get here and didn't return yet? (not currently possible)
+}
+
+function getPrice() {
+  const price = document.getElementById('price-form').elements;
+  for (i = 0; i < price.length; i++) {
+    if (price[i].checked) {
+      return price[i].value;
+    }
+  }
+  // TODO: error if we get here and didn't return yet? (not currently possible)
+}
+
+function getLocation() {
+  //TODO this is a hard-coded location, need to return the real location
+  return '32.070058,34.794347';
 }
 
 /**
@@ -72,47 +119,61 @@ function tryAgain() {
 }
 
 /**
- * creates a map that the given coordinates are in it's center, and places it in the given element
- * (according to element ID).
- */
-function getNewMap(latLong, elementId) {
-  const MEDIUM_ZOOM_LEVEL = 7;
-  return new google.maps.Map(
-      document.getElementById(elementId), {
-        zoom: MEDIUM_ZOOM_LEVEL,
-        center: latLong
-      });
-}
-
-/**
  * Prompts the user with a request to get his location, and adds the location map to the
  * query page.
  */
 function addUserLocationToMap() {
+  const FIVE_SECONDS = 5000;
+
   if (!navigator.geolocation) { // Browser doesn't support Geolocation
     handleLocationError("Error: Your browser doesn't support geolocation.");
     return;
   }
   navigator.geolocation.getCurrentPosition(
+    // In case of successs.
     (position) => {
       const userPosition = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
       };
-      const userLocationMap = getNewMap(userPosition, 'user-location-map');
-      infoWindow = new google.maps.InfoWindow({
-        content: 'My location',
-        position: userPosition
-      });
-      infoWindow.open(userLocationMap);
+      addMapWithWindow('map', userPosition);
     },
+    // In case of error.
     () => {
-      // In case of error
       handleLocationError("Error: The Geolocation service failed.");
+    },
+    // Options.
+    {
+      timeout: FIVE_SECONDS,
     }
   );
+
+  document.getElementById('map').style.display = 'block';
+  document.getElementById('submit-query').style.display = 'block';
+}
+
+function addMapWithWindow(elementId, latLong) {
+  const HIGH_ZOOM_LEVEL = 14;
+  const map = new google.maps.Map(
+      document.getElementById(elementId), {
+        center: latLong,
+        zoom: HIGH_ZOOM_LEVEL
+      }
+  );
+  infoWindow = new google.maps.InfoWindow({
+    content: 'My location',
+    position: latLong
+  });
+  infoWindow.open(map);
 }
 
 function handleLocationError(errorMessage) {
-  //TODO: decide what we want to de if there is an error
+  //TODO(M2?): Take user location in other ways.
+  //DEVELOPEMENT MODE: cloud top doesn't enable to take it's location, we display a default location
+  const GOOGLE_OFFICE_COORDINATES = {lat: 32.070058, lng:34.794347};
+  addMapWithWindow('map', GOOGLE_OFFICE_COORDINATES);
+  const mapElement = document.getElementById('map');
+  const errorText = 'We had trouble getting yout location. ' + errorMessage +
+      " Using default location";
+  mapElement.appendChild(document.createTextNode(errorText));
 }
