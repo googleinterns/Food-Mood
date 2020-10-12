@@ -1,3 +1,5 @@
+package com.google.sps.servlets;
+
 // Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +36,30 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     int maxNumPlacesToRecommend = 3;
-    ImmutableList<Place> fetchedPlaces = new PlacesFetcher.fetch();
+      /** A valid Place object with name "name1". */
+  final Place PLACE_1 =
+  Place.builder()
+      .setName("name1")
+      .setWebsiteUrl("website@google.com")
+      .setPhone("+97250-0000-000")
+      .setRating(4)
+      .setPriceLevel(3)
+      .setLongitude(35.35)
+      .setLatitude(30.30)
+      .build();
+    /** A valid Place object with name "name2". */
+    final Place PLACE_2 =
+      Place.builder()
+          .setName("name2")
+          .setWebsiteUrl("website@google.com")
+          .setPhone("+97250-0000-000")
+          .setRating(4)
+          .setPriceLevel(3)
+          .setLongitude(35.35)
+          .setLatitude(30.30)
+          .build();
+
+    ImmutableList<Place> fetchedPlaces =  ImmutableList.of(PLACE_1, PLACE_2);
     //TODO(M1): add call to filterer
     ImmutableList<Place> sortedPlaces = Places.randomSort(fetchedPlaces);
     int numPlacesToDisplay = Math.min(maxNumPlacesToRecommend, sortedPlaces.size());

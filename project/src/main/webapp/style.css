@@ -49,5 +49,6 @@ li {
 .button {
   width: 150px;
   padding: 5px;
-  background-color: rgb(199, 232, 245);
+  background-color: rgb(228 231 232);
+  margin-top: 10px;
 }
