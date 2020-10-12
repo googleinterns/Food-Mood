@@ -18,7 +18,10 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
+import com.google.maps.model.LatLng;
+
 import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
+
 
 /**
  * Represents a place that food can be ordered from in the food-mood
@@ -62,14 +65,9 @@ public abstract class Place {
   public abstract int priceLevel();
 
   /**
-   * @return coordinate of the physical place.
-   */
-  public abstract double longitude();
-
-  /**
-   * @return coordinate of the physical place.
+   * @return the coordinates of the physical place.
   */
-  public abstract double latitude();
+  public abstract LatLng location();
 
   /**
    * @return a builder that enables to build a new Place object
@@ -102,16 +100,10 @@ public abstract class Place {
     public abstract Builder setPhone(String phone);
 
     /**
-     * @param longitude coordinate of the physical place
+     * @param location the coordinates of the physical place
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setLongitude(double longitude);
-
-    /**
-     * @param latitude coordinate of the physical place
-     * @return a Place builder that enables to continue building
-     */
-    public abstract Builder setLatitude(double latitude);
+    public abstract Builder setLocation(LatLng location);
 
     /**
      * @param rating the rating of the place, represented by a number of 1-5
