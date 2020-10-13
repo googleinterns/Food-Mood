@@ -17,12 +17,42 @@ package com.google.sps.servlets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.Before;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.ArgumentMatchers.any;
+
 
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
 
+  // @Mock
+  // HttpServletRequest request;
+  // @Mock
+  // HttpServletResponse response;
+
+  // @Before
+  // public void setUp() throws Exception {
+  // }
+
   @Test
   public void getRequest_respondMaxNumOfPlaces() {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    when(request.getParameter("fn")).thenReturn("Vinod");
+    when(request.getParameter("ln")).thenReturn("Kashyap");
+
+    when(response.getWriter()).thenReturn(pw);
+
+    QueryServlet myServlet = new QueryServlet();
+    myServlet.doGet(request, response);
   }
 
 }
