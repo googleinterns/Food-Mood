@@ -131,10 +131,8 @@ public abstract class Place {
      */
     public Place build() throws IllegalArgumentException {
       Place place = autoBuild();
-      checkArgument(place.rating() >= MIN_RATING && place.rating() <= MAX_RATING,
-          "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
-      checkArgument(place.priceLevel() >= MIN_PRICE_LEVEL && place.priceLevel() <= MAX_PRICE_LEVEL,
-          "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
+      ValidationUtils.validateRating(place.rating());
+      ValidationUtils.validatePriceLevel(place.priceLevel());
       return place;
     }
   }
