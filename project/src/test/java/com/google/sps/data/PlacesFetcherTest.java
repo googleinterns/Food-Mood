@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.test;
+package com.google.sps.data;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.maps.PlaceDetailsRequest;
@@ -23,8 +23,6 @@ import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.model.PriceLevel;
-import com.google.sps.data.Place;
-import com.google.sps.data.PlacesFetcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;

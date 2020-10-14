@@ -86,7 +86,7 @@ public class PlacesFetcher {
      * @throws IOException
      */
     @VisibleForTesting
-    public PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
+    PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
             throws ApiException, InterruptedException, IOException {
         return query.await().results;
     }
@@ -133,7 +133,7 @@ public class PlacesFetcher {
      * @throws IOException
      */
     @VisibleForTesting
-   public PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+    PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
             throws ApiException, InterruptedException, IOException {
         return request.await();
     }
