@@ -19,6 +19,7 @@
 function fetchFromQuery() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
+  document.getElementById('map-container').style.display = 'none';
   const map = createMap();
   const placesDiv = document.getElementById('place');
   fetch('/query').then(response => response.json()).then((places) => {
@@ -27,6 +28,7 @@ function fetchFromQuery() {
       addPlaceMarker(map, singlePlace);
     });
   });
+  document.getElementById('map-container').style.display = 'block';
 }
 
 /**
@@ -43,10 +45,10 @@ function createPlaceElement(place) {
   placeElement.appendChild(document.createElement('br'));
 
   // Add link to website
-  if (place.website) {
+  if (place.websiteUrl) {
     const websiteLink = document.createElement('a');
-    websiteLink.href = place.website;
-    websiteLink.title = place.website;
+    websiteLink.href = place.websiteUrl;
+    websiteLink.title = place.websiteUrl;
     websiteLink.innerHTML = 'Restaurant\'s website';
     placeElement.appendChild(websiteLink);
   } else {
@@ -78,10 +80,10 @@ function tryAgain() {
  *  Creates a map and adds it to the page.
  */
 function createMap() {
-  const GIVATAYIM = { lat: 32.08, lng: 34.80 };
+  const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
   var map = new google.maps.Map(document.getElementById("map-container"), {
-    center: GIVATAYIM,
-    zoom: 14,
+    center: USER_LOCATION,
+    zoom: 12,
   });
   return map;
 }
@@ -93,10 +95,11 @@ function addPlaceMarker(map, place) {
   const marker = new google.maps.Marker({
       title: place.name,
       position: place.location,
+      description: place.name.link(place.websiteUrl),
       map: map
   });
-  if (place.website) {
-    const infoWindow = new google.maps.InfoWindow({content: place.details});
+  if (place.websiteUrl) {
+    const infoWindow = new google.maps.InfoWindow({content: marker.description});
     marker.addListener('click', () => {
         infoWindow.open(map, marker);
     });
