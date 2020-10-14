@@ -37,12 +37,16 @@ public final class QueryServlet extends HttpServlet {
 
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
-  private static PlacesFetcher fetcher;
+  private PlacesFetcher fetcher;
 
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher();
+  }
+
+  void init(PlacesFetcher inputFetcher) {
+    fetcher = inputFetcher;
   }
 
   @Override
@@ -53,7 +57,6 @@ public final class QueryServlet extends HttpServlet {
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList());
-      System.out.println("json: " + placesToDisplay); //TODO: delete
       response.setContentType("application/json");
       response.getWriter().write(new Gson().toJson(placesToDisplay));
     }
