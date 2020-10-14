@@ -37,14 +37,6 @@ li {
   margin-left: 15px;
 }
 
-#map {
-  height: 300px;
-  width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  display: 'none';
-}
-
 .form-element-toolbar {
   margin: 10px;
 }
@@ -89,4 +81,21 @@ li {
 
 .form-button:hover {
   background-color: rgb(78, 136, 243);
+}
+
+#location-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 10px 11px 10px 13px;
+  width: 250px;
+}
+
+#map {
+  height: 300px;
+  width: 600px;
+  margin-left: auto;
+  display: 'none';
 }

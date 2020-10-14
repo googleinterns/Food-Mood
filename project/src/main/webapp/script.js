@@ -19,10 +19,10 @@
 function fetchFromQuery() {
   try {
     const params = [
-      `quisines=${getQuisinesFromUserUi()}`,
-      `rating=${getRatingFromUserUi()}`,
-      `price=${getPriceFromUserUi()}`,
-      `location=${getLocationFromUserUi()}`
+      `quisines=${getUserQuisinesFromUi()}`,
+      `rating=${getUserRatingFromUi()}`,
+      `price=${getUserPriceFromUi()}`,
+      `location=${getUserLocationFromUi()}`
     ].join('&');
     const placesDiv = document.getElementById('place');
     fetch('/query?' + params).then(response => response.json()).then((places) => {
@@ -38,7 +38,7 @@ function fetchFromQuery() {
   }
 }
 
-function getQuisinesFromUserUi() {
+function getUserQuisinesFromUi() {
   // const quisines = document.forms[0];
   const quisines = document.getElementById('quisines-form').elements;
   let result = "";
@@ -55,7 +55,7 @@ function getQuisinesFromUserUi() {
   result = result.endsWith(",") ? result.substring(0, result.length - 1) : result;
 }
 
-function getRatingFromUserUi() {
+function getUserRatingFromUi() {
   const rating = document.getElementById('rating-form').elements;
   for (i = 0; i < rating.length; i++) {
     if (rating[i].checked) {
@@ -65,7 +65,7 @@ function getRatingFromUserUi() {
   throw "Rating input error: user must choose exactly one rating.";
 }
 
-function getPriceFromUserUi() {
+function getUserPriceFromUi() {
   const price = document.getElementById('price-form').elements;
   for (i = 0; i < price.length; i++) {
     if (price[i].checked) {
@@ -75,9 +75,10 @@ function getPriceFromUserUi() {
   throw "Price input error: user must choose exactly one price level.";
 }
 
-function getLocationFromUserUi() {
-  //TODO this is a hard-coded location, need to return the real location
-  return '32.070058,34.794347';
+function getUserLocationFromUi() {
+  const coords = window.currentUserLocation;
+  console.log(coords.lat + "," + coords.lng);
+  return coords.lat + "," + coords.lng;
 }
 
 function getPlaceUiElement(place) {
@@ -121,61 +122,132 @@ function tryAgain() {
   document.getElementById('place').innerHTML = '';
 }
 
+function addSearchBoxToMap(map, input) {
+  // Create the search box and link it to the UI element.
+  const searchBox = new google.maps.places.SearchBox(input);
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  // Bias the SearchBox results towards current map's viewport.
+  map.addListener("bounds_changed", () => {
+    searchBox.setBounds(map.getBounds());
+  });
+  let markers = [];
+  // Listen for the event fired when the user selects a prediction and retrieve
+  // more details for that place.
+  searchBox.addListener("places_changed", () => {
+    const places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+    // Clear out the old markers.
+    markers.forEach((marker) => {
+      marker.setMap(null);
+    });
+    markers = [];
+    // For each place, get the icon, name and location.
+    const bounds = new google.maps.LatLngBounds();
+    places.forEach((place) => {
+      if (!place.geometry) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+      const icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25),
+      };
+      window.currentUserLocation = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      };
+      // Create a marker for each place.
+      markers.push(
+        new google.maps.Marker({
+          map,
+          icon,
+          title: place.name,
+          position: place.geometry.location,
+        })
+      );
+
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    map.fitBounds(bounds);
+  });
+}
+
+/**
+ * Displays a Google Maps map that allows the user to search fo his location.
+ */
+function addMapWithSearchBox() {
+  const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
+  const LOW_ZOOM_LEVEL = 9;
+  window.map = new google.maps.Map(document.getElementById("map"), {
+    center: DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE,
+    zoom: LOW_ZOOM_LEVEL,
+    mapTypeId: "roadmap",
+  });
+  window.currentUserLocation = DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE ;
+  const input = document.getElementById("location-input");
+  addSearchBoxToMap(window.map, input);
+}
+
 /**
  * Prompts the user with a request to get his location, and adds the location map to the
  * query page.
  */
-function addUserLocationToMap() {
+function getDeviceLocationAndShowOnMap() {
   const FIVE_SECONDS = 5000;
+  const HIGH_ZOOM_LEVEL = 13;
 
   if (!navigator.geolocation) { // Browser doesn't support Geolocation
-    handleLocationError("Error: Your browser doesn't support geolocation.");
+    displayFeolocationError('Your browser doesn\'t support geolocation');
     return;
   }
   navigator.geolocation.getCurrentPosition(
     // In case of successs.
     (position) => {
+      const map = window.map;
       const userPosition = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
       };
-      addMapWithWindow('map', userPosition);
+      map.setCenter(userPosition);
+      map.setZoom(HIGH_ZOOM_LEVEL);
+      window.currentUserLocation = userPosition;
+      // Add marker with info window to display user location.
+      const infowindow = new google.maps.InfoWindow({
+        content: 'My location',
+      });
+      const marker = new google.maps.Marker({
+        position: userPosition,
+        map,
+        title: 'My location',
+      });
+      marker.addListener("click", () => {
+        infowindow.open(map, marker);
+      });
     },
     // In case of error.
     () => {
-      handleLocationError("Error: The Geolocation service failed.");
+      displayFeolocationError('The Geolocation service failed');
     },
     // Options.
     {
       timeout: FIVE_SECONDS,
     }
   );
-  document.getElementById('map').style.display = 'block';
-  document.getElementById('submit-query').style.display = 'block';
 }
 
-function addMapWithWindow(elementId, latLong) {
-  const HIGH_ZOOM_LEVEL = 14;
-  const map = new google.maps.Map(
-      document.getElementById(elementId), {
-        center: latLong,
-        zoom: HIGH_ZOOM_LEVEL
-      }
-  );
-  infoWindow = new google.maps.InfoWindow({
-    content: 'My location',
-    position: latLong
-  });
-  infoWindow.open(map);
-}
-
-function handleLocationError(errorMessage) {
-  //TODO(M2?): Take user location in other ways. DEVELOPEMENT MODE: cloud top doesn't enable to take
-  //it's location, so we display a default location for developement purposes.
-  const GOOGLE_OFFICE_COORDINATES = {lat: 32.070058, lng:34.794347};
-  addMapWithWindow('map', GOOGLE_OFFICE_COORDINATES);
-
-  const mapElement = document.getElementById('map');
-  mapElement.appendChild(document.createTextNode('We had trouble getting yout location. ' +
-      errorMessage + " Using default location"));
+function displayFeolocationError(errorText) {
+  document.getElementById('map-error-container').appendChild(document.createTextNode(
+    errorText + ', so we can\'t use device location.'
+  ));
 }

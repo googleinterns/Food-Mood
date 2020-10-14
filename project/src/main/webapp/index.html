@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY">
-  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
   <script src="script.js"></script>
   <head>
     <meta charset="UTF-8">
@@ -54,12 +54,16 @@
         <input type="radio" id="price-4" name="price" value="4">
         <label for="price-4">Very Expensive</label>
       </form>
-      <br>
-      <input class="form-button" id="get-user-location" value="Find my location!"
-          onclick="addUserLocationToMap()">
-      <div id="map" style="display: none"></div>
-      <input class="form-button" id="submit-query" value="Decide for me!" style="display: none"
-          onclick="fetchFromQuery()">
+      <form id="location-form" class="form-element-toolbar">
+        <input type="radio" id="device-location" name="location" value="device-location"
+            onclick="getDeviceLocationAndShowOnMap()">
+        <label for="device-location">Use my device's location!</label>
+      </form>
+      <input id="location-input" class="controls" type="text" placeholder="Search Box"/>
+      <div id="map-error-container"></div>
+      <div id="map"></div>
+      <script> addMapWithSearchBox() </script>
+      <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">
       <h2>Our recommendation:</h2>
