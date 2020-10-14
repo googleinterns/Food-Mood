@@ -70,7 +70,7 @@ public final class PlacesFetcherTest {
   private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
    /** An invalid placeId for an ivalid PlacesSearchResult used in tests. */
-  private static final String PLACEID_INVALID= "abc";
+  private static final String PLACEID_INVALID = "abc";
 
   /** Valid PlacesSearchResult. */
   private static final PlacesSearchResult SEARCH_RESULT_1 =
