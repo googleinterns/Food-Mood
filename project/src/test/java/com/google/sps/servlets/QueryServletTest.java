@@ -53,7 +53,6 @@ public final class QueryServletTest {
     when(RESPONSE.getWriter()).thenReturn(printWriter);
 
     servlet.doGet(REQUEST, RESPONSE);
-
     JsonArray jsonPlaces = new Gson().fromJson(stringWriter.getBuffer().toString(), JsonArray.class);
 
     // Make sure we got the right number of elements
@@ -83,10 +82,10 @@ public final class QueryServletTest {
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.
   private static ImmutableList<Place> createPlacesListBySize(int numOfPlaces) {
-    List<Place> tempList = new ArrayList<Place>();
+    ImmutableList.Builder<Place> places = ImmutableList.builder();
     for (int i = 0; i < numOfPlaces; ++i) {
       String name = String.valueOf(i);
-      tempList.add(Place.builder()
+      places.add(Place.builder()
           .setName(name)
           .setWebsiteUrl("website@google.com")
           .setPhone("+97250-0000-000")
@@ -96,6 +95,6 @@ public final class QueryServletTest {
           .build()
       );
     }
-    return ImmutableList.copyOf(tempList);
+    return places.build();
   }
 }
