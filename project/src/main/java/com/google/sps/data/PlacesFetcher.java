@@ -14,10 +14,11 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
-import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PriceLevel;
 import com.google.sps.data.errors.FetcherException;
 import com.google.maps.GeoApiContext;
@@ -26,106 +27,85 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
-
 public class PlacesFetcher {
 
-    /** Places will be fetched within a ceratain radius from this location. */
-    private final LatLng location;
-
-    /** The cuisine types of the places that are fetched. */
-    private final String cuisineType;
+    /**
+     * Those constants are temporaraly hardcoded for M0. In next versions those same
+     * constants will be fields of a UserPrefrences instance passed to fetch() by
+     * the Servlet.
+     */
+    private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
+    private static final String CUISINES = "sushi"; // TODO(M0): change to set of types;
+    private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
+    private static final boolean OPEN_NOW = true;
 
     /**
-     * The maximum price level as identified in Google Places of the fetched places.
+     * The type of places that will be searched is RESTAURANT. Since most places
+     * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
+     * rather as "RESTAURANT" this is the most suitable type to search for.
      */
-    private final PriceLevel maxPriceLevel;
-
-    /** Specifies if the fetched places must be open at the time of fetching. */
-    private final boolean openNow;
-
-    /** The type of places that will be searched. */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** The search radius for place. */
+    /** In this radius around "LOCATION" places will be searched. */
     private static final int SEARCH_RADIUS = 5000;
-    // TODO (M1): check at least 10 results, and if less extend radius
+    // TODO(M1): check at least 10 results, and if less extend radius
 
     /** The entry point for a Google GEO API request. */
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
-        .apiKey("AIza..") // TODO : save key in a file that can be accessed and pushed to github
+        .apiKey(System.getenv("API_KEY"))
         .build();
-
-    /**
-     * Fields are temporaraly hard coded for M0 version. In next versions those same
-     * fields will be the fields of a UserPrefrences instance passed to the
-     * PlacesFetcher constructor by the Servlet.
-     */
-    public PlacesFetcher() {
-        this.location = new LatLng(32.080576, 34.780641); // Rabin Square TLV
-        this.cuisineType = "sushi"; // TODO (talbarnahor): change to set of types
-        this.maxPriceLevel = PriceLevel.values()[2];
-        this.openNow = true;
-    }
 
     /**
      * Builds a query and requests it from Google Places API.
      *
-     * @return list of places that supply the query.
+     * @return an immutable list of places that supply the query.
      * @throws FetcherException
      */
-    public List<Place> fetch() throws FetcherException {
-        PlacesSearchResult[] results = getPlacesSearchResults();
-        return createPlacesList(results);
+    public ImmutableList<Place> fetch() throws FetcherException {
+        TextSearchRequest query =
+            PlacesApi.textSearchQuery(CONTEXT, CUISINES, LOCATION)
+                .radius(SEARCH_RADIUS)
+                .maxPrice(MAX_PRICE_LEVEL)
+                .type(TYPE);
+        if (OPEN_NOW) {
+            query.openNow(OPEN_NOW);
+        }
+        return createPlacesList(getPlacesSearchResults(query));
     }
 
     /**
-     * Queries Google Places API according to given params.
+     * Queries Google Places API according to given query.
      *
+     * @param query A TextSearchRequest with all params to query on
      * @return A PlacesSearchResponse which contains the search results
      * @throws FetcherException
      */
-    public PlacesSearchResult[] getPlacesSearchResults() throws FetcherException {
-        TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, cuisineType, location)
-                .radius(SEARCH_RADIUS)
-                .maxPrice(maxPriceLevel)
-                .type(TYPE);
-        if (openNow) {
-            query.openNow(openNow);
-        }
-        PlacesSearchResponse results;
+    @VisibleForTesting
+    PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query) throws FetcherException {
         try {
-            results = query.await();
+            return query.await().results;
         } catch (ApiException | InterruptedException | IOException e) {
             throw new FetcherException(e.getMessage());
         }
-        return results.results;
     }
 
-    /**
-     * Creates a Place out of each PlacesSearchResult and returns a list of those
-     * Places.
-     *
-     * @param searchResultsArr An array of maximum 20 PlacesSearchResults
-     * @return An immutable list of Places
-     * @throws FetcherException
-     */
-    private List<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
+    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
             throws FetcherException {
         List<Place> places = new ArrayList<Place>();
-        for (PlacesSearchResult searchResult: searchResultsArr) {
-            PlaceDetails placeDetails = getPlaceDetails(searchResult.placeId);
+        for (PlacesSearchResult searchResult : searchResultsArr) {
+            PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
+            PlaceDetails placeDetails = getPlaceDetails(detailsRequest);
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber)
+                    .setWebsiteUrl(placeDetails.website == null
+                            ? "" : placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber == null
+                            ? "" : placeDetails.formattedPhoneNumber.toString())
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
@@ -134,25 +114,29 @@ public class PlacesFetcher {
         return ImmutableList.copyOf(places);
     }
 
+    @VisibleForTesting
+    private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
+        return PlacesApi.placeDetails(CONTEXT, placeId)
+            .fields(
+                PlaceDetailsRequest.FieldMask.NAME,
+                PlaceDetailsRequest.FieldMask.WEBSITE,
+                PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+                PlaceDetailsRequest.FieldMask.RATING,
+                PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
+    }
+
     /**
-     * Queries Google Places API to recieve details about a certain place.
+     * Queries Google Places API to recieve requested details about a certain place.
      *
-     * @param placeId The Google Places placeId of the place that his details will
-     *                be queried
-     * @return PlacesDetails containig certain details about the place
+     * @param request A PlaceDetailsRequest to query certain details on a certain place
+     * @return PlacesDetails containig requested details about the place
      * @throws FetcherException
      */
-    public PlaceDetails getPlaceDetails(String placeId) throws FetcherException {
+    @VisibleForTesting
+    PlaceDetails getPlaceDetails(PlaceDetailsRequest request) throws FetcherException {
         try {
-            return PlacesApi.placeDetails(CONTEXT, placeId)
-                    .fields(
-                        PlaceDetailsRequest.FieldMask.NAME,
-                        PlaceDetailsRequest.FieldMask.WEBSITE,
-                        PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
-                        PlaceDetailsRequest.FieldMask.RATING,
-                        PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-                        PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION)
-                    .await();
+            return request.await();
         } catch (ApiException | InterruptedException | IOException e) {
             throw new FetcherException(e.getMessage());
         }
