@@ -19,7 +19,7 @@ import static com.google.appengine.repackaged.com.google.common.base.Preconditio
 /**
  * A utility class for validation.
  */
-public class ValidationUtils {
+public final class ValidationUtils {
 
     /** The maximal valid rating value. */
     private static final float MAX_RATING = 5.0f;
