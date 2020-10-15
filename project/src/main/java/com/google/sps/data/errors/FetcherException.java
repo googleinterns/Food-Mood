@@ -19,6 +19,10 @@ package com.google.sps.data.errors;
 @SuppressWarnings("serial")
  public final class FetcherException extends Exception {
 
+  /**
+   * @param message the message shown when the exception is thrown
+   * @param cause the cause of the exception
+   */
     public FetcherException(String message, Throwable cause) {
       super(message, cause);
     }
