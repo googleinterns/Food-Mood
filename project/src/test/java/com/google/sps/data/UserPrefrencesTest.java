@@ -14,15 +14,15 @@
 
 package com.google.sps.data;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import java.util.Arrays;
-import java.util.List;
-import com.google.maps.model.LatLng;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import com.google.common.collect.ImmutableList;
+import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
 public class UserPrefrencesTest {
@@ -30,7 +30,7 @@ public class UserPrefrencesTest {
     private static final float RATING = 4;
     private static final int PRICE_LEVEL = 2;
     private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
-    private static final List<String> CUISINES = Arrays.asList("sushi", "burger");
+    private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
 
     @Test
     public void build_invalidLowRating_throwsIllegalArgumentException() {
@@ -79,9 +79,7 @@ public class UserPrefrencesTest {
         );
     }
 
-    /**
-     * @return a UserPrefrences builder that has valid values of all attributes
-     */
+    // Returns a UserPrefrences builder that has valid values of all attributes.
     private UserPrefrences.Builder getValidUserPrefrencesBuilder() {
       return UserPrefrences.builder()
           .setMinRating(RATING)

@@ -15,9 +15,8 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
-
-import java.util.List;
 
 /**
  * Represents the prefrences entered by a user.
@@ -45,7 +44,7 @@ public abstract class UserPrefrences {
   /**
   * @return the cuisine types that the user prefers.
   */
-  public abstract List<String> cuisineTypes();
+  public abstract ImmutableList<String> cuisineTypes();
 
   /**
    * @return a builder that enables to build a new Place object
@@ -53,7 +52,6 @@ public abstract class UserPrefrences {
   public static Builder builder() {
     return new AutoValue_UserPrefrences.Builder();
   }
-
 
 /**
    * A builder class for creating UserPrefrences objects.
@@ -84,7 +82,7 @@ public abstract class UserPrefrences {
      * @param cuisineTypes the cuisine types that the user prefers
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setCuisineTypes(List<String> cuisineTypes);
+    public abstract Builder setCuisineTypes(ImmutableList<String> cuisineTypes);
 
     /**
      * Builds the UserPrefrences object according to the data that was set so far.

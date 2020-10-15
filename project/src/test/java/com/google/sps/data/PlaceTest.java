@@ -81,9 +81,7 @@ public final class PlaceTest {
       );
   }
 
-  /**
-   * @return a Place builder that has valid values of all attributes
-   */
+  // Returns a Place builder that has valid values of all attributes.
   private Place.Builder getValidPlaceBuilder() {
     return Place.builder()
         .setName(NAME)
