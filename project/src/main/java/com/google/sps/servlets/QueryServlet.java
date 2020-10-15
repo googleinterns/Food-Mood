@@ -58,8 +58,7 @@ public final class QueryServlet extends HttpServlet {
           .collect(Collectors.toList());
       response.setContentType("application/json");
       response.getWriter().write(new Gson().toJson(placesToDisplay));
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       //TODO(M1): handle errors - TBD
     }
   }
