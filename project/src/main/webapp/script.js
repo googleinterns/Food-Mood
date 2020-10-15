@@ -41,18 +41,12 @@ function fetchFromQuery() {
 function getUserQuisinesFromUi() {
   // const quisines = document.forms[0];
   const quisines = document.getElementById('quisines-form').elements;
-  let result = "";
-  let i;
-  for (i = 0; i < quisines.length; i++) {
-    if (quisines[i].checked) {
-      result = result + quisines[i].value + ",";
-    }
-  }
+  let result = quisines.join(',');
   if (result === "") {
     alert("You must choose at least one quisine type!");
     throw "Quisines input error: user must choose at least one quisine.";
   }
-  result = result.endsWith(",") ? result.substring(0, result.length - 1) : result;
+  return result;
 }
 
 function getUserRatingFromUi() {
