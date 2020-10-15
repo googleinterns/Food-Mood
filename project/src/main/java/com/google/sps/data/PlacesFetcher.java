@@ -14,8 +14,10 @@
 
 package com.google.sps.data;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import static java.util.stream.Collectors.joining;
+
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
@@ -37,7 +39,7 @@ public class PlacesFetcher {
      * will be fields of a UserPrefrences instance passed to fetch() by the Servlet.
      */
     private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final List<String> CUISINES_LIST = new ArrayList<>(List.of("sushi", "burger"));
+    private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
     private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
     private static final boolean OPEN_NOW = true;
 
@@ -66,7 +68,7 @@ public class PlacesFetcher {
      */
     public ImmutableList<Place> fetch() throws IOException, InterruptedException, ApiException {
         TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, genCuisinesStr(CUISINES_LIST), LOCATION)
+            PlacesApi.textSearchQuery(CONTEXT, createCuisenesQuery(), LOCATION)
                 .radius(SEARCH_RADIUS)
                 .maxPrice(MAX_PRICE_LEVEL)
                 .type(TYPE);
@@ -138,14 +140,7 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private String genCuisinesStr(List<String> cuisineLst) {
-        String cuisineStr = "";
-        for (int i = 0; i < cuisineLst.size(); i++) {
-            cuisineStr += cuisineLst.get(i);
-            if (i != cuisineLst.size() - 1) {
-                cuisineStr += "|";
-            }
-        }
-        return cuisineStr;
+    private static String createCuisenesQuery() {
+        return CUISINES.stream().collect(joining("|"));
     }
 }
