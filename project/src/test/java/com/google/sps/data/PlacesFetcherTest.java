@@ -28,6 +28,7 @@ import java.net.URL;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -141,8 +142,7 @@ public final class PlacesFetcherTest {
   }
 
   @Test
-  public void fetch_PlaceDetailsQueryFails_throwsFetcherException()
-      throws FetcherException {
+  public void fetch_PlaceDetailsQueryFails_throwsFetcherException() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     doReturn(new PlacesSearchResult[] {SEARCH_RESULT_INVALID})
         .when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));

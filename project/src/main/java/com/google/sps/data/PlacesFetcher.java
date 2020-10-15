@@ -62,8 +62,9 @@ public class PlacesFetcher {
     /**
      * Builds a query and requests it from Google Places API.
      *
-     * @return an immutable list of places that supply the query.
-     * @throws FetcherException
+     * @return an immutable list of places that supply the query
+     * @throws FetcherException when an error occurs in querying the Places API
+     *     for places or for places details
      */
     public ImmutableList<Place> fetch() throws FetcherException {
         TextSearchRequest query =
@@ -82,14 +83,14 @@ public class PlacesFetcher {
      *
      * @param query A TextSearchRequest with all params to query on
      * @return A PlacesSearchResponse which contains the search results
-     * @throws FetcherException
+     * @throws FetcherException when an error occurs in querying the Places API
      */
     @VisibleForTesting
     PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query) throws FetcherException {
         try {
             return query.await().results;
         } catch (ApiException | InterruptedException | IOException e) {
-            throw new FetcherException(e.getMessage());
+            throw new FetcherException("Couldn't fetch places from Places API", e.getCause());
         }
     }
 
@@ -131,14 +132,15 @@ public class PlacesFetcher {
      *
      * @param request A PlaceDetailsRequest to query certain details on a certain place
      * @return PlacesDetails containig requested details about the place
-     * @throws FetcherException
+     * @throws FetcherException when an error occurs in querying the Places API
      */
     @VisibleForTesting
     PlaceDetails getPlaceDetails(PlaceDetailsRequest request) throws FetcherException {
         try {
             return request.await();
         } catch (ApiException | InterruptedException | IOException e) {
-            throw new FetcherException(e.getMessage());
+            throw new FetcherException(
+                "Couldn't get place details from Places API", e.getCause());
         }
     }
 }

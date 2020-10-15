@@ -16,11 +16,10 @@ package com.google.sps.data.errors;
 /**
  * FetcherException represents an error returned by the PlacesFetcher.
  */
-public class FetcherException extends Exception {
+@SuppressWarnings("serial")
+ public final class FetcherException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
-    public FetcherException(String message) {
-      super(message);
+    public FetcherException(String message, Throwable cause) {
+      super(message, cause);
     }
 }
