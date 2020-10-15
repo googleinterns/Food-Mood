@@ -32,9 +32,8 @@ function fetchFromQuery() {
     });
     document.getElementById('query-form').style.display = 'none';
     document.getElementById('results').style.display = 'block';
-  }
-  catch(error) {
-    // TODO: define what we want when there is an error
+  } catch (error) {
+    alert(error.message);
   }
 }
 
@@ -43,8 +42,7 @@ function getUserQuisinesFromUi() {
   const quisines = document.getElementById('quisines-form').elements;
   let result = quisines.join(',');
   if (result === "") {
-    alert("You must choose at least one quisine type!");
-    throw "Quisines input error: user must choose at least one quisine.";
+    throw new Error("Choose at least one quisine.");
   }
   return result;
 }
@@ -56,7 +54,7 @@ function getUserRatingFromUi() {
       return rating[i].value;
     }
   }
-  throw "Rating input error: user must choose exactly one rating.";
+  throw new Error("Choose exactly one rating.");
 }
 
 function getUserPriceFromUi() {
@@ -66,7 +64,7 @@ function getUserPriceFromUi() {
       return price[i].value;
     }
   }
-  throw "Price input error: user must choose exactly one price level.";
+  throw new Error("Choose exactly one price level.");
 }
 
 function getUserLocationFromUi() {
