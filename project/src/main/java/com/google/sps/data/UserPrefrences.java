@@ -20,7 +20,7 @@ import com.google.maps.model.LatLng;
 import java.util.List;
 
 /**
- * Represents the prefrences entered by a user
+ * Represents the prefrences entered by a user.
  */
 @AutoValue
 public abstract class UserPrefrences {

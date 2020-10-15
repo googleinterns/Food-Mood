@@ -20,24 +20,12 @@ package com.google.sps.data;
 import com.google.auto.value.AutoValue;
 import com.google.maps.model.LatLng;
 
-import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
-
-
 /**
  * Represents a place that food can be ordered from in the food-mood
  * web application.
  */
 @AutoValue
 public abstract class Place {
-
-  /** The maximal valid rating value. */
-  private static final float MAX_RATING = 5.0f;
-  /** The minimal valid rating value. */
-  private static final float MIN_RATING = 1.0f;
-  /** The maximal valid price level value. */
-  private static final int MAX_PRICE_LEVEL = 4;
-  /** The minimal valid price level value. */
-  private static final int MIN_PRICE_LEVEL = 0;
 
   /**
    * @return the name of the place.

@@ -30,7 +30,7 @@ public final class PlaceTest {
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final String NAME = "name";
   private static final String PHONE = "+97250-0000-000";
-  private static final String WEBSITE ="website@google.com";
+  private static final String WEBSITE = "website@google.com";
 
   @Test
   public void build_invalidLowRating_throwsIllegalArgumentException() {
