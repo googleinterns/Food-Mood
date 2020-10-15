@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.Place;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
@@ -42,7 +40,7 @@ public final class QueryServletTest {
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
 
   @Test
-  public void getRequest_fetchedMoreThanMaxNumPlaces_respondWithMaxNumPlaces() throws Exception{
+  public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
     StringWriter stringWriter = new StringWriter();
     PrintWriter printWriter = new PrintWriter(stringWriter);
     ImmutableList<Place> placesListWithMoreThanMaxNum =
@@ -53,14 +51,15 @@ public final class QueryServletTest {
     when(RESPONSE.getWriter()).thenReturn(printWriter);
 
     servlet.doGet(REQUEST, RESPONSE);
-    JsonArray jsonPlaces = new Gson().fromJson(stringWriter.getBuffer().toString(), JsonArray.class);
+    JsonArray jsonPlaces = new Gson().
+        fromJson(stringWriter.getBuffer().toString(), JsonArray.class);
 
     // Make sure we got the right number of elements
     assertEquals(jsonPlaces.size(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
   }
 
   @Test
-  public void getRequest_fetchedLessThanMaxNumPlaces_respondWithAllFetchedPlaces() throws Exception{
+  public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
     StringWriter stringWriter = new StringWriter();
     PrintWriter printWriter = new PrintWriter(stringWriter);
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
