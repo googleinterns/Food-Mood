@@ -34,7 +34,7 @@ public final class ValidationUtils {
      * @param rating the rating of a place, should be represented by a number between 1-5.
      * @throws IllegalArgumentException
      */
-    public static final void validateRating(float rating) throws IllegalArgumentException {
+    public static void validateRating(float rating) throws IllegalArgumentException {
         checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
         "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
     }
@@ -43,7 +43,7 @@ public final class ValidationUtils {
      * @param priceLevel the price level of a place, should be represented by a number between 0-4.
      * @throws IllegalArgumentException
      */
-    public static final void validatePriceLevel(int priceLevel) throws IllegalArgumentException {
+    public static void validatePriceLevel(int priceLevel) throws IllegalArgumentException {
         checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
         "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
     }
