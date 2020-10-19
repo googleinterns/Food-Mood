@@ -37,7 +37,7 @@ public class PlacesFetcher {
      * will be fields of a UserPrefrences instance passed to fetch() by the Servlet.
      */
     private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+    private static final ImmutableList<String> CUISINES = ImmutableList.of();
     private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
     private static final boolean OPEN_NOW = true;
 
@@ -97,7 +97,6 @@ public class PlacesFetcher {
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
             PlaceDetails placeDetails = getPlaceDetails(detailsRequest);
-            System.out.println(placeDetails.name);
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
