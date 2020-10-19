@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -38,44 +39,41 @@ public final class QueryServletTest {
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
+  private StringWriter responseStringWriter;
+  private PrintWriter responsePrintWriter;
+  private QueryServlet servlet;
+
+  @Before
+  public void setUp() throws Exception {
+    responseStringWriter = new StringWriter();
+    responsePrintWriter = new PrintWriter(responseStringWriter);
+    servlet = new QueryServlet();
+    servlet.init(FETCHER);
+    when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
+  }
 
   @Test
   public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
     ImmutableList<Place> placesListWithMoreThanMaxNum =
         createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
-    QueryServlet servlet = new QueryServlet();
-    servlet.init(FETCHER);
     when(FETCHER.fetch()).thenReturn(placesListWithMoreThanMaxNum);
-    when(RESPONSE.getWriter()).thenReturn(printWriter);
 
     servlet.doGet(REQUEST, RESPONSE);
-    JsonArray jsonPlaces = new Gson().
-        fromJson(stringWriter.getBuffer().toString(), JsonArray.class);
 
     // Make sure we got the right number of elements
-    assertEquals(jsonPlaces.size(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
+    assertEquals(getResponseSize(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
   }
 
   @Test
   public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter printWriter = new PrintWriter(stringWriter);
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
-    QueryServlet servlet = new QueryServlet();
-    servlet.init(FETCHER);
     when(FETCHER.fetch()).thenReturn(placesListWithLessThanMaxNum);
-    when(RESPONSE.getWriter()).thenReturn(printWriter);
 
     servlet.doGet(REQUEST, RESPONSE);
 
-    JsonArray jsonPlaces = new Gson()
-        .fromJson(stringWriter.getBuffer().toString(), JsonArray.class);
-
     // Make sure we got the right number of elements
-    assertEquals(jsonPlaces.size(), numOfFetchedPlaces);
+    assertEquals(getResponseSize(), numOfFetchedPlaces);
   }
 
   // Returns an immutable list that has the required number of Place elements. All elements are
@@ -95,5 +93,12 @@ public final class QueryServletTest {
       );
     }
     return places.build();
+  }
+
+  // Returns the number of json elements in the servlet's response
+  private int getResponseSize() {
+    return new Gson()
+        .fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class)
+        .size();
   }
 }
