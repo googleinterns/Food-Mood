@@ -80,7 +80,7 @@ public final class PlacesFetcherTest {
 
   /** An array of valid PlacesSearchResults. */
   private static final PlacesSearchResult[] SEARCH_RESULT_ARR =
-      { SEARCH_RESULT_1, SEARCH_RESULT_2 };
+      {SEARCH_RESULT_1, SEARCH_RESULT_2 };
 
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
