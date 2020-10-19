@@ -37,8 +37,8 @@ function fetchFromQuery() {
   }
 }
 
+// TODO: take out for loop to another function
 function getUserQuisinesFromUi() {
-  // const quisines = document.forms[0];
   const quisines = document.getElementById('quisines-form').elements;
   let result = quisines.join(',');
   if (result === "") {
@@ -65,6 +65,16 @@ function getUserPriceFromUi() {
     }
   }
   throw new Error("Choose exactly one price level.");
+}
+
+function getUserOpenNowFromUi() {
+  const openNow = document.getElementById('open-now-form').elements;
+  for (i = 0; i < openNow.length; i++) {
+    if (openNow[i].checked) {
+      return rating[i].value;
+    }
+  }
+  throw new Error("Choose if the place should be open now or you don't mind.");
 }
 
 function getUserLocationFromUi() {
