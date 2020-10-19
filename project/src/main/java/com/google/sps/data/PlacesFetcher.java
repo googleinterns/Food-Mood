@@ -14,11 +14,8 @@
 
 package com.google.sps.data;
 
-import static java.util.stream.Collectors.joining;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -36,7 +33,8 @@ public class PlacesFetcher {
 
     /** The type of places that will be searched is RESTAURANT. Since most places
      * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
-     * rather as "RESTAURANT" this is the most suitable type to search for. */
+     * rather as "RESTAURANT" this is the most suitable type to search for.
+     */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
     /** In this radius around "LOCATION" places will be searched. */
@@ -51,14 +49,11 @@ public class PlacesFetcher {
     /**
      * Builds a query and requests it from Google Places API.
      *
-     * @param prefrences UserPrefrences as defined by the user
-     * @return an immutable list of places that supply the query.
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ApiException
+     * @return an immutable list of places that supply the query
+     * @throws FetcherException when an error occurs in querying the Places API
+     *     for places or for places details
      */
-    public ImmutableList<Place> fetch(UserPrefrences prefrences)
-            throws IOException, InterruptedException, ApiException {
+    public ImmutableList<Place> fetch(UserPrefrences prefrences) throws FetcherException {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(CONTEXT, createCuisenesQuery(prefrences.cuisines()), prefrences.location())
                 .radius(SEARCH_RADIUS)
@@ -67,7 +62,11 @@ public class PlacesFetcher {
         if (prefrences.openNow()) {
             query.openNow(prefrences.openNow());
         }
-        return createPlacesList(getPlacesSearchResults(query));
+        try {
+            return createPlacesList(getPlacesSearchResults(query));
+        } catch (ApiException | InterruptedException | IOException e) {
+            throw new FetcherException("Couldn't fetch places from Places API", e);
+        }
     }
 
     /**
@@ -75,9 +74,9 @@ public class PlacesFetcher {
      *
      * @param query A TextSearchRequest with all params to query on
      * @return A PlacesSearchResponse which contains the search results
-     * @throws ApiException
-     * @throws InterruptedException
      * @throws IOException
+     * @throws InterruptedException
+     * @throws ApiException
      */
     @VisibleForTesting
     PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
@@ -86,11 +85,17 @@ public class PlacesFetcher {
     }
 
     private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
-            throws ApiException, InterruptedException, IOException {
+            throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
-            PlaceDetails placeDetails = getPlaceDetails(detailsRequest);
+            PlaceDetails placeDetails;
+            try {
+                placeDetails = getPlaceDetails(detailsRequest);
+            } catch (ApiException | InterruptedException | IOException e) {
+                throw new FetcherException(
+                    "Couldn't get place details from Places API", e);
+            }
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
@@ -122,9 +127,6 @@ public class PlacesFetcher {
      *
      * @param request A PlaceDetailsRequest to query certain details on a certain place
      * @return PlacesDetails containig requested details about the place
-     * @throws ApiException
-     * @throws InterruptedException
-     * @throws IOException
      */
     @VisibleForTesting
     PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
@@ -133,6 +135,6 @@ public class PlacesFetcher {
     }
 
     private static String createCuisenesQuery(ImmutableList<String> cuisines) {
-        return cuisines.stream().collect(joining("|"));
+        return String.join("|", cuisines);
     }
 }

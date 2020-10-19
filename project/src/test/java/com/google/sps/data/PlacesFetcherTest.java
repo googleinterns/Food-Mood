@@ -14,10 +14,9 @@
 
 package com.google.sps.data;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.TextSearchRequest;
-import com.google.maps.errors.ApiException;
 import com.google.maps.model.Geometry;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
@@ -31,8 +30,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 
 @RunWith(JUnit4.class)
@@ -43,19 +45,14 @@ public final class PlacesFetcherTest {
   private static final String PHONE = "+97250-0000-000";
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final float RATING = 4;
-  private static final int PRICELEVEL_INT = 2; // used for Places
+  private static final int PRICELEVEL_INT = 2; // used for Places and UserPrefrences
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
-      /**
-     * Those constants are temporaraly hardcoded for M0. In next versions those same constants
-     * will be fields of a UserPrefrences instance passed to fetch() by the Servlet.
-     */
-    private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
-    private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
-    private static final boolean OPEN_NOW = true;
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+  private static final boolean OPEN_NOW = true;
 
   /** Valid Place objects. */
   private static final Place PLACE_1 =
-    Place.builder()
+      Place.builder()
       .setName("name1")
       .setWebsiteUrl(PLACE_URL)
       .setPhone(PHONE)
@@ -64,7 +61,7 @@ public final class PlacesFetcherTest {
       .setLocation(LOCATION)
       .build();
   private static final Place PLACE_2 =
-    Place.builder()
+      Place.builder()
       .setName("name2")
       .setWebsiteUrl(PLACE_URL)
       .setPhone(PHONE)
@@ -72,6 +69,15 @@ public final class PlacesFetcherTest {
       .setPriceLevel(PRICELEVEL_INT)
       .setLocation(LOCATION)
       .build();
+
+  /** Valid UserPrefrences builder. */
+   private static final UserPrefrences.Builder prefrencesBuilder =
+      UserPrefrences.builder()
+      .setMinRating(RATING)
+      .setMaxPriceLevel(PRICELEVEL_INT)
+      .setLocation(LOCATION)
+      .setCuisines(CUISINES)
+      .setOpenNow(OPEN_NOW);
 
   /** Place IDs for valid PlacesSearchResults used in tests. */
   private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
@@ -84,13 +90,14 @@ public final class PlacesFetcherTest {
       createTestPlacesSearchResult(PLACEID_2);
 
   /** An array of valid PlacesSearchResults. */
-  private static final PlacesSearchResult[] SEARCH_RESULT_ARR = {SEARCH_RESULT_1, SEARCH_RESULT_2};
+  private static final PlacesSearchResult[] SEARCH_RESULT_ARR =
+      {SEARCH_RESULT_1, SEARCH_RESULT_2 };
 
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
-    createTestPlaceDetails("name1", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+      createTestPlaceDetails("name1", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
   private static final PlaceDetails PLACE_DETAILS_2 =
-    createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+      createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
 
   private static URL createTestURL(String s) {
     try {
@@ -102,7 +109,7 @@ public final class PlacesFetcherTest {
   }
 
   private static PlaceDetails createTestPlaceDetails(
-      String name, URL url, String phone, float rating, PriceLevel priceLevel, LatLng location) {
+        String name, URL url, String phone, float rating, PriceLevel priceLevel, LatLng location) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
     placeDetails.website = url;
@@ -126,19 +133,70 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(new PlacesSearchResult[0])
-        .when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));
-    assertEquals(ImmutableList.of(), spiedFetcher.fetch());
+    doReturn(new PlacesSearchResult[0]).when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    assertEquals(ImmutableList.of(), spiedFetcher.fetch(prefrencesBuilder.build()));
   }
 
   @Test
-  public void fetch_validSearchResults_returnsListOfPlaces()
-      throws ApiException, InterruptedException, IOException {
+  public void fetch_validSearchResults_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(PLACE_DETAILS_1).doReturn(PLACE_DETAILS_2)
-        .when(spiedFetcher).getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_ARR)
-        .when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));
-    assertEquals(ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch());
+    doReturn(PLACE_DETAILS_1).
+    doReturn(PLACE_DETAILS_2).when(spiedFetcher)
+        .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
+        .getPlacesSearchResults(any(TextSearchRequest.class));
+    assertEquals(
+      ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch(prefrencesBuilder.build()));
+  }
+
+  @Test
+  public void fetch_noPreferedCuisines_returnsListOfPlaces() throws Exception {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doReturn(PLACE_DETAILS_1).
+    doReturn(PLACE_DETAILS_2).when(spiedFetcher)
+        .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
+        .getPlacesSearchResults(any(TextSearchRequest.class));
+    assertEquals(
+      ImmutableList.of(PLACE_1, PLACE_2),
+      spiedFetcher.fetch(prefrencesBuilder.setCuisines(ImmutableList.of()).build()));
+  }
+
+  @Test
+  public void fetch_noOpenNowPreference_returnsListOfPlaces() throws Exception {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doReturn(PLACE_DETAILS_1).
+    doReturn(PLACE_DETAILS_2).when(spiedFetcher)
+        .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
+        .getPlacesSearchResults(any(TextSearchRequest.class));
+    assertEquals(
+      ImmutableList.of(PLACE_1, PLACE_2),
+      spiedFetcher.fetch(prefrencesBuilder.setOpenNow(false).build()));
+  }
+
+  @Test
+  public void fetch_ResultsQueryFails_throwsFetcherException() throws Exception {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doThrow(new IOException()).when(spiedFetcher)
+        .getPlacesSearchResults(any(TextSearchRequest.class));
+    FetcherException thrown =
+        assertThrows(FetcherException.class, () -> spiedFetcher.fetch(prefrencesBuilder.build()));
+    assertTrue(thrown.getCause() instanceof IOException);
+    assertTrue(thrown.getMessage().contains("fetch places"));
+  }
+
+  @Test
+  public void fetch_PlaceDetailsQueryFails_throwsFetcherException() throws Exception {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
+        .getPlacesSearchResults(any(TextSearchRequest.class));
+    doThrow(new IOException()).when(spiedFetcher)
+        .getPlaceDetails(any(PlaceDetailsRequest.class));
+    FetcherException thrown =
+        assertThrows(FetcherException.class, () -> spiedFetcher.fetch(prefrencesBuilder.build()));
+    assertTrue(thrown.getCause() instanceof IOException);
+    assertTrue(thrown.getMessage().contains("place details"));
   }
 }
