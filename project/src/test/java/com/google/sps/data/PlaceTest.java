@@ -14,11 +14,11 @@
 
 package com.google.sps.data;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertThrows;
-
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)

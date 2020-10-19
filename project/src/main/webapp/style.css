@@ -3,7 +3,8 @@
   margin-right: auto;
   width: 650px;
   font-size: 20px;
-  font-family: Impact, Charcoal, sans-serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  white-space: nowrap;
 }
 
 li {
@@ -34,4 +35,19 @@ li {
   margin-top: auto;
   display: inline-block;
   margin-left: 15px;
+}
+
+.submit {
+  background-color: rgb(197, 235, 197);
+  width: 200px;
+  height: 50px;
+  padding: 10px;
+  font-size: 20px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.button {
+  width: 150px;
+  padding: 5px;
+  background-color: rgb(199, 232, 245);
 }

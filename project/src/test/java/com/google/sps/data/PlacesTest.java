@@ -14,11 +14,11 @@
 
 package com.google.sps.data;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertTrue;
-
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 

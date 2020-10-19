@@ -17,11 +17,10 @@
  */
 package com.google.sps.data;
 
-import com.google.auto.value.AutoValue;
-import com.google.maps.model.LatLng;
-
 import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
 
+import com.google.auto.value.AutoValue;
+import com.google.maps.model.LatLng;
 
 /**
  * Represents a place that food can be ordered from in the food-mood

@@ -14,6 +14,14 @@
 
 package com.google.sps.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.TextSearchRequest;
@@ -28,14 +36,6 @@ import java.net.URL;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
 
 @RunWith(JUnit4.class)
 public final class PlacesFetcherTest {
