@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.test;
+package com.google.sps.data;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import static org.junit.Assert.assertThrows;
-import com.google.sps.data.Place;
 
+import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
 public final class PlaceTest {
@@ -70,7 +70,6 @@ public final class PlaceTest {
         .setPhone("+97250-0000-000")
         .setRating(4)
         .setPriceLevel(3)
-        .setLongitude(35.35)
-        .setLatitude(30.30);
+        .setLocation(new LatLng(35.35, 30.30));
   }
 }
