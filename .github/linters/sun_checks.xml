@@ -95,7 +95,6 @@
     <module name="JavadocStyle"/>
     <module name="MissingJavadocMethod">
       <property name="allowedAnnotations" value="Override, Test, Before"/>
-      <property name="excludeScope" value="private"/>
     </module>
 
 
