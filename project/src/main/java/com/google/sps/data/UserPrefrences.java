@@ -53,7 +53,7 @@ public abstract class UserPrefrences {
     return new AutoValue_UserPrefrences.Builder();
   }
 
-/**
+  /**
    * A builder class for creating UserPrefrences objects.
    */
   @AutoValue.Builder

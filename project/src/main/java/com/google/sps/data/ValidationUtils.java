@@ -48,6 +48,5 @@ public final class ValidationUtils {
         "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
     }
 
-    private ValidationUtils() {
-    }
+    private ValidationUtils() {}
 }
