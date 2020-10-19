@@ -76,8 +76,7 @@ public class PlacesFetcher {
         }
         try {
             return createPlacesList(getPlacesSearchResults(query));
-        }
-        catch (ApiException | InterruptedException | IOException e) {
+        } catch (ApiException | InterruptedException | IOException e) {
             throw new FetcherException("Couldn't fetch places from Places API", e);
         }
     }
@@ -105,8 +104,7 @@ public class PlacesFetcher {
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
-            }
-            catch (ApiException | InterruptedException | IOException e) {
+            } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException(
                     "Couldn't get place details from Places API", e);
             }

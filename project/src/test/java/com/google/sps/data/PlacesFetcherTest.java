@@ -49,27 +49,44 @@ public final class PlacesFetcherTest {
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
 
   /** Valid Place objects. */
-  private static final Place PLACE_1 = Place.builder().setName("name1").setWebsiteUrl(PLACE_URL).setPhone(PHONE)
-      .setRating(RATING).setPriceLevel(PRICELEVEL_INT).setLocation(LOCATION).build();
-  private static final Place PLACE_2 = Place.builder().setName("name2").setWebsiteUrl(PLACE_URL).setPhone(PHONE)
-      .setRating(RATING).setPriceLevel(PRICELEVEL_INT).setLocation(LOCATION).build();
+  private static final Place PLACE_1 =
+      Place.builder()
+      .setName("name1")
+      .setWebsiteUrl(PLACE_URL)
+      .setPhone(PHONE)
+      .setRating(RATING)
+      .setPriceLevel(PRICELEVEL_INT)
+      .setLocation(LOCATION)
+      .build();
+  private static final Place PLACE_2 =
+      Place.builder()
+      .setName("name2")
+      .setWebsiteUrl(PLACE_URL)
+      .setPhone(PHONE)
+      .setRating(RATING)
+      .setPriceLevel(PRICELEVEL_INT)
+      .setLocation(LOCATION)
+      .build();
 
   /** Place IDs for valid PlacesSearchResults used in tests. */
   private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
   private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
   /** Valid PlacesSearchResult. */
-  private static final PlacesSearchResult SEARCH_RESULT_1 = createTestPlacesSearchResult(PLACEID_1);
-  private static final PlacesSearchResult SEARCH_RESULT_2 = createTestPlacesSearchResult(PLACEID_2);
+  private static final PlacesSearchResult SEARCH_RESULT_1 =
+      createTestPlacesSearchResult(PLACEID_1);
+  private static final PlacesSearchResult SEARCH_RESULT_2 =
+      createTestPlacesSearchResult(PLACEID_2);
 
   /** An array of valid PlacesSearchResults. */
-  private static final PlacesSearchResult[] SEARCH_RESULT_ARR = { SEARCH_RESULT_1, SEARCH_RESULT_2 };
+  private static final PlacesSearchResult[] SEARCH_RESULT_ARR =
+      { SEARCH_RESULT_1, SEARCH_RESULT_2 };
 
   /** Valid PlaceDetails. */
-  private static final PlaceDetails PLACE_DETAILS_1 = createTestPlaceDetails("name1", PLACES_DETAILS_URL, PHONE, RATING,
-      PRICELEVEL, LOCATION);
-  private static final PlaceDetails PLACE_DETAILS_2 = createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING,
-      PRICELEVEL, LOCATION);
+  private static final PlaceDetails PLACE_DETAILS_1 =
+      createTestPlaceDetails("name1", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+  private static final PlaceDetails PLACE_DETAILS_2 =
+      createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
 
   private static URL createTestURL(String s) {
     try {
@@ -80,8 +97,8 @@ public final class PlacesFetcherTest {
     }
   }
 
-  private static PlaceDetails createTestPlaceDetails(String name, URL url, String phone, float rating,
-      PriceLevel priceLevel, LatLng location) {
+  private static PlaceDetails createTestPlaceDetails(
+        String name, URL url, String phone, float rating, PriceLevel priceLevel, LatLng location) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
     placeDetails.website = url;
@@ -105,7 +122,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(new PlacesSearchResult[0]).when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(new PlacesSearchResult[0]).when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(ImmutableList.of(), spiedFetcher.fetch());
   }
 
@@ -114,7 +132,8 @@ public final class PlacesFetcherTest {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     doReturn(PLACE_DETAILS_1).doReturn(PLACE_DETAILS_2).when(spiedFetcher)
         .getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher).getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
+        .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch());
   }
 
@@ -133,7 +152,7 @@ public final class PlacesFetcherTest {
   public void fetch_PlaceDetailsQueryFails_throwsFetcherException() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
-      .getPlacesSearchResults(any(TextSearchRequest.class));
+        .getPlacesSearchResults(any(TextSearchRequest.class));
     doThrow(new IOException()).when(spiedFetcher)
         .getPlaceDetails(any(PlaceDetailsRequest.class));
     FetcherException thrown =
