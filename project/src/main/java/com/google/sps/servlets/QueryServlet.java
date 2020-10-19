@@ -52,12 +52,13 @@ public final class QueryServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
       //TODO(M1): add call to filterer
-      List<Place> placesToDisplay = Places.randomSort(fetcher.fetch())
+      response.setContentType("application/json");
+      response.getWriter().write(new Gson().toJson(
+          Places.randomSort(fetcher.fetch())
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-          .collect(Collectors.toList());
-      response.setContentType("application/json");
-      response.getWriter().write(new Gson().toJson(placesToDisplay));
+          .collect(Collectors.toList())
+      ));
     } catch (Exception e) {
       //TODO(M1): handle errors - TBD
     }
