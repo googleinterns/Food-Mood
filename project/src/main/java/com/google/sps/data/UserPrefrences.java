@@ -44,7 +44,13 @@ public abstract class UserPrefrences {
   /**
   * @return the cuisine types that the user prefers.
   */
-  public abstract ImmutableList<String> cuisineTypes();
+  public abstract ImmutableList<String> cuisines();
+
+  /**
+  * @return true if the user wants the place to be currently open.
+  */
+  public abstract boolean openNow();
+
 
   /**
    * @return a builder that enables to build a new Place object
@@ -82,7 +88,13 @@ public abstract class UserPrefrences {
      * @param cuisineTypes the cuisine types that the user prefers
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setCuisineTypes(ImmutableList<String> cuisineTypes);
+    public abstract Builder setCuisines(ImmutableList<String> cuisines);
+
+    /**
+     * @param openNow a boolean representing whether the users wants the place to be currently open
+     * @return a Place builder that enables to continue building
+     */
+    public abstract Builder setOpenNow(boolean openNow);
 
     /**
      * Builds the UserPrefrences object according to the data that was set so far.

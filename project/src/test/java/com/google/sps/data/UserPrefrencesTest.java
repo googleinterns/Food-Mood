@@ -31,6 +31,7 @@ public class UserPrefrencesTest {
     private static final int PRICE_LEVEL = 2;
     private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
     private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+    private static final boolean OPEN_NOW = true;
 
     @Test
     public void build_invalidLowRating_throwsIllegalArgumentException() {
@@ -75,7 +76,8 @@ public class UserPrefrencesTest {
             () -> assertEquals(RATING, prefrences.minRating()),
             () -> assertEquals(PRICE_LEVEL, prefrences.maxPriceLevel()),
             () -> assertEquals(LOCATION, prefrences.location()),
-            () -> assertEquals(CUISINES, prefrences.cuisineTypes())
+            () -> assertEquals(CUISINES, prefrences.cuisines()),
+            () -> assertEquals(OPEN_NOW, prefrences.openNow())
         );
     }
 
@@ -85,6 +87,7 @@ public class UserPrefrencesTest {
           .setMinRating(RATING)
           .setMaxPriceLevel(PRICE_LEVEL)
           .setLocation(LOCATION)
-          .setCuisineTypes(CUISINES);
+          .setCuisines(CUISINES)
+          .setOpenNow(OPEN_NOW);
     }
 }

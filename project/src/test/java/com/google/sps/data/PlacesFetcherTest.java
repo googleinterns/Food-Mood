@@ -45,6 +45,13 @@ public final class PlacesFetcherTest {
   private static final float RATING = 4;
   private static final int PRICELEVEL_INT = 2; // used for Places
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
+      /**
+     * Those constants are temporaraly hardcoded for M0. In next versions those same constants
+     * will be fields of a UserPrefrences instance passed to fetch() by the Servlet.
+     */
+    private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+    private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
+    private static final boolean OPEN_NOW = true;
 
   /** Valid Place objects. */
   private static final Place PLACE_1 =
