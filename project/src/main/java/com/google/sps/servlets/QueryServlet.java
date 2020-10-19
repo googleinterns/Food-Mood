@@ -15,13 +15,11 @@
 package com.google.sps.servlets;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
