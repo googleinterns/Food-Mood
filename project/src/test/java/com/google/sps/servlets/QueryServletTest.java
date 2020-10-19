@@ -60,8 +60,7 @@ public final class QueryServletTest {
 
     servlet.doGet(REQUEST, RESPONSE);
 
-    // Make sure we got the right number of elements
-    assertEquals(getResponseSize(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
+    assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
   }
 
   @Test
@@ -72,8 +71,7 @@ public final class QueryServletTest {
 
     servlet.doGet(REQUEST, RESPONSE);
 
-    // Make sure we got the right number of elements
-    assertEquals(getResponseSize(), numOfFetchedPlaces);
+    assertEquals(getPlacesAmountInResponse(), numOfFetchedPlaces);
   }
 
   // Returns an immutable list that has the required number of Place elements. All elements are
@@ -96,7 +94,7 @@ public final class QueryServletTest {
   }
 
   // Returns the number of json elements in the servlet's response
-  private int getResponseSize() {
+  private int getPlacesAmountInResponse() {
     return new Gson()
         .fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class)
         .size();
