@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps.data.errors;
+package com.google.sps.data;
 /**
  * FetcherException represents an error returned by the PlacesFetcher.
  */

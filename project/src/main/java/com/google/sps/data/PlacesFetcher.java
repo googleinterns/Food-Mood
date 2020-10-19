@@ -20,7 +20,6 @@ import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
-import com.google.sps.data.errors.FetcherException;
 import com.google.maps.GeoApiContext;
 import com.google.maps.TextSearchRequest;
 import com.google.maps.PlaceDetailsRequest;
@@ -75,7 +74,12 @@ public class PlacesFetcher {
         if (OPEN_NOW) {
             query.openNow(OPEN_NOW);
         }
-        return createPlacesList(getPlacesSearchResults(query));
+        try {
+            return createPlacesList(getPlacesSearchResults(query));
+        }
+        catch (ApiException | InterruptedException | IOException e) {
+            throw new FetcherException("Couldn't fetch places from Places API", e);
+        }
     }
 
     /**
@@ -83,15 +87,14 @@ public class PlacesFetcher {
      *
      * @param query A TextSearchRequest with all params to query on
      * @return A PlacesSearchResponse which contains the search results
-     * @throws FetcherException when an error occurs in querying the Places API
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ApiException
      */
     @VisibleForTesting
-    PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query) throws FetcherException {
-        try {
-            return query.await().results;
-        } catch (ApiException | InterruptedException | IOException e) {
-            throw new FetcherException("Couldn't fetch places from Places API", e.getCause());
-        }
+    PlacesSearchResult[] getPlacesSearchResults(TextSearchRequest query)
+            throws ApiException, InterruptedException, IOException {
+        return query.await().results;
     }
 
     private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
@@ -99,7 +102,14 @@ public class PlacesFetcher {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
-            PlaceDetails placeDetails = getPlaceDetails(detailsRequest);
+            PlaceDetails placeDetails;
+            try {
+                placeDetails = getPlaceDetails(detailsRequest);
+            }
+            catch (ApiException | InterruptedException | IOException e) {
+                throw new FetcherException(
+                    "Couldn't get place details from Places API", e);
+            }
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
@@ -115,7 +125,6 @@ public class PlacesFetcher {
         return ImmutableList.copyOf(places);
     }
 
-    @VisibleForTesting
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
         return PlacesApi.placeDetails(CONTEXT, placeId)
             .fields(
@@ -132,15 +141,10 @@ public class PlacesFetcher {
      *
      * @param request A PlaceDetailsRequest to query certain details on a certain place
      * @return PlacesDetails containig requested details about the place
-     * @throws FetcherException when an error occurs in querying the Places API
      */
     @VisibleForTesting
-    PlaceDetails getPlaceDetails(PlaceDetailsRequest request) throws FetcherException {
-        try {
-            return request.await();
-        } catch (ApiException | InterruptedException | IOException e) {
-            throw new FetcherException(
-                "Couldn't get place details from Places API", e.getCause());
-        }
+    PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+            throws ApiException, InterruptedException, IOException {
+        return request.await();
     }
 }
