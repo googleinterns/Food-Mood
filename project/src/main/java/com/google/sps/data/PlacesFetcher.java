@@ -14,8 +14,6 @@
 
 package com.google.sps.data;
 
-import static java.util.stream.Collectors.joining;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
@@ -68,7 +66,7 @@ public class PlacesFetcher {
      */
     public ImmutableList<Place> fetch() throws IOException, InterruptedException, ApiException {
         TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, createCuisenesQuery(), LOCATION)
+            PlacesApi.textSearchQuery(CONTEXT, createCuisinesQuery(), LOCATION)
                 .radius(SEARCH_RADIUS)
                 .maxPrice(MAX_PRICE_LEVEL)
                 .type(TYPE);
@@ -99,6 +97,7 @@ public class PlacesFetcher {
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
             PlaceDetails placeDetails = getPlaceDetails(detailsRequest);
+            System.out.println(placeDetails.name);
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
@@ -140,7 +139,7 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisenesQuery() {
-        return CUISINES.stream().collect(joining("|"));
+    private static String createCuisinesQuery() {
+        return String.join("|", CUISINES);
     }
 }
