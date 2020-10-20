@@ -14,8 +14,8 @@
 
 package com.google.sps.data;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
@@ -38,7 +38,7 @@ public class PlacesFetcher {
      * the Servlet.
      */
     private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final String CUISINES = "sushi"; // TODO(M0): change to set of types;
+    private static final ImmutableList<String> CUISINES = ImmutableList.of();
     private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
     private static final boolean OPEN_NOW = true;
 
@@ -67,7 +67,7 @@ public class PlacesFetcher {
      */
     public ImmutableList<Place> fetch() throws FetcherException {
         TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, CUISINES, LOCATION)
+            PlacesApi.textSearchQuery(CONTEXT, createCuisinesQuery(), LOCATION)
                 .radius(SEARCH_RADIUS)
                 .maxPrice(MAX_PRICE_LEVEL)
                 .type(TYPE);
@@ -144,5 +144,9 @@ public class PlacesFetcher {
     PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
             throws ApiException, InterruptedException, IOException {
         return request.await();
+    }
+
+    private static String createCuisinesQuery() {
+        return String.join("|", CUISINES);
     }
 }
