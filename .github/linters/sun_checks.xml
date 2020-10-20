@@ -86,7 +86,7 @@
     <!-- See https://checkstyle.org/config_javadoc.html -->
     <module name="InvalidJavadocPosition"/>
     <module name="JavadocMethod">
-      <property name="allowedAnnotations" value="Override, Test"/>
+      <property name="allowedAnnotations" value="Override, Test, Before"/>
     </module>
     <module name="JavadocType"/>
     <module name="JavadocVariable">
@@ -94,7 +94,7 @@
     </module>
     <module name="JavadocStyle"/>
     <module name="MissingJavadocMethod">
-      <property name="allowedAnnotations" value="Override, Test"/>
+      <property name="allowedAnnotations" value="Override, Test, Before"/>
     </module>
 
 
