@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
