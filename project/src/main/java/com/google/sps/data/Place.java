@@ -17,11 +17,6 @@
  */
 package com.google.sps.data;
 
-<<<<<<< HEAD
-=======
-import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
-
->>>>>>> ccee23f1cb4ebfae639b17d1bdda81efe079aca9
 import com.google.auto.value.AutoValue;
 import com.google.maps.model.LatLng;
 
