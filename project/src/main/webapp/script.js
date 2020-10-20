@@ -20,15 +20,20 @@ function fetchFromQuery() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
   document.getElementById('map-container').style.display = 'none';
+  document.getElementById('feedback-box').style.display = 'none';
   const map = createMap();
   const placesDiv = document.getElementById('place');
-  fetch('/query').then(response => response.json()).then((places) => {
+  fetch('/query')
+  .then(response => response.json())
+  .then((places) => {
     places.forEach((singlePlace) => {
       placesDiv.appendChild(createPlaceElement(singlePlace));
-      addPlaceMarker(map, singlePlace);
-    });
-  });
-  document.getElementById('map-container').style.display = 'block';
+      addPlaceMarker(map, singlePlace)
+      })
+    })
+  .then(() => {document.getElementById('waiting-message').style.display = 'none'})
+  .then(() => {document.getElementById('map-container').style.display = 'block'})
+  .then(() => {document.getElementById('feedback-box').style.display = 'block'});
 }
 
 /**
@@ -58,9 +63,11 @@ function createPlaceElement(place) {
   placeElement.appendChild(document.createElement('br'));
 
   // Add phone number
-  const phone = document.createTextNode('Phone number:' + place.phone);
-  placeElement.appendChild(phone);
-  placeElement.appendChild(document.createElement('br'));
+  if (place.phone) {
+    const phone = document.createTextNode('Phone number:' + place.phone);
+    placeElement.appendChild(phone);
+    placeElement.appendChild(document.createElement('br'));
+  }
 
   return placeElement;
 }
@@ -72,6 +79,7 @@ function createPlaceElement(place) {
 function tryAgain() {
   document.getElementById('query-form').style.display = 'block';
   document.getElementById('results').style.display = 'none';
+  document.getElementById('waiting-message').style.display = 'block'
   document.getElementById('place').innerHTML = '';
 }
 
@@ -81,7 +89,7 @@ function tryAgain() {
  */
 function createMap() {
   const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
-  var map = new google.maps.Map(document.getElementById("map-container"), {
+  var map = new google.maps.Map(document.getElementById('map-container'), {
     center: USER_LOCATION,
     zoom: 12,
   });
@@ -104,4 +112,9 @@ function addPlaceMarker(map, place) {
         infoWindow.open(map, marker);
     });
   }
+  // Zoom when clicking on marker
+  google.maps.event.addListener(marker,'click', function() {
+    map.setZoom(15);
+    map.setCenter(marker.position);
+  });
 }

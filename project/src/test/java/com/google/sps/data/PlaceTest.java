@@ -17,15 +17,23 @@ package com.google.sps.data;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertThrows;
-
 import com.google.maps.model.LatLng;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(JUnit4.class)
 public final class PlaceTest {
 
+  private static final float RATING = 4;
+  private static final int PRICE_LEVEL = 2;
+  private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
+  private static final String NAME = "name";
+  private static final String PHONE = "+97250-0000-000";
+  private static final String WEBSITE = "website@google.com";
+
   @Test
-  public void create_invalidLowRating_throwsIllegalArgumentException() {
+  public void build_invalidLowRating_throwsIllegalArgumentException() {
     int invalidLowRating = 0;
 
     assertThrows(IllegalArgumentException.class, () -> {
@@ -34,7 +42,7 @@ public final class PlaceTest {
   }
 
   @Test
-  public void create_invalidHighRating_throwsIllegalArgumentException() {
+  public void build_invalidHighRating_throwsIllegalArgumentException() {
     int invalidHighRating = 10;
 
     assertThrows(IllegalArgumentException.class, () -> {
@@ -43,7 +51,7 @@ public final class PlaceTest {
   }
 
   @Test
-  public void create_invalidLowPriceLevel_throwsIllegalArgumentException() {
+  public void build_invalidLowPriceLevel_throwsIllegalArgumentException() {
     int invalidLowPriceLevel = -1;
 
     assertThrows(IllegalArgumentException.class, () -> {
@@ -52,7 +60,7 @@ public final class PlaceTest {
   }
 
   @Test
-  public void create_invalidHighPriceLevel_throwsIllegalArgumentException() {
+  public void build_invalidHighPriceLevel_throwsIllegalArgumentException() {
     int invalidHighPriceLevel = 5;
 
     assertThrows(IllegalArgumentException.class, () -> {
@@ -60,16 +68,27 @@ public final class PlaceTest {
     });
   }
 
-  /**
-   * @return a Place builder that has valid values of all attributes
-   */
+  @Test
+  public void build_validInput_returnsValidPlace() {
+    Place place = getValidPlaceBuilder().build();
+      assertAll("place",
+          () -> assertEquals(NAME, place.name()),
+          () -> assertEquals(WEBSITE, place.websiteUrl()),
+          () -> assertEquals(PHONE, place.phone()),
+          () -> assertEquals(RATING, place.rating()),
+          () -> assertEquals(PRICE_LEVEL, place.priceLevel()),
+          () -> assertEquals(LOCATION, place.location())
+      );
+  }
+
+  // Returns a Place builder that has valid values of all attributes.
   private Place.Builder getValidPlaceBuilder() {
     return Place.builder()
-        .setName("name")
-        .setWebsiteUrl("website@google.com")
-        .setPhone("+97250-0000-000")
-        .setRating(4)
-        .setPriceLevel(3)
-        .setLocation(new LatLng(35.35, 30.30));
+        .setName(NAME)
+        .setWebsiteUrl(WEBSITE)
+        .setPhone(PHONE)
+        .setRating(RATING)
+        .setPriceLevel(PRICE_LEVEL)
+        .setLocation(LOCATION);
   }
 }
