@@ -32,7 +32,7 @@ public final class Places {
    * @param immutableList the list we want to sort.
    * @return a new list containing the original list's elements in random order.
    */
-  public static ImmutableList<Place> randomSort(com.google.common.collect.ImmutableList<Place> immutableList) {
+  public static ImmutableList<Place> randomSort(ImmutableList<Place> immutableList) {
     List<Place> mutablePlaces = new ArrayList<>(immutableList);
     Collections.shuffle(mutablePlaces);
     return ImmutableList.copyOf(mutablePlaces);
