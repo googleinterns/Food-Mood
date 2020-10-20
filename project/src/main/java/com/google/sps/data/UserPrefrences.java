@@ -85,7 +85,7 @@ public abstract class UserPrefrences {
     public abstract Builder setLocation(LatLng location);
 
     /**
-     * @param cuisineTypes the cuisine types that the user prefers
+     * @param cuisines the cuisine types that the user prefers
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setCuisines(ImmutableList<String> cuisines);

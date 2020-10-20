@@ -71,7 +71,7 @@ public final class PlacesFetcherTest {
       .build();
 
   /** Valid UserPrefrences builder. */
-   private static final UserPrefrences.Builder prefrencesBuilder =
+   private static final UserPrefrences.Builder PREFRENCES_BUILDER =
       UserPrefrences.builder()
       .setMinRating(RATING)
       .setMaxPriceLevel(PRICELEVEL_INT)
@@ -135,7 +135,7 @@ public final class PlacesFetcherTest {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     doReturn(new PlacesSearchResult[0]).when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
-    assertEquals(ImmutableList.of(), spiedFetcher.fetch(prefrencesBuilder.build()));
+    assertEquals(ImmutableList.of(), spiedFetcher.fetch(PREFRENCES_BUILDER.build()));
   }
 
   @Test
@@ -147,7 +147,7 @@ public final class PlacesFetcherTest {
     doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
         .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
-      ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch(prefrencesBuilder.build()));
+      ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch(PREFRENCES_BUILDER.build()));
   }
 
   @Test
@@ -160,7 +160,7 @@ public final class PlacesFetcherTest {
         .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
       ImmutableList.of(PLACE_1, PLACE_2),
-      spiedFetcher.fetch(prefrencesBuilder.setCuisines(ImmutableList.of()).build()));
+      spiedFetcher.fetch(PREFRENCES_BUILDER.setCuisines(ImmutableList.of()).build()));
   }
 
   @Test
@@ -173,7 +173,7 @@ public final class PlacesFetcherTest {
         .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
       ImmutableList.of(PLACE_1, PLACE_2),
-      spiedFetcher.fetch(prefrencesBuilder.setOpenNow(false).build()));
+      spiedFetcher.fetch(PREFRENCES_BUILDER.setOpenNow(false).build()));
   }
 
   @Test
@@ -182,7 +182,7 @@ public final class PlacesFetcherTest {
     doThrow(new IOException()).when(spiedFetcher)
         .getPlacesSearchResults(any(TextSearchRequest.class));
     FetcherException thrown =
-        assertThrows(FetcherException.class, () -> spiedFetcher.fetch(prefrencesBuilder.build()));
+        assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFRENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("fetch places"));
   }
@@ -195,7 +195,7 @@ public final class PlacesFetcherTest {
     doThrow(new IOException()).when(spiedFetcher)
         .getPlaceDetails(any(PlaceDetailsRequest.class));
     FetcherException thrown =
-        assertThrows(FetcherException.class, () -> spiedFetcher.fetch(prefrencesBuilder.build()));
+        assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFRENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("place details"));
   }
