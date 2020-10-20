@@ -84,6 +84,20 @@ function getUserLocationFromUi() {
 }
 
 function getPlaceUiElement(place) {
+  document.getElementById('query-form').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  const placesDiv = document.getElementById('place');
+  fetch('/query').then(response => response.json()).then((places) => {
+    places.forEach((singlePlace) => {
+      placesDiv.appendChild(createPlaceElement(singlePlace));
+    });
+  });
+}
+
+/**
+ * Creates a place element.
+ */
+function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = 'place-container';
 

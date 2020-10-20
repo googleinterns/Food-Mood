@@ -18,7 +18,7 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
+import com.google.maps.model.LatLng;
 
 /**
  * Represents a place that food can be ordered from in the food-mood
@@ -26,15 +26,6 @@ import static com.google.appengine.repackaged.com.google.common.base.Preconditio
  */
 @AutoValue
 public abstract class Place {
-
-  /** The maximal valid rating value. */
-  private static final float MAX_RATING = 5.0f;
-  /** The minimal valid rating value. */
-  private static final float MIN_RATING = 1.0f;
-  /** The maximal valid price level value. */
-  private static final int MAX_PRICE_LEVEL = 4;
-  /** The minimal valid price level value. */
-  private static final int MIN_PRICE_LEVEL = 0;
 
   /**
    * @return the name of the place.
@@ -62,14 +53,9 @@ public abstract class Place {
   public abstract int priceLevel();
 
   /**
-   * @return coordinate of the physical place.
-   */
-  public abstract double longitude();
-
-  /**
-   * @return coordinate of the physical place.
+   * @return the coordinates of the physical place.
   */
-  public abstract double latitude();
+  public abstract LatLng location();
 
   /**
    * @return a builder that enables to build a new Place object
@@ -102,16 +88,10 @@ public abstract class Place {
     public abstract Builder setPhone(String phone);
 
     /**
-     * @param longitude coordinate of the physical place
+     * @param location the coordinates of the physical place
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setLongitude(double longitude);
-
-    /**
-     * @param latitude coordinate of the physical place
-     * @return a Place builder that enables to continue building
-     */
-    public abstract Builder setLatitude(double latitude);
+    public abstract Builder setLocation(LatLng location);
 
     /**
      * @param rating the rating of the place, represented by a number of 1-5
@@ -139,10 +119,8 @@ public abstract class Place {
      */
     public Place build() throws IllegalArgumentException {
       Place place = autoBuild();
-      checkArgument(place.rating() >= MIN_RATING && place.rating() <= MAX_RATING,
-          "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
-      checkArgument(place.priceLevel() >= MIN_PRICE_LEVEL && place.priceLevel() <= MAX_PRICE_LEVEL,
-          "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
+      ValidationUtils.validateRating(place.rating());
+      ValidationUtils.validatePriceLevel(place.priceLevel());
       return place;
     }
   }
