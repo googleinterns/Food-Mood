@@ -17,8 +17,6 @@
  */
 package com.google.sps.data;
 
-import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
-
 import com.google.auto.value.AutoValue;
 import com.google.maps.model.LatLng;
 
@@ -28,15 +26,6 @@ import com.google.maps.model.LatLng;
  */
 @AutoValue
 public abstract class Place {
-
-  /** The maximal valid rating value. */
-  private static final float MAX_RATING = 5.0f;
-  /** The minimal valid rating value. */
-  private static final float MIN_RATING = 1.0f;
-  /** The maximal valid price level value. */
-  private static final int MAX_PRICE_LEVEL = 4;
-  /** The minimal valid price level value. */
-  private static final int MIN_PRICE_LEVEL = 0;
 
   /**
    * @return the name of the place.
@@ -130,10 +119,8 @@ public abstract class Place {
      */
     public Place build() throws IllegalArgumentException {
       Place place = autoBuild();
-      checkArgument(place.rating() >= MIN_RATING && place.rating() <= MAX_RATING,
-          "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
-      checkArgument(place.priceLevel() >= MIN_PRICE_LEVEL && place.priceLevel() <= MAX_PRICE_LEVEL,
-          "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
+      ValidationUtils.validateRating(place.rating());
+      ValidationUtils.validatePriceLevel(place.priceLevel());
       return place;
     }
   }
