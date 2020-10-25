@@ -37,9 +37,14 @@ public class PlacesFetcher {
      */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** In this radius around "LOCATION" places will be searched. */
-    private static final int SEARCH_RADIUS = 5000;
-    // TODO(M1): check at least 10 results, and if less extend radius
+    /** In this radius around "LOCATION" places will be searched initially. */
+    private static final int INIT_SEARCH_RADIUS = 5000;
+
+    /** The minimum number of results to be fetched. */
+    private static final int MIN_NUM_OF_RESULTS = 8;
+
+    /** The maximum radius to search in is INIT_SEARCH_RADIUS * MAX_RADUIS_MULT. */
+    private static final int MAX_RADUIS_MULT = 4;
 
     /** The entry point for a Google GEO API request. */
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
@@ -58,14 +63,22 @@ public class PlacesFetcher {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(
                 CONTEXT, createCuisenesQuery(prefrences.cuisines()), prefrences.location())
-                .radius(SEARCH_RADIUS)
                 .maxPrice(PriceLevel.values()[prefrences.maxPriceLevel()])
                 .type(TYPE);
         if (prefrences.openNow()) {
             query.openNow(prefrences.openNow());
         }
         try {
-            return createPlacesList(getPlacesSearchResults(query));
+            PlacesSearchResult[] PlacesSearchResult;
+            int radiusMult = 1;
+            do {
+                query.radius(INIT_SEARCH_RADIUS * radiusMult);
+                PlacesSearchResult = getPlacesSearchResults(query);
+                radiusMult++;
+            }
+            while (
+                PlacesSearchResult.length < MIN_NUM_OF_RESULTS && radiusMult <= MAX_RADUIS_MULT);
+            return createPlacesList(PlacesSearchResult);
         } catch (ApiException | InterruptedException | IOException e) {
             throw new FetcherException("Couldn't fetch places from Places API", e);
         }
