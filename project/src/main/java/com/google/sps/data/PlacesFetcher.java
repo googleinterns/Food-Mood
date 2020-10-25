@@ -49,20 +49,20 @@ public class PlacesFetcher {
     /**
      * Builds a query and requests it from Google Places API.
      *
-     * @param prefrences the UserPrefrences as specified by the user
+     * @param preferences the UserPreferences as specified by the user
      * @return an immutable list of places that supply the query
      * @throws FetcherException when an error occurs in querying the Places API
      *     for places or for places details
      */
-    public ImmutableList<Place> fetch(UserPrefrences prefrences) throws FetcherException {
+    public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(
-                CONTEXT, createCuisenesQuery(prefrences.cuisines()), prefrences.location())
+                CONTEXT, createCuisenesQuery(preferences.cuisines()), preferences.location())
                 .radius(SEARCH_RADIUS)
-                .maxPrice(PriceLevel.values()[prefrences.maxPriceLevel()])
+                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
-        if (prefrences.openNow()) {
-            query.openNow(prefrences.openNow());
+        if (preferences.openNow()) {
+            query.openNow(preferences.openNow());
         }
         try {
             return createPlacesList(getPlacesSearchResults(query));
