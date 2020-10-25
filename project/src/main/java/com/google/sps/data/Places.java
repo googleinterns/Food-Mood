@@ -29,11 +29,11 @@ public final class Places {
 
   /**
    * Sorts the given list of Places randomly.
-   * @param immutableList the list we want to sort.
+   * @param places the list we want to sort.
    * @return a new list containing the original list's elements in random order.
    */
-  public static ImmutableList<Place> randomSort(ImmutableList<Place> immutableList) {
-    List<Place> mutablePlaces = new ArrayList<>(immutableList);
+  public static ImmutableList<Place> randomSort(ImmutableList<Place> places) {
+    List<Place> mutablePlaces = new ArrayList<>(places);
     Collections.shuffle(mutablePlaces);
     return ImmutableList.copyOf(mutablePlaces);
   }

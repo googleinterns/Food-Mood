@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.import java.io.IOException;
 
+
 /**
  * Fetches recommended places from the 'query' servlet, and switches from the query form to the
  * results elements in order to display them to the user.
@@ -88,10 +89,11 @@ function tryAgain() {
  *  Creates a map and adds it to the page.
  */
 function createMap() {
+  const ZOOM_OUT = 12;
   const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
-  var map = new google.maps.Map(document.getElementById('map-container'), {
+  const map = new google.maps.Map(document.getElementById('map-container'), {
     center: USER_LOCATION,
-    zoom: 12,
+    zoom: ZOOM_OUT,
   });
   return map;
 }
@@ -100,6 +102,7 @@ function createMap() {
  * Adds to the map a place's marker.
  */
 function addPlaceMarker(map, place) {
+  const ZOOM_IN = 15;
   const marker = new google.maps.Marker({
       title: place.name,
       position: place.location,
@@ -112,9 +115,8 @@ function addPlaceMarker(map, place) {
         infoWindow.open(map, marker);
     });
   }
-  // Zoom when clicking on marker
-  google.maps.event.addListener(marker,'click', function() {
-    map.setZoom(15);
+  google.maps.event.addListener(marker,'click', () => {
+    map.setZoom(ZOOM_IN);
     map.setCenter(marker.position);
   });
 }
