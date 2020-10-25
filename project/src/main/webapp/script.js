@@ -91,10 +91,12 @@ function tryAgain() {
 function createMap() {
   const ZOOM_OUT = 12;
   const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
-  const map = new google.maps.Map(document.getElementById('map-container'), {
-    center: USER_LOCATION,
-    zoom: ZOOM_OUT,
-  });
+  const map = new widow.google.maps.Map(
+    document.getElementById('map-container'), {
+        center: USER_LOCATION,
+        zoom: ZOOM_OUT,
+    }
+  );
   return map;
 }
 
@@ -103,19 +105,21 @@ function createMap() {
  */
 function addPlaceMarker(map, place) {
   const ZOOM_IN = 15;
-  const marker = new google.maps.Marker({
+  const marker = new widow.google.maps.Marker({
       title: place.name,
       position: place.location,
       description: place.name.link(place.websiteUrl),
       map: map
   });
   if (place.websiteUrl) {
-    const infoWindow = new google.maps.InfoWindow({content: marker.description});
+    const infoWindow = new window.google.maps.InfoWindow({
+        content: marker.description
+    });
     marker.addListener('click', () => {
         infoWindow.open(map, marker);
     });
   }
-  google.maps.event.addListener(marker,'click', () => {
+  window.google.maps.event.addListener(marker,'click', () => {
     map.setZoom(ZOOM_IN);
     map.setCenter(marker.position);
   });
