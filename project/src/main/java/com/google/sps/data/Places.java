@@ -72,8 +72,7 @@ public final class Places {
   }
 
   //A utility function that allows to distinct beteen objects using a certain property
-  public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
-  {
+  private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
       Map<Object, Boolean> map = new ConcurrentHashMap<>();
       return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
