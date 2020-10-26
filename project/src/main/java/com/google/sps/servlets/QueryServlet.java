@@ -22,8 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.UserPrefrences;
 
 /**
  * A servlet that handles the user query. Currently accepts no input, and responds with a list of
@@ -49,10 +52,18 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
+      UserPrefrences userPrefs =
+          UserPrefrences.builder()
+              .setMinRating(Float.parseFloat(request.getParameter("rating")))
+              .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
+              .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
+              .setLocation(getLatLngFromString(request.getParameter("location")))
+              .setCuisineTypes(ImmutableList.copyOf(request.getParameter("quisines").split(",")))
+              .build();
       //TODO(M1): add call to filterer
       response.setContentType("application/json");
       response.getWriter().write(new Gson().toJson(
-          Places.randomSort(fetcher.fetch())
+          Places.randomSort(fetcher.fetch(userPrefs))
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())
@@ -61,4 +72,9 @@ public final class QueryServlet extends HttpServlet {
       //TODO(M1): handle errors - TBD
     }
   }
-}
+
+  private LatLng getLatLngFromString(String coordinates) {
+    String[] latLng = coordinates.split(",");
+    return new LatLng(Float.parseFloat(latLng[0]), Float.parseFloat(latLng[1]));
+  }
+ }
