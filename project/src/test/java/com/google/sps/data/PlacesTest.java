@@ -45,10 +45,10 @@ public final class PlacesTest {
     ImmutableList<Place> twoPlaces = ImmutableList.of(PLACE_1, PLACE_2);
 
     ImmutableList<Place> result = Places.filter(
-        /** places */ twoPlaces,
-        /** min rating */ 1,
-        /** filter if no website */ true,
-        /** filter branches of same place */ true
+      twoPlaces /* places */,
+        1 /* min rating */,
+        true /* filter if no website */,
+        true /* filter branches of same place */
     );
 
     assertEquals(result, twoPlaces);
@@ -61,10 +61,10 @@ public final class PlacesTest {
     Place branch3 = getValidPlaceBuilder().setLocation(new LatLng(35.35, 35.35)).build();
 
     ImmutableList<Place> result = Places.filter(
-        /** places */ ImmutableList.of(branch1, branch2, branch3),
-        /** min rating */ 1,
-        /** filter if no website */ false,
-        /** filter branches of same place */ true
+        ImmutableList.of(branch1, branch2, branch3) /* places */,
+        1 /* min rating */,
+        false /* filter if no website */,
+        true /* filter branches of same place */
       );
 
     assertEquals(result, ImmutableList.of(branch1));
@@ -76,10 +76,10 @@ public final class PlacesTest {
     Place websiteEmpty = getValidPlaceBuilder().setWebsiteUrl("").build();
 
     ImmutableList<Place> result = Places.filter(
-        /** places */ ImmutableList.of(websiteEmpty, PLACE_1, PLACE_2),
-        /** min rating */ 1,
-        /** filter if no website */ true,
-        /** filter branches of same place */ false
+        ImmutableList.of(websiteEmpty, PLACE_1, PLACE_2) /* places */,
+        1 /* min rating */,
+        true /* filter if no website */,
+        false /* filter branches of same place */
     );
 
     assertEquals(result, ImmutableList.of(PLACE_1, PLACE_2));
@@ -93,10 +93,10 @@ public final class PlacesTest {
     Place lowRatingPlace = getValidPlaceBuilder().setRating(lowerRating).build();
 
     ImmutableList<Place> result = Places.filter(
-        /** places */ ImmutableList.of(highRatingPlace, lowRatingPlace),
-        /** min rating */ highRating,
-        /** filter if no website */ false,
-        /** filter branches of same place */ false
+        ImmutableList.of(highRatingPlace, lowRatingPlace) /* places */,
+        highRating /* min rating */,
+        false /* filter if no website */,
+        false /* filter branches of same place */
     );
 
     assertEquals(result, ImmutableList.of(highRatingPlace));
