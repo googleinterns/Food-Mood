@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.import java.io.IOException;
 
+/* The user location map. the map has to be accessed from different functions, so it has to be kept
+ * globally. */
+let globalUserMap;
+
 /**
  * Fetches recommended places from the 'query' servlet, and switches from the query form to the
  * results elements in order to display them to the user.
@@ -76,11 +80,12 @@ function getCheckedValueByElementId(elementId, errorMessage) {
       return options[i].value;
     }
   }
+  // If no item was checked and returned, there is an error
   throw new Error(errorMessage);
 }
 
 function getUserLocationFromUi() {
-  const coords = window.currentUserLocation;
+  const coords = JSON.parse(localStorage.getItem('userLocation'));
   console.log(coords.lat + "," + coords.lng);
   return coords.lat + "," + coords.lng;
 }
@@ -151,10 +156,8 @@ function addSearchBoxToMap(map, input) {
       if (!place.geometry) {
         return;
       }
-      window.currentUserLocation = {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng()
-      };
+      localStorage.setItem('userLocation',
+          JSON.stringify({lat: place.geometry.location.lat(), lng: place.geometry.location.lng()}));
       // Create a marker for each place.
       markers.push(
         new google.maps.Marker({
@@ -181,14 +184,15 @@ function addSearchBoxToMap(map, input) {
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
-  window.map = new google.maps.Map(document.getElementById("map"), {
+  let map = new google.maps.Map(document.getElementById("map"), {
     center: DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE,
     zoom: LOW_ZOOM_LEVEL,
     mapTypeId: "roadmap",
   });
-  window.currentUserLocation = DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE ;
+  globalUserMap = map;
+  localStorage.setItem('userLocation', JSON.stringify(DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE));
   const input = document.getElementById("location-input");
-  addSearchBoxToMap(window.map, input);
+  addSearchBoxToMap(map, input);
 }
 
 /**
@@ -206,14 +210,14 @@ function getDeviceLocationAndShowOnMap() {
   navigator.geolocation.getCurrentPosition(
     // In case of successs.
     (position) => {
-      const map = window.map;
+      const map = globalUserMap;
       const userPosition = {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
       };
       map.setCenter(userPosition);
       map.setZoom(HIGH_ZOOM_LEVEL);
-      window.currentUserLocation = userPosition;
+      localStorage.setItem('userLocation', JSON.stringify(userPosition));
       // Add marker with info window to display user location.
       const infowindow = new google.maps.InfoWindow({
         content: 'My location',
