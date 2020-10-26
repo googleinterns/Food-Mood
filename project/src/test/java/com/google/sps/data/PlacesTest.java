@@ -14,38 +14,23 @@
 
 package com.google.sps.data;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
 public final class PlacesTest {
 
   /** A valid Place object with name "name1". */
-  private static final Place PLACE_1 =
-      Place.builder()
-          .setName("name1")
-          .setWebsiteUrl("website@google.com")
-          .setPhone("+97250-0000-000")
-          .setRating(4)
-          .setPriceLevel(3)
-          .setLocation(new LatLng(35.35, 30.30))
-          .build();
+  private static final Place PLACE_1 = getValidPlaceBuilder().setName("name1").build();
 
   /** A valid Place object with name "name2". */
-  private static final Place PLACE_2 =
-      Place.builder()
-          .setName("name2")
-          .setWebsiteUrl("website@google.com")
-          .setPhone("+97250-0000-000")
-          .setRating(4)
-          .setPriceLevel(3)
-          .setLocation(new LatLng(35.35, 30.30))
-          .build();
+  private static final Place PLACE_2 = getValidPlaceBuilder().setName("name2").build();
 
   @Test
   public void randomSort_keepsAllItems() {
@@ -53,5 +38,78 @@ public final class PlacesTest {
 
     assertTrue(result.contains(PLACE_1));
     assertTrue(result.contains(PLACE_2));
+  }
+
+  @Test
+  public void filter_noNeedToFilter_noFilter() {
+    ImmutableList<Place> twoPlaces = ImmutableList.of(PLACE_1, PLACE_2);
+
+    ImmutableList<Place> result = Places.filter(
+        twoPlaces /** places */,
+        1 /** min rating */,
+        true /** filter if no website */,
+        true /** filter branches of same place */
+    );
+
+    assertEquals(result, twoPlaces);
+  }
+
+  @Test
+  public void filter_fewBranchesOfSamePlace_filterOutBranches() {
+    Place branch1 = getValidPlaceBuilder().setLocation(new LatLng(35.35, 30.30)).build();
+    Place branch2 = getValidPlaceBuilder().setLocation(new LatLng(30.30, 30.30)).build();
+    Place branch3 = getValidPlaceBuilder().setLocation(new LatLng(35.35, 35.35)).build();
+
+    ImmutableList<Place> result = Places.filter(
+        ImmutableList.of(branch1, branch2, branch3) /** places */,
+        1 /** min rating */,
+        false /** filter if no website */,
+        true /** filter branches of same place */
+      );
+
+    assertEquals(result, ImmutableList.of(branch1));
+  }
+
+
+  @Test
+  public void filter_noWebsite_filterOut() {
+    Place websiteEmpty = getValidPlaceBuilder().setWebsiteUrl("").build();
+
+    ImmutableList<Place> result = Places.filter(
+        ImmutableList.of(websiteEmpty, PLACE_1, PLACE_2) /** places */,
+        1 /** min rating */,
+        true /** filter if no website */,
+        false /** filter branches of same place */
+    );
+
+    assertEquals(result, ImmutableList.of(PLACE_1, PLACE_2));
+  }
+
+  @Test
+  public void filter_tooLowRating_filterOut() {
+    int highRating = 5;
+    int lowerRating = 4;
+    Place highRatingPlace = getValidPlaceBuilder().setRating(highRating).build();
+    Place lowRatingPlace = getValidPlaceBuilder().setRating(lowerRating).build();
+
+    ImmutableList<Place> result = Places.filter(
+        ImmutableList.of(highRatingPlace, lowRatingPlace) /** places */,
+        highRating /** min rating */,
+        false /** filter if no website */,
+        false /** filter branches of same place */
+    );
+
+    assertEquals(result, ImmutableList.of(highRatingPlace));
+  }
+
+  // Returns a Place builder that has valid values of all attributes.
+  private static Place.Builder getValidPlaceBuilder() {
+    return Place.builder()
+        .setName("name")
+        .setWebsiteUrl("website@google.com")
+        .setPhone("+97250-0000-000")
+        .setRating(4)
+        .setPriceLevel(3)
+        .setLocation(new LatLng(35.35, 30.30));
   }
 }

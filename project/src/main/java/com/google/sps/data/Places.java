@@ -17,8 +17,14 @@
  */
 package com.google.sps.data;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -36,6 +42,36 @@ public final class Places {
     List<Place> mutablePlaces = new ArrayList<>(places);
     Collections.shuffle(mutablePlaces);
     return ImmutableList.copyOf(mutablePlaces);
+  }
+
+  /**
+   * filters the given list of places according to the given parameters.
+   * @param places the list we want to sort.
+   * @param minRating The minimal rating we want to limit the list by. A number between 1 and 5.
+   * @param filterIfNoWebsite Specifies whether we should filter if there is no available website
+   *        for the restaurant.
+   * @param filterBranchesOfSamePlace Specifies whether we should remove different branches of the
+   *        same place from the results. Places are considered the same if they have the same name.
+   * @return the filtered list.
+   */
+  public static ImmutableList<Place> filter(ImmutableList<Place> places, int minRating, Boolean
+      filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
+    //TODO(M1): also filter by place status when the attribute is added
+    ImmutableList<Place> result = ImmutableList.copyOf(
+        places.stream()
+            .filter(place -> place.rating() >= minRating)
+            .filter(place -> !Strings.isNullOrEmpty(place.websiteUrl()))
+            .filter(distinctByKey(p -> p.name()))
+            .collect(Collectors.toList())
+    );
+    return result;
+  }
+
+  //A utility function that allows to distinct beteen objects using a certain property
+  public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
+  {
+      Map<Object, Boolean> map = new ConcurrentHashMap<>();
+      return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 
   private Places() { }
