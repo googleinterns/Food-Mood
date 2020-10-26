@@ -56,12 +56,16 @@ public final class Places {
    */
   public static ImmutableList<Place> filter(ImmutableList<Place> places, int minRating, Boolean
       filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
-    //TODO(M1): also filter by place status when the attribute is added
+    //TODO(M1): also filter by place's status when the attribute is added
     ImmutableList<Place> result = ImmutableList.copyOf(
         places.stream()
             .filter(place -> place.rating() >= minRating)
-            .filter(place -> !Strings.isNullOrEmpty(place.websiteUrl()))
-            .filter(distinctByKey(p -> p.name()))
+            .filter(filterIfNoWebsite
+                ? place -> !Strings.isNullOrEmpty(place.websiteUrl())
+                : place -> true)
+            .filter(filterBranchesOfSamePlace
+                ? distinctByKey(p -> p.name())
+                : p -> true)
             .collect(Collectors.toList())
     );
     return result;
