@@ -45,6 +45,7 @@ function fetchFromQuery() {
 function getUserQuisinesFromUi() {
   const quisines = document.getElementById('quisines-form').elements;
   let result = '';
+  let i;
   for (i = 0; i < quisines.length; i++) {
     if (quisines[i].checked) {
       result = result + quisines[i].value + ',';
@@ -75,6 +76,7 @@ function getUserOpenNowFromUi() {
 
 function getCheckedValueByElementId(elementId, errorMessage) {
   const options = document.getElementById(elementId).elements;
+  let i;
   for (i = 0; i < options.length; i++) {
     if (options[i].checked) {
       return options[i].value;

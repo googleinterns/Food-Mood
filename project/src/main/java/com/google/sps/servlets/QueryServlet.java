@@ -57,7 +57,7 @@ public final class QueryServlet extends HttpServlet {
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())
       ));
-    } catch (Exception e) { 
+    } catch (Exception e) {
       //TODO(M1): handle errors - TBD
     }
   }
