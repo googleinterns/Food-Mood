@@ -22,12 +22,13 @@ function fetchFromQuery() {
       `quisines=${getUserQuisinesFromUi()}`,
       `rating=${getUserRatingFromUi()}`,
       `price=${getUserPriceFromUi()}`,
+      `open=${getUserOpenNowFromUi()}`,
       `location=${getUserLocationFromUi()}`
     ].join('&');
     const placesDiv = document.getElementById('place');
     fetch('/query?' + params).then(response => response.json()).then((places) => {
       places.forEach((singlePlace) => {
-        placesDiv.appendChild(getPlaceUiElement(singlePlace));
+        placesDiv.appendChild(createPlaceElement(singlePlace));
       });
     });
     document.getElementById('query-form').style.display = 'none';
@@ -37,44 +38,45 @@ function fetchFromQuery() {
   }
 }
 
-// TODO: take out for loop to another function
 function getUserQuisinesFromUi() {
   const quisines = document.getElementById('quisines-form').elements;
-  let result = quisines.join(',');
-  if (result === "") {
+  let result = '';
+  for (i = 0; i < quisines.length; i++) {
+    if (quisines[i].checked) {
+      result = result + quisines[i].value + ',';
+    }
+  }
+  if (result === '') {
     throw new Error("Choose at least one quisine.");
   }
+  // Remove obselete comma
+  result = result.slice(0, -1);
   return result;
 }
 
 function getUserRatingFromUi() {
-  const rating = document.getElementById('rating-form').elements;
-  for (i = 0; i < rating.length; i++) {
-    if (rating[i].checked) {
-      return rating[i].value;
-    }
-  }
-  throw new Error("Choose exactly one rating.");
+  return getCheckedValueByElementId('rating-form',
+      'Choose exactly one rating.');
 }
 
 function getUserPriceFromUi() {
-  const price = document.getElementById('price-form').elements;
-  for (i = 0; i < price.length; i++) {
-    if (price[i].checked) {
-      return price[i].value;
-    }
-  }
-  throw new Error("Choose exactly one price level.");
+  return getCheckedValueByElementId('price-form',
+      'Choose exactly one price level.');
 }
 
 function getUserOpenNowFromUi() {
-  const openNow = document.getElementById('open-now-form').elements;
-  for (i = 0; i < openNow.length; i++) {
-    if (openNow[i].checked) {
-      return rating[i].value;
+  return getCheckedValueByElementId('open-now-form',
+      'Choose if the place should be open now or you don\'t mind.');
+}
+
+function getCheckedValueByElementId(elementId, errorMessage) {
+  const options = document.getElementById(elementId).elements;
+  for (i = 0; i < options.length; i++) {
+    if (options[i].checked) {
+      return options[i].value;
     }
   }
-  throw new Error("Choose if the place should be open now or you don't mind.");
+  throw new Error(errorMessage);
 }
 
 function getUserLocationFromUi() {
@@ -83,35 +85,19 @@ function getUserLocationFromUi() {
   return coords.lat + "," + coords.lng;
 }
 
-function getPlaceUiElement(place) {
-  document.getElementById('query-form').style.display = 'none';
-  document.getElementById('results').style.display = 'block';
-  const placesDiv = document.getElementById('place');
-  fetch('/query').then(response => response.json()).then((places) => {
-    places.forEach((singlePlace) => {
-      placesDiv.appendChild(createPlaceElement(singlePlace));
-    });
-  });
-}
-
-/**
- * Creates a place element.
- */
 function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = 'place-container';
-
   // Add name
   const name = document.createElement('li');
   name.innerText = place.name;
   placeElement.appendChild(name);
   placeElement.appendChild(document.createElement('br'));
-
   // Add link to website
-  if (place.website) {
+  if (place.websiteUrl) {
     const websiteLink = document.createElement('a');
-    websiteLink.href = place.website;
-    websiteLink.title = place.website;
+    websiteLink.href = place.websiteUrl;
+    websiteLink.title = place.websiteUrl;
     websiteLink.innerHTML = 'Restaurant\'s website';
     placeElement.appendChild(websiteLink);
   } else {
@@ -119,7 +105,6 @@ function createPlaceElement(place) {
     placeElement.appendChild(noSite);
   }
   placeElement.appendChild(document.createElement('br'));
-
   // Add phone number
   const phone = document.createTextNode('Phone number:' + place.phone);
   placeElement.appendChild(phone);
@@ -129,8 +114,8 @@ function createPlaceElement(place) {
 }
 
 /**
- * Displays the query form to the user and hides the results, so that the user can try again with a
- * different query.
+ * Displays the query form to the user and hides the results, so that the user can try to get new
+ * results.
  */
 function tryAgain() {
   document.getElementById('query-form').style.display = 'block';
@@ -160,20 +145,12 @@ function addSearchBoxToMap(map, input) {
       marker.setMap(null);
     });
     markers = [];
-    // For each place, get the icon, name and location.
+    // For each place, get the name and location.
     const bounds = new google.maps.LatLngBounds();
     places.forEach((place) => {
       if (!place.geometry) {
-        console.log("Returned place contains no geometry");
         return;
       }
-      const icon = {
-        url: place.icon,
-        size: new google.maps.Size(71, 71),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(17, 34),
-        scaledSize: new google.maps.Size(25, 25),
-      };
       window.currentUserLocation = {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng()
@@ -182,7 +159,6 @@ function addSearchBoxToMap(map, input) {
       markers.push(
         new google.maps.Marker({
           map,
-          icon,
           title: place.name,
           position: place.geometry.location,
         })
@@ -224,7 +200,7 @@ function getDeviceLocationAndShowOnMap() {
   const HIGH_ZOOM_LEVEL = 13;
 
   if (!navigator.geolocation) { // Browser doesn't support Geolocation
-    displayFeolocationError('Your browser doesn\'t support geolocation');
+    displayGeolocationError('Your browser doesn\'t support geolocation');
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -253,7 +229,7 @@ function getDeviceLocationAndShowOnMap() {
     },
     // In case of error.
     () => {
-      displayFeolocationError('The Geolocation service failed');
+      displayGeolocationError('The Geolocation service failed');
     },
     // Options.
     {
@@ -262,8 +238,8 @@ function getDeviceLocationAndShowOnMap() {
   );
 }
 
-function displayFeolocationError(errorText) {
-  document.getElementById('map-error-container').appendChild(document.createTextNode(
-    errorText + ', so we can\'t use device location.'
-  ));
+function displayGeolocationError(errorText) {
+  document.getElementById('map-error-container').innerHTML =
+      errorText + ', so we can\'t use your location.' + '<br>' +
+      'Use the map to find your location.' + '<br>';
 }
