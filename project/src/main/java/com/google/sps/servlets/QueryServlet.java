@@ -20,6 +20,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -60,16 +62,22 @@ public final class QueryServlet extends HttpServlet {
               .setLocation(getLatLngFromString(request.getParameter("location")))
               .setCuisineTypes(ImmutableList.copyOf(request.getParameter("quisines").split(",")))
               .build();
-      //TODO(M1): add call to filterer
+      ImmutableList<Place> filteredPlaces = Places.filter(
+          fetcher.fetch(userPrefs) /* places */,
+          Integer.parseInt(request.getParameter("rating")) /* min rating */,
+          true /* filter if no website */,
+          true /* filter branches of same place */
+      );
       response.setContentType("application/json");
       response.getWriter().write(new Gson().toJson(
-          Places.randomSort(fetcher.fetch(userPrefs))
+          Places.randomSort(filteredPlaces)
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())
       ));
     } catch (Exception e) {
-      //TODO(M1): handle errors - TBD
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Fetching from Google Places API encountered a problem");
     }
   }
 
