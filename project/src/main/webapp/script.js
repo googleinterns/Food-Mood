@@ -23,7 +23,7 @@ let globalUserMap;
 function fetchFromQuery() {
   try {
     const params = [
-      `quisines=${getUserQuisinesFromUi()}`,
+      `cuisines=${getUsercuisinesFromUi()}`,
       `rating=${getUserRatingFromUi()}`,
       `price=${getUserPriceFromUi()}`,
       `open=${getUserOpenNowFromUi()}`,
@@ -42,17 +42,17 @@ function fetchFromQuery() {
   }
 }
 
-function getUserQuisinesFromUi() {
-  const quisines = document.getElementById('quisines-form').elements;
+function getUsercuisinesFromUi() {
+  const cuisines = document.getElementById('cuisines-form').elements;
   let result = '';
   let i;
-  for (i = 0; i < quisines.length; i++) {
-    if (quisines[i].checked) {
-      result = result + quisines[i].value + ',';
+  for (i = 0; i < cuisines.length; i++) {
+    if (cuisines[i].checked) {
+      result = result + cuisines[i].value + ',';
     }
   }
   if (result === '') {
-    throw new Error("Choose at least one quisine.");
+    throw new Error("Choose at least one cuisine.");
   }
   // Remove obselete comma
   result = result.slice(0, -1);
@@ -130,10 +130,10 @@ function tryAgain() {
   document.getElementById('place').innerHTML = '';
 }
 
-function addSearchBoxToMap(map, input) {
+function addSearchBoxToMap(map, searchBoxElement) {
   // Create the search box and link it to the UI element.
-  const searchBox = new window.google.maps.places.SearchBox(input);
-  map.controls[window.google.maps.ControlPosition.TOP_LEFT].push(input);
+  const searchBox = new window.google.maps.places.SearchBox(searchBoxElement);
+  map.controls[window.google.maps.ControlPosition.TOP_LEFT].push(searchBoxElement);
   // Bias the SearchBox results towards current map's viewport.
   map.addListener("bounds_changed", () => {
     searchBox.setBounds(map.getBounds());
@@ -193,8 +193,8 @@ function addMapWithSearchBox() {
   });
   globalUserMap = map;
   localStorage.setItem('userLocation', JSON.stringify(DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE));
-  const input = document.getElementById("location-input");
-  addSearchBoxToMap(map, input);
+  const searchBoxElement = document.getElementById("location-input");
+  addSearchBoxToMap(map, searchBoxElement);
 }
 
 /**
