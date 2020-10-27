@@ -130,6 +130,7 @@ function tryAgain() {
   document.getElementById('place').innerHTML = '';
 }
 
+// Adds a search box to the map,  and sets it so that the user interraction with it is
 function addSearchBoxToMap(map, searchBoxElement) {
   // Create the search box and link it to the UI element.
   const searchBox = new window.google.maps.places.SearchBox(searchBoxElement);
@@ -139,18 +140,17 @@ function addSearchBoxToMap(map, searchBoxElement) {
     searchBox.setBounds(map.getBounds());
   });
   let markers = [];
-  // Listen for the event fired when the user selects a prediction and retrieve
-  // more details for that place.
+  // Listen for the event fired when the user selects a location, and retrieve more details for it.
   searchBox.addListener("places_changed", () => {
     const places = searchBox.getPlaces();
-
     if (places.length == 0) {
       return;
     }
+    // Update the user location to be the first place. If there is more than one, it is changes
+    // when the user clicks on a different marker
+    localStorage.setItem('userLocation', JSON.stringify(places[0].geometry.location));
     // Clear out the old markers.
-    markers.forEach((marker) => {
-      marker.setMap(null);
-    });
+    markers.forEach((marker) => {marker.setMap(null);});
     markers = [];
     // For each place, get the name and location.
     const bounds = new window.google.maps.LatLngBounds();
@@ -158,17 +158,19 @@ function addSearchBoxToMap(map, searchBoxElement) {
       if (!place.geometry) {
         return;
       }
-      localStorage.setItem('userLocation',
-          JSON.stringify({lat: place.geometry.location.lat(), lng: place.geometry.location.lng()}));
       // Create a marker for each place.
-      markers.push(
-        new window.google.maps.Marker({
-          map,
-          title: place.name,
-          position: place.geometry.location,
-        })
-      );
-
+      const currentMarker = new window.google.maps.Marker({
+        map,
+        title: place.name,
+        position: place.geometry.location,
+      })
+      var infowindow = new window.google.maps.InfoWindow({content: place.name});
+      markers.push(currentMarker);
+      currentMarker.addListener("click", () => {
+        map.setCenter(currentMarker.getPosition());
+        localStorage.setItem('userLocation', JSON.stringify(currentMarker.getPosition()));
+        infowindow.open(map,currentMarker);
+      });
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
         bounds.union(place.geometry.viewport);
