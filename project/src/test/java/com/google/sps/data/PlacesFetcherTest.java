@@ -133,7 +133,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(new PlacesSearchResult[0]).when(spiedFetcher)
+    doReturn(new PlacesSearchResult[0])
+      .when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(ImmutableList.of(), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
   }
@@ -141,11 +142,13 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_validSearchResults_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(PLACE_DETAILS_1).
-    doReturn(PLACE_DETAILS_2).when(spiedFetcher)
-        .getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
-        .getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(PLACE_DETAILS_1)
+      .doReturn(PLACE_DETAILS_2)
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR)
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
       ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
   }
@@ -153,10 +156,13 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_noPreferedCuisines_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(PLACE_DETAILS_1).doReturn(PLACE_DETAILS_2)
-        .when(spiedFetcher).getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
-        .getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(PLACE_DETAILS_1)
+      .doReturn(PLACE_DETAILS_2)
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR)
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
       ImmutableList.of(PLACE_1, PLACE_2),
       spiedFetcher.fetch(PREFERENCES_BUILDER.setCuisines(ImmutableList.of()).build()));
@@ -165,10 +171,13 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_noOpenNowPreference_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(PLACE_DETAILS_1).doReturn(PLACE_DETAILS_2)
-        .when(spiedFetcher).getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
-        .getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(PLACE_DETAILS_1)
+      .doReturn(PLACE_DETAILS_2)
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR)
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
       ImmutableList.of(PLACE_1, PLACE_2),
       spiedFetcher.fetch(PREFERENCES_BUILDER.setOpenNow(false).build()));
@@ -177,8 +186,9 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_ResultsQueryFails_throwsFetcherException() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doThrow(new IOException()).when(spiedFetcher)
-        .getPlacesSearchResults(any(TextSearchRequest.class));
+    doThrow(new IOException())
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
     FetcherException thrown =
         assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
@@ -188,10 +198,12 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_PlaceDetailsQueryFails_throwsFetcherException() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(SEARCH_RESULT_ARR).when(spiedFetcher)
-        .getPlacesSearchResults(any(TextSearchRequest.class));
-    doThrow(new IOException()).when(spiedFetcher)
-        .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(SEARCH_RESULT_ARR)
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    doThrow(new IOException())
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
     FetcherException thrown =
         assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);

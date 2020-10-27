@@ -57,7 +57,7 @@ public class PlacesFetcher {
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         TextSearchRequest query =
             PlacesApi.textSearchQuery(
-                CONTEXT, createCuisenesQuery(preferences.cuisines()), preferences.location())
+                CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
                 .radius(SEARCH_RADIUS)
                 .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
@@ -136,7 +136,7 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisenesQuery(ImmutableList<String> cuisines) {
+    private static String createCuisinesQuery(ImmutableList<String> cuisines) {
         return String.join("|", cuisines);
     }
 }
