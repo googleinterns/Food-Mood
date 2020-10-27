@@ -132,8 +132,8 @@ function tryAgain() {
 
 function addSearchBoxToMap(map, input) {
   // Create the search box and link it to the UI element.
-  const searchBox = new google.maps.places.SearchBox(input);
-  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  const searchBox = new window.google.maps.places.SearchBox(input);
+  map.controls[window.google.maps.ControlPosition.TOP_LEFT].push(input);
   // Bias the SearchBox results towards current map's viewport.
   map.addListener("bounds_changed", () => {
     searchBox.setBounds(map.getBounds());
@@ -153,7 +153,7 @@ function addSearchBoxToMap(map, input) {
     });
     markers = [];
     // For each place, get the name and location.
-    const bounds = new google.maps.LatLngBounds();
+    const bounds = new window.google.maps.LatLngBounds();
     places.forEach((place) => {
       if (!place.geometry) {
         return;
@@ -162,7 +162,7 @@ function addSearchBoxToMap(map, input) {
           JSON.stringify({lat: place.geometry.location.lat(), lng: place.geometry.location.lng()}));
       // Create a marker for each place.
       markers.push(
-        new google.maps.Marker({
+        new window.google.maps.Marker({
           map,
           title: place.name,
           position: place.geometry.location,
@@ -186,7 +186,7 @@ function addSearchBoxToMap(map, input) {
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
-  let map = new google.maps.Map(document.getElementById("map"), {
+  let map = new window.google.maps.Map(document.getElementById("map"), {
     center: DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE,
     zoom: LOW_ZOOM_LEVEL,
     mapTypeId: "roadmap",
@@ -221,10 +221,10 @@ function getDeviceLocationAndShowOnMap() {
       map.setZoom(HIGH_ZOOM_LEVEL);
       localStorage.setItem('userLocation', JSON.stringify(userPosition));
       // Add marker with info window to display user location.
-      const infowindow = new google.maps.InfoWindow({
+      const infowindow = new window.google.maps.InfoWindow({
         content: 'My location',
       });
-      const marker = new google.maps.Marker({
+      const marker = new window.google.maps.Marker({
         position: userPosition,
         map,
         title: 'My location',
