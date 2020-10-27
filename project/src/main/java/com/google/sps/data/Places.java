@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * A utility class for Place objects.
@@ -59,9 +60,10 @@ public final class Places {
     //TODO(M1): also filter by place's status when the attribute is added
     ImmutableList<Place> result = ImmutableList.copyOf(
         places.stream()
+            .sorted(Comparator.comparing(Place::rating).reversed())
             .filter(place -> place.rating() >= minRating)
-            .filter(filterIfNoWebsite
       //TODO(M1): take in account whether the place has a google maps link, when attribute is added
+            .filter(filterIfNoWebsite
                 ? place -> !Strings.isNullOrEmpty(place.websiteUrl())
                 : place -> true)
             .filter(filterBranchesOfSamePlace
