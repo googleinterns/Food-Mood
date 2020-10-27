@@ -130,7 +130,8 @@ function tryAgain() {
   document.getElementById('place').innerHTML = '';
 }
 
-// Adds a search box to the map,  and sets it so that the user interraction with it is
+// Adds a search box to the map, and allows it to keep the user's updating location according to
+// his search box activity
 function addSearchBoxToMap(map, searchBoxElement) {
   // Create the search box and link it to the UI element.
   const searchBox = new window.google.maps.places.SearchBox(searchBoxElement);
