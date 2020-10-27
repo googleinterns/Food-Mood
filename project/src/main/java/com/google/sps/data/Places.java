@@ -46,7 +46,7 @@ public final class Places {
 
   /**
    * filters the given list of places according to the given parameters.
-   * @param places the list we want to sort.
+   * @param places the list we want to filter.
    * @param minRating The minimal rating we want to limit the list by. A number between 1 and 5.
    * @param filterIfNoWebsite Specifies whether we should filter if there is no available website
    *        for the restaurant.
@@ -61,20 +61,21 @@ public final class Places {
         places.stream()
             .filter(place -> place.rating() >= minRating)
             .filter(filterIfNoWebsite
+      //TODO(M1): take in account whether the place has a google maps link, when attribute is added
                 ? place -> !Strings.isNullOrEmpty(place.websiteUrl())
                 : place -> true)
             .filter(filterBranchesOfSamePlace
-                ? distinctByKey(p -> p.name())
-                : p -> true)
+                ? distinctByKey(place -> place.name())
+                : place -> true)
             .collect(Collectors.toList())
     );
     return result;
   }
 
-  //A utility function that allows to distinct beteen objects using a certain property
+  //A utility function that allows to distinct between objects using a certain property
   private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-      Map<Object, Boolean> map = new ConcurrentHashMap<>();
-      return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    Map<Object, Boolean> map = new ConcurrentHashMap<>();
+    return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 
   private Places() { }
