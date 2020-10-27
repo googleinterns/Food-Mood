@@ -18,23 +18,35 @@
  * results elements in order to display them to the user.
  */
 function fetchFromQuery() {
+  displayResultsPage();
+  const map = createMap();
+  const placesDiv = document.getElementById('place');
+  fetch('/query').then(response => response.json()).then((places) => {
+    places.forEach((singlePlace) => {
+      placesDiv.appendChild(createPlaceElement(singlePlace));
+      addPlaceMarker(map, singlePlace)
+    });
+  }).then(() => displayAfterResults());
+}
+
+/**
+ * Displays the results page.
+ */
+function displayResultsPage() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
   document.getElementById('map-container').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
-  const map = createMap();
-  const placesDiv = document.getElementById('place');
-  fetch('/query')
-  .then(response => response.json())
-  .then((places) => {
-    places.forEach((singlePlace) => {
-      placesDiv.appendChild(createPlaceElement(singlePlace));
-      addPlaceMarker(map, singlePlace)
-      })
-    })
-  .then(() => {document.getElementById('waiting-message').style.display = 'none'})
-  .then(() => {document.getElementById('map-container').style.display = 'block'})
-  .then(() => {document.getElementById('feedback-box').style.display = 'block'});
+}
+
+/**
+ * Displays the map and the feedback box in the results page
+ * after the results are ready.
+ */
+function displayAfterResults() {
+  document.getElementById('waiting-message').style.display = 'none';
+  document.getElementById('map-container').style.display = 'block';
+  document.getElementById('feedback-box').style.display = 'block';
 }
 
 /**
