@@ -26,23 +26,22 @@ import com.google.maps.model.LatLng;
 @RunWith(JUnit4.class)
 public final class PlacesTest {
 
-  /** A valid Place object with name "name1". */
-  private static final Place PLACE_1 = createValidPlaceBuilderByName("name1").build();
-
-  /** A valid Place object with name "name2". */
-  private static final Place PLACE_2 = createValidPlaceBuilderByName("name2").build();
-
   @Test
   public void randomSort_keepsAllItems() {
-    ImmutableList<Place> result = Places.randomSort(ImmutableList.of(PLACE_1, PLACE_2));
+    Place place1 = createValidPlaceBuilderByName("name1").build();
+    Place place2 = createValidPlaceBuilderByName("name2").build();
+    ImmutableList<Place> result = Places.randomSort(ImmutableList.of(place1, place2));
 
-    assertTrue(result.contains(PLACE_1));
-    assertTrue(result.contains(PLACE_2));
+    assertTrue(result.contains(place1));
+    assertTrue(result.contains(place2));
   }
 
   @Test
   public void filter_noNeedToFilter_noFilter() {
-    ImmutableList<Place> twoPlaces = ImmutableList.of(PLACE_1, PLACE_2);
+    ImmutableList<Place> twoPlaces = ImmutableList.of(
+        createValidPlaceBuilderByName("name1").build(),
+        createValidPlaceBuilderByName("name2").build()
+    );
 
     ImmutableList<Place> result = Places.filter(
       twoPlaces /* places */,
@@ -76,16 +75,18 @@ public final class PlacesTest {
 
   @Test
   public void filter_noWebsite_filterOut() {
-    Place websiteEmpty = createValidPlaceBuilderByName("name1").setWebsiteUrl("").build();
+    Place websiteEmpty = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
+    Place place1 = createValidPlaceBuilderByName("name1").build();
+    Place place2 = createValidPlaceBuilderByName("name2").build();
 
     ImmutableList<Place> result = Places.filter(
-        ImmutableList.of(websiteEmpty, PLACE_1, PLACE_2) /* places */,
+        ImmutableList.of(websiteEmpty, place1, place2) /* places */,
         1 /* min rating */,
         true /* filter if no website */,
         false /* filter branches of same place */
     );
 
-    assertEquals(result, ImmutableList.of(PLACE_1, PLACE_2));
+    assertEquals(result, ImmutableList.of(place1, place2));
   }
 
   @Test

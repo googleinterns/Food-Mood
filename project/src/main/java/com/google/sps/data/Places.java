@@ -17,12 +17,17 @@
  */
 package com.google.sps.data;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.TreeSet;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.TreeSet;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 /**
  * A utility class for Place objects.
@@ -57,10 +62,8 @@ public final class Places {
         places.stream()
             .sorted(Comparator.comparing(Place::rating).reversed())
             .filter(place -> place.rating() >= minRating)
-      //TODO(M1): take in account whether the place has a google maps link, when attribute is added
-            .filter(filterIfNoWebsite
-                ? place -> !Strings.isNullOrEmpty(place.websiteUrl())
-                : place -> true)
+    //TODO(M1): take in account whether the place has a google maps link, when attribute is added
+            .filter(place -> !(filterIfNoWebsite && Strings.isNullOrEmpty(place.websiteUrl())))
             .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparing(Place::name))),
                 ImmutableList::copyOf));
     return result;
