@@ -31,7 +31,8 @@ import java.util.List;
 
 public class PlacesFetcher {
 
-    /** The type of places that will be searched is RESTAURANT. Since most places
+    /**
+     * The type of places that will be searched is RESTAURANT. Since most places
      * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
      * rather as "RESTAURANT" this is the most suitable type to search for.
      */
@@ -54,12 +55,12 @@ public class PlacesFetcher {
     /**
      * Builds a query and requests it from Google Places API.
      *
-     * @param prefrences the UserPrefrences as specified by the user
+     * @param preferences the UserPreferences as specified by the user
      * @return an immutable list of places that supply the query
      * @throws FetcherException when an error occurs in querying the Places API
      *     for places or for places details
      */
-    public ImmutableList<Place> fetch(UserPrefrences prefrences) throws FetcherException {
+    public ImmutableList<Place> fetch(UserPreferences prefrences) throws FetcherException {
         PlacesSearchResult[] PlacesSearchResult;
         int radiusMult = 1;
         do {
@@ -75,9 +76,9 @@ public class PlacesFetcher {
         return createPlacesList(PlacesSearchResult);
     }
 
-    private TextSearchRequest genTextSearchRequest(UserPrefrences prefrences, int radius) {
+    private TextSearchRequest genTextSearchRequest(UserPreferences prefrences, int radius) {
         TextSearchRequest request = PlacesApi.textSearchQuery(
-            CONTEXT, createCuisenesQuery(prefrences.cuisines()), prefrences.location())
+            CONTEXT, createCuisinesQuery(prefrences.cuisines()), prefrences.location())
                 .radius(radius)
                 .maxPrice(PriceLevel.values()[prefrences.maxPriceLevel()])
                 .type(TYPE);
@@ -153,7 +154,7 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisenesQuery(ImmutableList<String> cuisines) {
+    private static String createCuisinesQuery(ImmutableList<String> cuisines) {
         return String.join("|", cuisines);
     }
 }
