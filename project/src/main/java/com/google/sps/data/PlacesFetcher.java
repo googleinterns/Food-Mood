@@ -31,8 +31,7 @@ import java.util.List;
 
 public class PlacesFetcher {
 
-    /**
-     * The type of places that will be searched is RESTAURANT. Since most places
+    /** The type of places that will be searched is RESTAURANT. Since most places
      * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
      * rather as "RESTAURANT" this is the most suitable type to search for.
      */
@@ -111,7 +110,6 @@ public class PlacesFetcher {
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
-                System.out.println(placeDetails.name);
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException(
                     "Couldn't get place details from Places API", e);

@@ -213,11 +213,13 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    doReturn(new PlacesSearchResult[0]).doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
-        .when(spiedFetcher)
-        .getPlacesSearchResults(any(TextSearchRequest.class));
-    doReturn(PLACE_DETAILS_1).when(spiedFetcher)
-        .getPlaceDetails(any(PlaceDetailsRequest.class));
+    doReturn(new PlacesSearchResult[0])
+      .doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(PLACE_DETAILS_1)
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
     assertEquals(
       ImmutableList.of(PLACE_1), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
   }
