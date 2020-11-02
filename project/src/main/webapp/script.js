@@ -21,12 +21,24 @@ function fetchFromQuery() {
   displayResultsPage();
   const map = createMap();
   const placesDiv = document.getElementById('place');
-  fetch('/query').then(response => response.json()).then((places) => {
-    places.forEach((singlePlace) => {
-      placesDiv.appendChild(createPlaceElement(singlePlace));
-      addPlaceMarker(map, singlePlace)
-    });
-  }).then(() => displayAfterResults());
+  fetch('/query')
+      .then(response => response.json())
+      .then((places) => {
+        places.forEach((singlePlace) => {
+          placesDiv.appendChild(createPlaceElement(singlePlace));
+          addPlaceMarker(map, singlePlace)
+        });
+      if (places.length < 3) {
+        document.getElementById('num-results').innerHTML =
+            'Your search had ' + places.length + ' results. You are welcome to try again, \
+            and maybe try to change some of the entered parameters.'
+      }
+      })
+      .then(() => displayAfterResults())
+      .catch((error) => {
+        document.getElementById('num-results').innerHTML = "Oops, we encountered a problem! \
+            Could you please try again?";
+      });
 }
 
 /**
