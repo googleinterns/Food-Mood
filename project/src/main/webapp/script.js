@@ -12,41 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.import java.io.IOException;
 
-
 /**
  * Fetches recommended places from the 'query' servlet, and switches from the query form to the
  * results elements in order to display them to the user.
  */
 function fetchFromQuery() {
-  displayResultsPage();
-  const map = createMap();
+  document.getElementById('query-form').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
   const placesDiv = document.getElementById('place');
   fetch('/query').then(response => response.json()).then((places) => {
     places.forEach((singlePlace) => {
       placesDiv.appendChild(createPlaceElement(singlePlace));
-      addPlaceMarker(map, singlePlace)
     });
-  }).then(() => displayAfterResults());
-}
-
-/**
- * Displays the results page.
- */
-function displayResultsPage() {
-  document.getElementById('query-form').style.display = 'none';
-  document.getElementById('results').style.display = 'block';
-  document.getElementById('map-container').style.display = 'none';
-  document.getElementById('feedback-box').style.display = 'none';
-}
-
-/**
- * Displays the map and the feedback box in the results page
- * after the results are ready.
- */
-function displayAfterResults() {
-  document.getElementById('waiting-message').style.display = 'none';
-  document.getElementById('map-container').style.display = 'block';
-  document.getElementById('feedback-box').style.display = 'block';
+  });
 }
 
 /**
@@ -63,10 +41,10 @@ function createPlaceElement(place) {
   placeElement.appendChild(document.createElement('br'));
 
   // Add link to website
-  if (place.websiteUrl) {
+  if (place.website) {
     const websiteLink = document.createElement('a');
-    websiteLink.href = place.websiteUrl;
-    websiteLink.title = place.websiteUrl;
+    websiteLink.href = place.website;
+    websiteLink.title = place.website;
     websiteLink.innerHTML = 'Restaurant\'s website';
     placeElement.appendChild(websiteLink);
   } else {
@@ -76,11 +54,9 @@ function createPlaceElement(place) {
   placeElement.appendChild(document.createElement('br'));
 
   // Add phone number
-  if (place.phone) {
-    const phone = document.createTextNode('Phone number:' + place.phone);
-    placeElement.appendChild(phone);
-    placeElement.appendChild(document.createElement('br'));
-  }
+  const phone = document.createTextNode('Phone number:' + place.phone);
+  placeElement.appendChild(phone);
+  placeElement.appendChild(document.createElement('br'));
 
   return placeElement;
 }
@@ -92,47 +68,5 @@ function createPlaceElement(place) {
 function tryAgain() {
   document.getElementById('query-form').style.display = 'block';
   document.getElementById('results').style.display = 'none';
-  document.getElementById('waiting-message').style.display = 'block'
   document.getElementById('place').innerHTML = '';
-}
-
-
-/**
- *  Creates a map and adds it to the page.
- */
-function createMap() {
-  const ZOOM_OUT = 12;
-  const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
-  const map = new window.google.maps.Map(
-    document.getElementById('map-container'), {
-        center: USER_LOCATION,
-        zoom: ZOOM_OUT,
-    }
-  );
-  return map;
-}
-
-/**
- * Adds to the map a place's marker.
- */
-function addPlaceMarker(map, place) {
-  const ZOOM_IN = 15;
-  const marker = new window.google.maps.Marker({
-      title: place.name,
-      position: place.location,
-      description: place.name.link(place.websiteUrl),
-      map: map
-  });
-  if (place.websiteUrl) {
-    const infoWindow = new window.google.maps.InfoWindow({
-        content: marker.description
-    });
-    marker.addListener('click', () => {
-        infoWindow.open(map, marker);
-    });
-  }
-  window.google.maps.event.addListener(marker,'click', () => {
-    map.setZoom(ZOOM_IN);
-    map.setCenter(marker.position);
-  });
 }
