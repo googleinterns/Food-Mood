@@ -161,9 +161,7 @@ function addSearchBoxToMap(map, searchBoxElement) {
   const searchBox = new window.google.maps.places.SearchBox(searchBoxElement);
   map.controls[window.google.maps.ControlPosition.TOP_LEFT].push(searchBoxElement);
   // Bias the SearchBox results towards current map's viewport.
-  map.addListener("bounds_changed", () => {
-    searchBox.setBounds(map.getBounds());
-  });
+  map.addListener("bounds_changed", () => {searchBox.setBounds(map.getBounds());});
   let markers = [];
   // Listen for the event fired when the user selects a location, and retrieve more details for it.
   searchBox.addListener("places_changed", () => {
@@ -171,8 +169,8 @@ function addSearchBoxToMap(map, searchBoxElement) {
     if (places.length == 0) {
       return;
     }
-    // Update the user location to be the first place. If there is more than one, it is changes
-    // when the user clicks on a different marker
+    // Update the user location to be the first place. This will change if the user clicks on a
+    // differnet marker (if there is more than one).
     localStorage.setItem('userLocation', JSON.stringify(places[0].geometry.location));
     // Clear out the old markers.
     markers.forEach((marker) => {marker.setMap(null);});
@@ -183,19 +181,7 @@ function addSearchBoxToMap(map, searchBoxElement) {
       if (!place.geometry) {
         return;
       }
-      // Create a marker for each place.
-      const currentMarker = new window.google.maps.Marker({
-        map,
-        title: place.name,
-        position: place.geometry.location,
-      })
-      var infowindow = new window.google.maps.InfoWindow({content: place.name});
-      markers.push(currentMarker);
-      currentMarker.addListener("click", () => {
-        map.setCenter(currentMarker.getPosition());
-        localStorage.setItem('userLocation', JSON.stringify(currentMarker.getPosition()));
-        infowindow.open(map,currentMarker);
-      });
+      markers.push(createInteractiveMarkerForPlace(place, map));
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
         bounds.union(place.geometry.viewport);
@@ -207,21 +193,43 @@ function addSearchBoxToMap(map, searchBoxElement) {
   });
 }
 
+ // Creates a marker for the given place in the given map. If the marker is clicked,
+ // it becomes the map's center and updates the user's location in our storage.
+ function createInteractiveMarkerForPlace(place, map) {
+  const currentMarker = createMapMarker(map, place.geometry.location, place.name);
+  var infowindow = new window.google.maps.InfoWindow({content: place.name});
+  currentMarker.addListener("click", () => {
+    map.setCenter(currentMarker.getPosition());
+    localStorage.setItem('userLocation', JSON.stringify(currentMarker.getPosition()));
+    infowindow.open(map,currentMarker);
+  });
+  return currentMarker;
+}
+
+ // Utility function for creating a new map marker based on it's required traits.
+function createMapMarker(map, placePosition, placeTitle) {
+  return new window.google.maps.Marker({
+    map,
+    title: placeTitle,
+    position: placePosition
+  })
+}
+
 /**
  * Displays a Google Maps map that allows the user to search fo his location.
  */
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
-  let map = new window.google.maps.Map(document.getElementById("map"), {
+  let userLocationMap = new window.google.maps.Map(document.getElementById("map"), {
     center: DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE,
     zoom: LOW_ZOOM_LEVEL,
     mapTypeId: "roadmap",
   });
-  globalUserMap = map;
+  globalUserMap = userLocationMap;
   localStorage.setItem('userLocation', JSON.stringify(DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE));
   const searchBoxElement = document.getElementById("location-input");
-  addSearchBoxToMap(map, searchBoxElement);
+  addSearchBoxToMap(userLocationMap, searchBoxElement);
 }
 
 /**
@@ -248,26 +256,16 @@ function getDeviceLocationAndShowOnMap() {
       map.setZoom(HIGH_ZOOM_LEVEL);
       localStorage.setItem('userLocation', JSON.stringify(userPosition));
       // Add marker with info window to display user location.
-      const infowindow = new window.google.maps.InfoWindow({
-        content: 'My location',
-      });
-      const marker = new window.google.maps.Marker({
-        position: userPosition,
-        map,
-        title: 'My location',
-      });
+      const infowindow = new window.google.maps.InfoWindow({content: 'My location'});
+      const marker = createMapMarker(map, userPosition, 'My location');
       marker.addListener("click", () => {
         infowindow.open(map, marker);
       });
     },
     // In case of error.
-    () => {
-      displayGeolocationError('The Geolocation service failed');
-    },
+    () => {displayGeolocationError('The Geolocation service failed');},
     // Options.
-    {
-      timeout: FIVE_SECONDS,
-    }
+    {timeout: FIVE_SECONDS}
   );
 }
 
