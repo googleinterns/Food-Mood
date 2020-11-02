@@ -19,10 +19,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 
 /**
- * Represents the prefrences entered by a user.
+ * Represents the preferences entered by a user.
  */
 @AutoValue
-public abstract class UserPrefrences {
+public abstract class UserPreferences {
 
   /**
    * @return the minimal rating that the user wants to consider,
@@ -44,17 +44,23 @@ public abstract class UserPrefrences {
   /**
   * @return the cuisine types that the user prefers.
   */
-  public abstract ImmutableList<String> cuisineTypes();
+  public abstract ImmutableList<String> cuisines();
+
+  /**
+  * @return true if the user wants the place to be currently open.
+  */
+  public abstract boolean openNow();
+
 
   /**
    * @return a builder that enables to build a new Place object
    */
   public static Builder builder() {
-    return new AutoValue_UserPrefrences.Builder();
+    return new AutoValue_UserPreferences.Builder();
   }
 
   /**
-   * A builder class for creating UserPrefrences objects.
+   * A builder class for creating UserPreferences objects.
    */
   @AutoValue.Builder
   public abstract static class Builder {
@@ -79,28 +85,34 @@ public abstract class UserPrefrences {
     public abstract Builder setLocation(LatLng location);
 
     /**
-     * @param cuisineTypes the cuisine types that the user prefers
+     * @param cuisines the cuisine types that the user prefers
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setCuisineTypes(ImmutableList<String> cuisineTypes);
+    public abstract Builder setCuisines(ImmutableList<String> cuisines);
 
     /**
-     * Builds the UserPrefrences object according to the data that was set so far.
+     * @param openNow a boolean representing whether the users wants the place to be currently open
+     * @return a Place builder that enables to continue building
+     */
+    public abstract Builder setOpenNow(boolean openNow);
+
+    /**
+     * Builds the UserPreferences object according to the data that was set so far.
      *
      * @return the object that was built
      */
-    abstract UserPrefrences autoBuild();
+    abstract UserPreferences autoBuild();
 
     /**
-     * Concludes the building of a new UserPrefrences instance.
+     * Concludes the building of a new UserPreferences instance.
      * @return the new instance.
      * @throws IllegalArgumentException if an input isn't valid (rating / price level)
      */
-    public UserPrefrences build() throws IllegalArgumentException {
-      UserPrefrences prefrences = autoBuild();
-      ValidationUtils.validateRating(prefrences.minRating());
-      ValidationUtils.validatePriceLevel(prefrences.maxPriceLevel());
-      return prefrences;
+    public UserPreferences build() throws IllegalArgumentException {
+      UserPreferences preferences = autoBuild();
+      ValidationUtils.validateRating(preferences.minRating());
+      ValidationUtils.validatePriceLevel(preferences.maxPriceLevel());
+      return preferences;
     }
   }
 }
