@@ -59,30 +59,30 @@ public class PlacesFetcher {
      * @throws FetcherException when an error occurs in querying the Places API
      *     for places or for places details
      */
-    public ImmutableList<Place> fetch(UserPreferences prefrences) throws FetcherException {
-        PlacesSearchResult[] PlacesSearchResult;
+    public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
+        PlacesSearchResult[] placesSearchResult;
         int radiusMult = 1;
         do {
             try {
-                PlacesSearchResult = getPlacesSearchResults(
-                    genTextSearchRequest(prefrences, INIT_SEARCH_RADIUS * radiusMult));
+                placesSearchResult = getPlacesSearchResults(
+                    genTextSearchRequest(preferences, INIT_SEARCH_RADIUS * radiusMult));
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException("Couldn't fetch places from Places API", e);
             }
             radiusMult++;
         } while (
-                PlacesSearchResult.length < MIN_NUM_OF_RESULTS && radiusMult <= MAX_RADIUS_MULT);
-        return createPlacesList(PlacesSearchResult);
+            placesSearchResult.length < MIN_NUM_OF_RESULTS && radiusMult <= MAX_RADIUS_MULT);
+        return createPlacesList(placesSearchResult);
     }
 
-    private TextSearchRequest genTextSearchRequest(UserPreferences prefrences, int radius) {
+    private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
         TextSearchRequest request = PlacesApi.textSearchQuery(
-            CONTEXT, createCuisinesQuery(prefrences.cuisines()), prefrences.location())
+            CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
                 .radius(radius)
-                .maxPrice(PriceLevel.values()[prefrences.maxPriceLevel()])
+                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
-        if (prefrences.openNow()) {
-            request.openNow(prefrences.openNow());
+        if (preferences.openNow()) {
+            request.openNow(preferences.openNow());
         }
         return request;
     }
