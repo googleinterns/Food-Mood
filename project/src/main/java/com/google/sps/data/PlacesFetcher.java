@@ -16,6 +16,9 @@ package com.google.sps.data;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
@@ -26,9 +29,14 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlacesFetcher {
 
@@ -38,7 +46,7 @@ public class PlacesFetcher {
      * the Servlet.
      */
     private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final ImmutableList<String> CUISINES = ImmutableList.of();
+    private static final ImmutableList<String> CUISINES = ImmutableList.of("italian");
     private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
     private static final boolean OPEN_NOW = true;
 
@@ -54,23 +62,21 @@ public class PlacesFetcher {
     // TODO(M1): check at least 10 results, and if less extend radius
 
     /** The entry point for a Google GEO API request. */
-    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
-        .apiKey(System.getenv("API_KEY"))
-        .build();
+    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder().apiKey(System.getenv("API_KEY")).build();
+
+    /** A mapping between cuisines and text search words. */
+    private static Map<String, String[]> cuisineToSearchWords = getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
      *
      * @return an immutable list of places that supply the query
-     * @throws FetcherException when an error occurs in querying the Places API
-     *     for places or for places details
+     * @throws FetcherException when an error occurs in querying the Places API for
+     *                          places or for places details
      */
     public ImmutableList<Place> fetch() throws FetcherException {
-        TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, createCuisinesQuery(), LOCATION)
-                .radius(SEARCH_RADIUS)
-                .maxPrice(MAX_PRICE_LEVEL)
-                .type(TYPE);
+        TextSearchRequest query = PlacesApi.textSearchQuery(CONTEXT, createCuisinesQuery(), LOCATION)
+                .radius(SEARCH_RADIUS).maxPrice(MAX_PRICE_LEVEL).type(TYPE);
         if (OPEN_NOW) {
             query.openNow(OPEN_NOW);
         }
@@ -96,8 +102,7 @@ public class PlacesFetcher {
         return query.await().results;
     }
 
-    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
-            throws FetcherException {
+    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr) throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
@@ -105,32 +110,22 @@ public class PlacesFetcher {
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
             } catch (ApiException | InterruptedException | IOException e) {
-                throw new FetcherException(
-                    "Couldn't get place details from Places API", e);
+                throw new FetcherException("Couldn't get place details from Places API", e);
             }
-            places.add(
-                Place.builder()
-                    .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null
-                            ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null
-                            ? "" : placeDetails.formattedPhoneNumber.toString())
-                    .setRating(placeDetails.rating)
-                    .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
-                    .setLocation(placeDetails.geometry.location)
-                    .build());
+            places.add(Place.builder().setName(placeDetails.name)
+                    .setWebsiteUrl(placeDetails.website == null ? "" : placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber == null ? ""
+                            : placeDetails.formattedPhoneNumber.toString())
+                    .setRating(placeDetails.rating).setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
+                    .setLocation(placeDetails.geometry.location).build());
         }
         return ImmutableList.copyOf(places);
     }
 
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
-        return PlacesApi.placeDetails(CONTEXT, placeId)
-            .fields(
-                PlaceDetailsRequest.FieldMask.NAME,
-                PlaceDetailsRequest.FieldMask.WEBSITE,
-                PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
-                PlaceDetailsRequest.FieldMask.RATING,
-                PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+        return PlacesApi.placeDetails(CONTEXT, placeId).fields(PlaceDetailsRequest.FieldMask.NAME,
+                PlaceDetailsRequest.FieldMask.WEBSITE, PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+                PlaceDetailsRequest.FieldMask.RATING, PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
                 PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
     }
 
@@ -141,12 +136,23 @@ public class PlacesFetcher {
      * @return PlacesDetails containig requested details about the place
      */
     @VisibleForTesting
-    PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
-            throws ApiException, InterruptedException, IOException {
+    PlaceDetails getPlaceDetails(PlaceDetailsRequest request) throws ApiException, InterruptedException, IOException {
         return request.await();
     }
 
     private static String createCuisinesQuery() {
-        return String.join("|", CUISINES);
+        return CUISINES.stream()
+            .map(cuisine -> String.join("|", cuisineToSearchWords.get(cuisine)))
+            .collect(Collectors.joining("|"));
+    }
+
+    private static Map<String, String[]> getCuisinesMap() {
+        try {
+            Type mapType = new TypeToken<Map<String,String[]>>() {}.getType();
+            return new Gson().fromJson(new JsonReader(new FileReader("project/src/main/java/com/google/sps/data/resources/cuisinesSearchWords.json")), mapType);
+        } catch (FileNotFoundException e) {
+            System.out.println("no file");
+            return null;
+        }
     }
 }
