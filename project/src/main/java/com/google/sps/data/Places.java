@@ -62,10 +62,13 @@ public final class Places {
         places.stream()
             .sorted(Comparator.comparing(Place::rating).reversed())
             .filter(place -> place.rating() >= minRating)
-    //TODO(M1): take in account whether the place has a google maps link, when attribute is added
+            //TODO(M1): also chack about having a google maps link, when attribute added
             .filter(place -> !(filterIfNoWebsite && Strings.isNullOrEmpty(place.websiteUrl())))
-            .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparing(Place::name))),
-                ImmutableList::copyOf));
+            .collect(ImmutableList.toImmutableList());
+        if (filterBranchesOfSamePlace) {
+          result = result.stream().collect(collectingAndThen(toCollection(() -> new TreeSet<>
+              (comparing(Place::name))),ImmutableList::copyOf));
+        }
     return result;
   }
 
