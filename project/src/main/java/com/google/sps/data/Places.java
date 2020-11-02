@@ -17,12 +17,17 @@
  */
 package com.google.sps.data;
 
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.Comparator.comparing;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
@@ -46,7 +51,7 @@ public final class Places {
   }
 
   /**
-   * filters the given list of places according to the given parameters.
+   * Filters the given list of places according to the given parameters.
    * @param places the list we want to filter.
    * @param minRating The minimal rating we want to limit the list by. A number between 1 and 5.
    * @param filterIfNoWebsite Specifies whether we should filter if there is no available website
@@ -58,7 +63,7 @@ public final class Places {
   public static ImmutableList<Place> filter(ImmutableList<Place> places, int minRating, Boolean
       filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
     //TODO(M1): also filter by place's status when the attribute is added
-    ImmutableList<Place> result = ImmutableList.copyOf(
+    ImmutableList<Place> result =
         places.stream()
             .sorted(Comparator.comparing(Place::rating).reversed())
             .filter(place -> place.rating() >= minRating)
@@ -66,18 +71,9 @@ public final class Places {
             .filter(filterIfNoWebsite
                 ? place -> !Strings.isNullOrEmpty(place.websiteUrl())
                 : place -> true)
-            .filter(filterBranchesOfSamePlace
-                ? distinctByKey(place -> place.name())
-                : place -> true)
-            .collect(Collectors.toList())
-    );
+            .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparing(Place::name))),
+                ImmutableList::copyOf));
     return result;
-  }
-
-  //A utility function that allows to distinct between objects using a certain property
-  private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-    Map<Object, Boolean> map = new ConcurrentHashMap<>();
-    return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 
   private Places() { }

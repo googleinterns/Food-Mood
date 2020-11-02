@@ -58,11 +58,16 @@ public abstract class Place {
   public abstract LatLng location();
 
   /**
-   * @return a builder that enables to build a new Place object
+   * @return a builder that enables to build a new Place object.
    */
   public static Builder builder() {
     return new AutoValue_Place.Builder();
   }
+
+  /**
+   * @return a builder that enables to continue building an existing Place object.
+   */
+  public abstract Builder toBuilder();
 
   /**
    * A builder class for creating Place objects.
