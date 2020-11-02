@@ -30,13 +30,14 @@ function fetchFromQuery() {
       `location=${getUserLocationFromUi()}`
     ].join('&');
     const placesDiv = document.getElementById('place');
+    displayResultsPage();
+    const map = createMap();
     fetch('/query?' + params).then(response => response.json()).then((places) => {
       places.forEach((singlePlace) => {
         placesDiv.appendChild(createPlaceElement(singlePlace));
+        addPlaceMarker(map, singlePlace)
       });
-    });
-    document.getElementById('query-form').style.display = 'none';
-    document.getElementById('results').style.display = 'block';
+    }).then(() => displayAfterResults());
   } catch (error) {
     alert(error.message);
   }
@@ -92,6 +93,26 @@ function getUserLocationFromUi() {
   return coords.lat + "," + coords.lng;
 }
 
+/**
+ * Displays the results page.
+ */
+function displayResultsPage() {
+  document.getElementById('query-form').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('map-container').style.display = 'none';
+  document.getElementById('feedback-box').style.display = 'none';
+}
+
+/**
+ * Displays the map and the feedback box in the results page
+ * after the results are ready.
+ */
+function displayAfterResults() {
+  document.getElementById('waiting-message').style.display = 'none';
+  document.getElementById('map-container').style.display = 'block';
+  document.getElementById('feedback-box').style.display = 'block';
+}
+
 function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = 'place-container';
@@ -113,9 +134,11 @@ function createPlaceElement(place) {
   }
   placeElement.appendChild(document.createElement('br'));
   // Add phone number
-  const phone = document.createTextNode('Phone number:' + place.phone);
-  placeElement.appendChild(phone);
-  placeElement.appendChild(document.createElement('br'));
+  if (place.phone) {
+    const phone = document.createTextNode('Phone number:' + place.phone);
+    placeElement.appendChild(phone);
+    placeElement.appendChild(document.createElement('br'));
+  }
 
   return placeElement;
 }
@@ -127,6 +150,7 @@ function createPlaceElement(place) {
 function tryAgain() {
   document.getElementById('query-form').style.display = 'block';
   document.getElementById('results').style.display = 'none';
+  document.getElementById('waiting-message').style.display = 'block'
   document.getElementById('place').innerHTML = '';
 }
 
@@ -251,4 +275,44 @@ function displayGeolocationError(errorText) {
   document.getElementById('map-error-container').innerHTML =
       errorText + ', so we can\'t use your location.' + '<br>' +
       'Use the map to find your location.' + '<br>';
+}
+
+/**
+ *  Creates a map and adds it to the page.
+ */
+function createMap() {
+  const ZOOM_OUT = 12;
+  const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
+  const map = new window.google.maps.Map(
+    document.getElementById('map-container'), {
+        center: USER_LOCATION,
+        zoom: ZOOM_OUT,
+    }
+  );
+  return map;
+}
+
+/**
+ * Adds to the map a place's marker.
+ */
+function addPlaceMarker(map, place) {
+  const ZOOM_IN = 15;
+  const marker = new window.google.maps.Marker({
+      title: place.name,
+      position: place.location,
+      description: place.name.link(place.websiteUrl),
+      map: map
+  });
+  if (place.websiteUrl) {
+    const infoWindow = new window.google.maps.InfoWindow({
+        content: marker.description
+    });
+    marker.addListener('click', () => {
+        infoWindow.open(map, marker);
+    });
+  }
+  window.google.maps.event.addListener(marker,'click', () => {
+    map.setZoom(ZOOM_IN);
+    map.setCenter(marker.position);
+  });
 }
