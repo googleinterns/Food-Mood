@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
-import com.google.sps.data.UserPrefrences;
+import com.google.sps.data.UserPreferences;
 
 /**
  * A servlet that handles the user query. Currently accepts no input, and responds with a list of
@@ -54,13 +54,13 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      UserPrefrences userPrefs =
-          UserPrefrences.builder()
+      UserPreferences userPrefs =
+          UserPreferences.builder()
               .setMinRating(Float.parseFloat(request.getParameter("rating")))
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
               .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
               .setLocation(getLatLngFromString(request.getParameter("location")))
-              .setCuisineTypes(ImmutableList.copyOf(request.getParameter("quisines").split(",")))
+              .setCuisines(ImmutableList.copyOf(request.getParameter("quisines").split(",")))
               .build();
       ImmutableList<Place> filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,

@@ -15,6 +15,7 @@
 package com.google.sps.servlets;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.UserPreferences;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
 import com.google.appengine.repackaged.com.google.gson.Gson;
@@ -56,7 +58,7 @@ public final class QueryServletTest {
   public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
     ImmutableList<Place> placesListWithMoreThanMaxNum =
         createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
-    when(FETCHER.fetch()).thenReturn(placesListWithMoreThanMaxNum);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithMoreThanMaxNum);
 
     servlet.doGet(REQUEST, RESPONSE);
 
@@ -67,7 +69,7 @@ public final class QueryServletTest {
   public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
-    when(FETCHER.fetch()).thenReturn(placesListWithLessThanMaxNum);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithLessThanMaxNum);
 
     servlet.doGet(REQUEST, RESPONSE);
 
