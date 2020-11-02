@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <script src="script.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIza.."></script>
   <head>
     <meta charset="UTF-8">
     <title>food-mood</title>
@@ -45,7 +46,8 @@
       <input class="submit" type="submit" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">
-      <h2>Our recommendation:</h2>
+      <h2>Food Mood's recommendation:</h2>
+      <p id="waiting-message">Please wait as we are finding the best results for you</p>
       <ol id="place"> </ol>
       <div id ="map-container"> </div>
       <div id = "feedback-box">

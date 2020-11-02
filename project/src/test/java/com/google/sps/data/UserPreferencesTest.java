@@ -25,19 +25,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
-public class UserPrefrencesTest {
+public class UserPreferencesTest {
 
     private static final float RATING = 4;
     private static final int PRICE_LEVEL = 2;
     private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
     private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+    private static final boolean OPEN_NOW = true;
 
     @Test
     public void build_invalidLowRating_throwsIllegalArgumentException() {
       int invalidLowRating = 0;
 
       assertThrows(IllegalArgumentException.class, () -> {
-        getValidUserPrefrencesBuilder().setMinRating(invalidLowRating).build();
+        getValidUserPreferencesBuilder().setMinRating(invalidLowRating).build();
       });
     }
 
@@ -46,7 +47,7 @@ public class UserPrefrencesTest {
       int invalidHighRating = 10;
 
       assertThrows(IllegalArgumentException.class, () -> {
-        getValidUserPrefrencesBuilder().setMinRating(invalidHighRating).build();
+        getValidUserPreferencesBuilder().setMinRating(invalidHighRating).build();
       });
     }
 
@@ -55,7 +56,7 @@ public class UserPrefrencesTest {
       int invalidLowPriceLevel = -1;
 
       assertThrows(IllegalArgumentException.class, () -> {
-        getValidUserPrefrencesBuilder().setMaxPriceLevel(invalidLowPriceLevel).build();
+        getValidUserPreferencesBuilder().setMaxPriceLevel(invalidLowPriceLevel).build();
       });
     }
 
@@ -64,27 +65,29 @@ public class UserPrefrencesTest {
       int invalidHighPriceLevel = 5;
 
       assertThrows(IllegalArgumentException.class, () -> {
-        getValidUserPrefrencesBuilder().setMaxPriceLevel(invalidHighPriceLevel).build();
+        getValidUserPreferencesBuilder().setMaxPriceLevel(invalidHighPriceLevel).build();
       });
     }
 
     @Test
-    public void build_validInput_returnsValidUserPrefrences() {
-        UserPrefrences prefrences = getValidUserPrefrencesBuilder().build();
-        assertAll("userPrefrences",
-            () -> assertEquals(RATING, prefrences.minRating()),
-            () -> assertEquals(PRICE_LEVEL, prefrences.maxPriceLevel()),
-            () -> assertEquals(LOCATION, prefrences.location()),
-            () -> assertEquals(CUISINES, prefrences.cuisineTypes())
+    public void build_validInput_returnsValidUserPreferences() {
+        UserPreferences preferences = getValidUserPreferencesBuilder().build();
+        assertAll("userPreferences",
+            () -> assertEquals(RATING, preferences.minRating()),
+            () -> assertEquals(PRICE_LEVEL, preferences.maxPriceLevel()),
+            () -> assertEquals(LOCATION, preferences.location()),
+            () -> assertEquals(CUISINES, preferences.cuisines()),
+            () -> assertEquals(OPEN_NOW, preferences.openNow())
         );
     }
 
-    // Returns a UserPrefrences builder that has valid values of all attributes.
-    private UserPrefrences.Builder getValidUserPrefrencesBuilder() {
-      return UserPrefrences.builder()
+    // Returns a UserPreferences builder that has valid values of all attributes.
+    private UserPreferences.Builder getValidUserPreferencesBuilder() {
+      return UserPreferences.builder()
           .setMinRating(RATING)
           .setMaxPriceLevel(PRICE_LEVEL)
           .setLocation(LOCATION)
-          .setCuisineTypes(CUISINES);
+          .setCuisines(CUISINES)
+          .setOpenNow(OPEN_NOW);
     }
 }

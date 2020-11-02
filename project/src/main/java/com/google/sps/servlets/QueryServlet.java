@@ -22,8 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.UserPreferences;
 
 /**
  * A servlet that handles the user query. Currently accepts no input, and responds with a list of
@@ -48,11 +51,20 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    UserPreferences pref = UserPreferences.builder()
+        .setMinRating(4)
+        .setMaxPriceLevel(2)
+        .setLocation(new LatLng(40.7581, -73.9855))
+        .setCuisines(ImmutableList.of("burger"))
+        .setOpenNow(true).build());
+
+    cuisineMap
+
     try {
       //TODO(M1): add call to filterer
       response.setContentType("application/json");
       response.getWriter().write(new Gson().toJson(
-          Places.randomSort(fetcher.fetch())
+          Places.randomSort(fetcher.fetch(pref, cuisineMap))
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())
