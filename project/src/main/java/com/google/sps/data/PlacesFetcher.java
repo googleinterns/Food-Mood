@@ -16,7 +16,6 @@ package com.google.sps.data;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -32,18 +31,7 @@ import java.util.List;
 
 public class PlacesFetcher {
 
-    /**
-     * Those constants are temporaraly hardcoded for M0. In next versions those same
-     * constants will be fields of a UserPrefrences instance passed to fetch() by
-     * the Servlet.
-     */
-    private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
-    private static final ImmutableList<String> CUISINES = ImmutableList.of();
-    private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
-    private static final boolean OPEN_NOW = true;
-
-    /**
-     * The type of places that will be searched is RESTAURANT. Since most places
+    /** The type of places that will be searched is RESTAURANT. Since most places
      * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
      * rather as "RESTAURANT" this is the most suitable type to search for.
      */
@@ -61,18 +49,20 @@ public class PlacesFetcher {
     /**
      * Builds a query and requests it from Google Places API.
      *
+     * @param preferences the UserPreferences as specified by the user
      * @return an immutable list of places that supply the query
      * @throws FetcherException when an error occurs in querying the Places API
      *     for places or for places details
      */
-    public ImmutableList<Place> fetch() throws FetcherException {
+    public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         TextSearchRequest query =
-            PlacesApi.textSearchQuery(CONTEXT, createCuisinesQuery(), LOCATION)
+            PlacesApi.textSearchQuery(
+                CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
                 .radius(SEARCH_RADIUS)
-                .maxPrice(MAX_PRICE_LEVEL)
+                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
-        if (OPEN_NOW) {
-            query.openNow(OPEN_NOW);
+        if (preferences.openNow()) {
+            query.openNow(preferences.openNow());
         }
         try {
             return createPlacesList(getPlacesSearchResults(query));
@@ -146,7 +136,7 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisinesQuery() {
-        return String.join("|", CUISINES);
+    private static String createCuisinesQuery(ImmutableList<String> cuisines) {
+        return String.join("|", cuisines);
     }
 }

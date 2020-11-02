@@ -17,12 +17,7 @@
  */
 package com.google.sps.data;
 
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.Comparator.comparing;
-
 import com.google.common.collect.ImmutableList;
-import com.google.common.base.Strings;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.ArrayList;
