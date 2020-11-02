@@ -31,7 +31,18 @@ import java.util.List;
 
 public class PlacesFetcher {
 
-    /** The type of places that will be searched is RESTAURANT. Since most places
+   /**
+     * Those constants are temporaraly hardcoded for M0. In next versions those same
+     * constants will be fields of a UserPrefrences instance passed to fetch() by
+     * the Servlet.
+     */
+    private static final LatLng LOCATION = new LatLng(32.080576, 34.780641); // Rabin Square TLV;
+    private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+    private static final PriceLevel MAX_PRICE_LEVEL = PriceLevel.values()[2];
+    private static final boolean OPEN_NOW = true;
+
+    /**
+     * The type of places that will be searched is RESTAURANT. Since most places
      * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
      * rather as "RESTAURANT" this is the most suitable type to search for.
      */

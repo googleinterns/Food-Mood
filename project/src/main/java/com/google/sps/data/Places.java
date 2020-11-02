@@ -17,7 +17,7 @@
  */
 package com.google.sps.data;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
