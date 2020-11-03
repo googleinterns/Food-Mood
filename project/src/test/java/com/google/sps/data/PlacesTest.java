@@ -106,6 +106,23 @@ public final class PlacesTest {
     assertEquals(result, ImmutableList.of(highRatingPlace));
   }
 
+  @Test
+  public void filter_filterNotRequired_notFiltering() {
+    Place websiteEmpty = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
+    Place samePlace1 = createValidPlaceBuilderByName("name1").build();
+    Place samePlace2 = createValidPlaceBuilderByName("name1").build();
+    ImmutableList<Place> allPlaces = ImmutableList.of(websiteEmpty, samePlace1, samePlace2);
+
+    ImmutableList<Place> result = Places.filter(
+      allPlaces /* places */,
+        1 /* min rating */,
+        false /* filter if no website */,
+        false /* filter branches of same place */
+    );
+
+    assertEquals(result, allPlaces);
+  }
+
   // Returns a Place builder that has valid values of all attributes.
   private static Place.Builder createValidPlaceBuilderByName(String name) {
     return Place.builder()
