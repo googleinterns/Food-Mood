@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.import java.io.IOException;
+// limitations under the License.
 
 /* The user location map. the map has to be accessed from different functions, so it has to be kept
  * globally. */
@@ -29,21 +29,22 @@ function fetchFromQuery() {
       `open=${getUserOpenNowFromUi()}`,
       `location=${getUserLocationFromUi()}`
     ].join('&');
-    const placesDiv = document.getElementById('place');
-    displayResultsPage();
-    const map = createMap();
-    fetch('/query?' + params).then(response => response.json()).then((places) => {
-      places.forEach((singlePlace) => {
-        placesDiv.appendChild(createPlaceElement(singlePlace));
-        addPlaceMarker(map, singlePlace)
-      });
-    }).then(() => displayAfterResults());
   } catch (error) {
     alert(error.message);
+    return;
   }
+  const placesDiv = document.getElementById('place');
+  displayResultsPage();
+  const map = createMap();
+  fetch('/query?' + params).then(response => response.json()).then((places) => {
+    places.forEach((singlePlace) => {
+      placesDiv.appendChild(createPlaceElement(singlePlace));
+      addPlaceMarker(map, singlePlace)
+    });
+  }).then(() => displayAfterResults());
 }
 
-// Gets the information about the cuisines that the user selected.
+/** Gets the information about the cuisines that the user selected. */
 function getUsercuisinesFromUi() {
   const cuisines = document.getElementById('cuisines-form').elements;
   let result = '';
@@ -76,7 +77,7 @@ function getUserOpenNowFromUi() {
       'Choose if the place should be open now or you don\'t mind.');
 }
 
-// Gets an element that has several options and returns the checked option.
+/** Gets an element that has several options and returns the checked option. */
 function getCheckedValueByElementId(elementId, errorMessage) {
   const options = document.getElementById(elementId).elements;
   let i;
@@ -89,16 +90,14 @@ function getCheckedValueByElementId(elementId, errorMessage) {
   throw new Error(errorMessage);
 }
 
-// Gets that user location that was ket in the local storage.
+/** Gets that user location that was ket in the local storage. */
 function getUserLocationFromUi() {
   const coords = JSON.parse(localStorage.getItem('userLocation'));
   console.log(coords.lat + "," + coords.lng);
   return coords.lat + "," + coords.lng;
 }
 
-/**
- * Displays the results page.
- */
+/** Displays the results page. */
 function displayResultsPage() {
   document.getElementById('query-form').style.display = 'none';
   document.getElementById('results').style.display = 'block';
@@ -106,17 +105,14 @@ function displayResultsPage() {
   document.getElementById('feedback-box').style.display = 'none';
 }
 
-/**
- * Displays the map and the feedback box in the results page
- * after the results are ready.
- */
+/** Displays the map and the feedback box in the results page after the results are ready. */
 function displayAfterResults() {
   document.getElementById('waiting-message').style.display = 'none';
   document.getElementById('map-container').style.display = 'block';
   document.getElementById('feedback-box').style.display = 'block';
 }
 
-// creates a place element that has all the information that we want to display to the user.
+/** Creates a place element that has all the information that we want to display to the user. */
 function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = 'place-container';
@@ -157,8 +153,10 @@ function tryAgain() {
   document.getElementById('place').innerHTML = '';
 }
 
-// Adds a search box to the map, and allows it to keep the user's updating location according to
-// his search box activity
+/**
+ * Adds a search box to the map, and allows it to keep the user's updating location according to
+ * his search box activity
+ */
 function addSearchBoxToMap(map, searchBoxElement) {
   // Create the search box and link it to the UI element.
   const searchBox = new window.google.maps.places.SearchBox(searchBoxElement);
@@ -196,9 +194,11 @@ function addSearchBoxToMap(map, searchBoxElement) {
   });
 }
 
- // Creates a marker for the given place in the given map. If the marker is clicked,
- // it becomes the map's center and updates the user's location in our storage.
- function createInteractiveMarkerForPlace(place, map) {
+  /**
+   * Creates a marker for the given place in the given map. If the marker is clicked, it becomes
+   * the map's center and updates the user's location in our storage.
+   */
+  function createInteractiveMarkerForPlace(place, map) {
   const currentMarker = createMapMarker(map, place.geometry.location, place.name);
   var infowindow = new window.google.maps.InfoWindow({content: place.name});
   currentMarker.addListener("click", () => {
@@ -209,7 +209,7 @@ function addSearchBoxToMap(map, searchBoxElement) {
   return currentMarker;
 }
 
- // Utility function for creating a new map marker based on it's required traits.
+/** Utility function for creating a new map marker based on it's required traits. */
 function createMapMarker(map, placePosition, placeTitle) {
   return new window.google.maps.Marker({
     map,
@@ -218,9 +218,7 @@ function createMapMarker(map, placePosition, placeTitle) {
   })
 }
 
-/**
- * Displays a Google Maps map that allows the user to search fo his location.
- */
+/** Displays a Google Maps map that allows the user to search fo his location. */
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
@@ -272,16 +270,14 @@ function getDeviceLocationAndShowOnMap() {
   );
 }
 
-// Desplays the given geolocation on the screen.
+/** Desplays the given geolocation on the screen. */
 function displayGeolocationError(errorText) {
   document.getElementById('map-error-container').innerHTML =
       errorText + ', so we can\'t use your location.' + '<br>' +
       'Use the map to find your location.' + '<br>';
 }
 
-/**
- *  Creates a map and adds it to the page.
- */
+/** Creates a map and adds it to the page. */
 function createMap() {
   const ZOOM_OUT = 12;
   const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
@@ -294,9 +290,7 @@ function createMap() {
   return map;
 }
 
-/**
- * Adds to the map a place's marker.
- */
+/** Adds to the map a place's marker. */
 function addPlaceMarker(map, place) {
   const ZOOM_IN = 15;
   new window.google.maps.Marker({
