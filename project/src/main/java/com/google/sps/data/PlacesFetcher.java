@@ -53,7 +53,7 @@ public class PlacesFetcher {
         .build();
 
     /** A mapping between cuisines and text search words. */
-    private static Map<String, String[]> cuisineToSearchWords = getCuisinesMap();
+    private static final Map<String, String[]> CUISINE_TO_SEARCH_WORDS_MAP = getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
@@ -146,7 +146,7 @@ public class PlacesFetcher {
 
     private static String createCuisinesQuery(ImmutableList<String> cuisines) {
         return cuisines.stream()
-            .map(cuisine -> String.join("|", cuisineToSearchWords.get(cuisine)))
+            .map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS_MAP.get(cuisine)))
             .collect(Collectors.joining("|"));
     }
 
