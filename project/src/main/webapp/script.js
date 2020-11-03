@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* The user location map. the map has to be accessed from different functions, so it has to be kept
- * globally. */
+// The user location map. the map has to be accessed from different functions, so it has to be kept
+ // globally. 
 let globalUserMap;
 
 /**
