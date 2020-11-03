@@ -37,14 +37,14 @@ public class PlacesFetcher {
      */
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** In this radius around "LOCATION" places will be searched initially. */
+    /** In this radius (in meters) around "LOCATION" places will be searched initially.*/
     private static final int INIT_SEARCH_RADIUS = 5000;
 
     /** The minimum number of results to be fetched. */
     private static final int MIN_NUM_OF_RESULTS = 10;
 
-    /** The maximum radius to search in is INIT_SEARCH_RADIUS * MAX_RADIUS_MULT. */
-    private static final int MAX_RADIUS_MULT = 4;
+    /** The maximum number of times the search radius will be extended. */
+    private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
     /** The entry point for a Google GEO API request. */
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
@@ -71,7 +71,8 @@ public class PlacesFetcher {
             }
             radiusMult++;
         } while (
-            placesSearchResult.length < MIN_NUM_OF_RESULTS && radiusMult <= MAX_RADIUS_MULT);
+            placesSearchResult.length < MIN_NUM_OF_RESULTS &&
+            radiusMult <= MAX_NUM_OF_RADIUS_EXTENSIONS);
         return createPlacesList(placesSearchResult);
     }
 
