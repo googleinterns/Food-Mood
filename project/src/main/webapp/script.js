@@ -43,6 +43,7 @@ function fetchFromQuery() {
   }
 }
 
+// Gets the information about the cuisines that the user selected.
 function getUsercuisinesFromUi() {
   const cuisines = document.getElementById('cuisines-form').elements;
   let result = '';
@@ -75,6 +76,7 @@ function getUserOpenNowFromUi() {
       'Choose if the place should be open now or you don\'t mind.');
 }
 
+// Gets an element that has several options and returns the checked option.
 function getCheckedValueByElementId(elementId, errorMessage) {
   const options = document.getElementById(elementId).elements;
   let i;
@@ -87,6 +89,7 @@ function getCheckedValueByElementId(elementId, errorMessage) {
   throw new Error(errorMessage);
 }
 
+// Gets that user location that was ket in the local storage.
 function getUserLocationFromUi() {
   const coords = JSON.parse(localStorage.getItem('userLocation'));
   console.log(coords.lat + "," + coords.lng);
@@ -113,6 +116,7 @@ function displayAfterResults() {
   document.getElementById('feedback-box').style.display = 'block';
 }
 
+// creates a place element that has all the information that we want to display to the user.
 function createPlaceElement(place) {
   const placeElement = document.createElement('div');
   placeElement.class = 'place-container';
@@ -139,7 +143,6 @@ function createPlaceElement(place) {
     placeElement.appendChild(phone);
     placeElement.appendChild(document.createElement('br'));
   }
-
   return placeElement;
 }
 
@@ -269,6 +272,7 @@ function getDeviceLocationAndShowOnMap() {
   );
 }
 
+// Desplays the given geolocation on the screen.
 function displayGeolocationError(errorText) {
   document.getElementById('map-error-container').innerHTML =
       errorText + ', so we can\'t use your location.' + '<br>' +
@@ -295,7 +299,7 @@ function createMap() {
  */
 function addPlaceMarker(map, place) {
   const ZOOM_IN = 15;
-  const marker = new window.google.maps.Marker({
+  new window.google.maps.Marker({
       title: place.name,
       position: place.location,
       description: place.name.link(place.websiteUrl),
