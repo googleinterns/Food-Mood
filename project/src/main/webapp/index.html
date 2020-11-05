@@ -3,7 +3,6 @@
   <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
   <script src="script.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIza.."></script>
   <head>
     <meta charset="UTF-8">
     <title>food-mood</title>
@@ -62,6 +61,7 @@
         <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
         <label for="open-now-dont-mind">I don't mind</label>
       </form>
+      <div id="input-error-container"></div>
       <form id="location-form" class="form-element-toolbar">
         <input type="radio" id="device-location" name="location" value="device-location"
             onclick="getDeviceLocationAndShowOnMap()">

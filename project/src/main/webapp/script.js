@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // The user location map. the map has to be accessed from different functions, so it has to be kept
- // globally. 
+ // globally.
 let globalUserMap;
 
 /**
@@ -21,6 +21,9 @@ let globalUserMap;
  * results elements in order to display them to the user.
  */
 function fetchFromQuery() {
+  document.getElementById('map-error-container').innerText = '';
+  const inputErrorElement = document.getElementById('input-error-container');
+  inputErrorElement.innerText = '';
   try {
     const params = [
       `cuisines=${getUsercuisinesFromUi()}`,
@@ -30,7 +33,7 @@ function fetchFromQuery() {
       `location=${getUserLocationFromUi()}`
     ].join('&');
   } catch (error) {
-    alert(error.message);
+    inputErrorElement.innerText = 'ERROR: ' + error.message;
     return;
   }
   const placesDiv = document.getElementById('place');
@@ -41,24 +44,24 @@ function fetchFromQuery() {
       placesDiv.appendChild(createPlaceElement(singlePlace));
       addPlaceMarker(map, singlePlace)
     });
-  }).then(() => displayAfterResults());
+    displayAfterResults();
+  });
 }
 
 /** Gets the information about the cuisines that the user selected. */
 function getUsercuisinesFromUi() {
   const cuisines = document.getElementById('cuisines-form').elements;
-  let result = '';
-  let i;
-  for (i = 0; i < cuisines.length; i++) {
-    if (cuisines[i].checked) {
-      result = result + cuisines[i].value + ',';
+  let checkedCuisines = [];
+  Array.prototype.forEach.call(cuisines, cuisine => {
+    if (cuisine.checked) {
+      checkedCuisines.push(cuisine.value);
     }
-  }
-  if (result === '') {
+  });
+  if (checkedCuisines.length === 0) {
     throw new Error("Choose at least one cuisine.");
   }
   // Remove obselete comma
-  result = result.slice(0, -1);
+  result = checkedCuisines.join(',');
   return result;
 }
 
@@ -80,17 +83,15 @@ function getUserOpenNowFromUi() {
 /** Gets an element that has several options and returns the checked option. */
 function getCheckedValueByElementId(elementId, errorMessage) {
   const options = document.getElementById(elementId).elements;
-  let i;
-  for (i = 0; i < options.length; i++) {
-    if (options[i].checked) {
-      return options[i].value;
-    }
+  const chosenOption = Array.prototype.find.call(options, option => option.checked).value;
+  if (chosenOption) {
+    return chosenOption.value;
   }
   // If no item was checked and returned, there is an error
   throw new Error(errorMessage);
 }
 
-/** Gets that user location that was ket in the local storage. */
+/** Gets that user location that was kept in the local storage. */
 function getUserLocationFromUi() {
   const coords = JSON.parse(localStorage.getItem('userLocation'));
   console.log(coords.lat + "," + coords.lng);
@@ -126,7 +127,7 @@ function createPlaceElement(place) {
     const websiteLink = document.createElement('a');
     websiteLink.href = place.websiteUrl;
     websiteLink.title = place.websiteUrl;
-    websiteLink.innerHTML = 'Restaurant\'s website';
+    websiteLink.innerText = 'Restaurant\'s website';
     placeElement.appendChild(websiteLink);
   } else {
     const noSite = document.createTextNode('We don\'t have a link to the restaurant\'s website.');
@@ -150,7 +151,7 @@ function tryAgain() {
   document.getElementById('query-form').style.display = 'block';
   document.getElementById('results').style.display = 'none';
   document.getElementById('waiting-message').style.display = 'block'
-  document.getElementById('place').innerHTML = '';
+  document.getElementById('place').innerText = '';
 }
 
 /**
@@ -167,7 +168,7 @@ function addSearchBoxToMap(map, searchBoxElement) {
   // Listen for the event fired when the user selects a location, and retrieve more details for it.
   searchBox.addListener("places_changed", () => {
     const places = searchBox.getPlaces();
-    if (places.length == 0) {
+    if (places.length === 0) {
       return;
     }
     // Update the user location to be the first place. This will change if the user clicks on a
@@ -200,11 +201,11 @@ function addSearchBoxToMap(map, searchBoxElement) {
    */
   function createInteractiveMarkerForPlace(place, map) {
   const currentMarker = createMapMarker(map, place.geometry.location, place.name);
-  var infowindow = new window.google.maps.InfoWindow({content: place.name});
+  var infoWindow = new window.google.maps.InfoWindow({content: place.name});
   currentMarker.addListener("click", () => {
     map.setCenter(currentMarker.getPosition());
     localStorage.setItem('userLocation', JSON.stringify(currentMarker.getPosition()));
-    infowindow.open(map,currentMarker);
+    infoWindow.open(map,currentMarker);
   });
   return currentMarker;
 }
@@ -238,6 +239,7 @@ function addMapWithSearchBox() {
  * query page.
  */
 function getDeviceLocationAndShowOnMap() {
+  document.getElementById('map-error-container').innerText = '';
   const FIVE_SECONDS = 5000;
   const HIGH_ZOOM_LEVEL = 13;
 
@@ -257,14 +259,12 @@ function getDeviceLocationAndShowOnMap() {
       map.setZoom(HIGH_ZOOM_LEVEL);
       localStorage.setItem('userLocation', JSON.stringify(userPosition));
       // Add marker with info window to display user location.
-      const infowindow = new window.google.maps.InfoWindow({content: 'My location'});
+      const infoWindow = new window.google.maps.InfoWindow({content: 'My location'});
       const marker = createMapMarker(map, userPosition, 'My location');
-      marker.addListener("click", () => {
-        infowindow.open(map, marker);
-      });
+      marker.addListener("click", () => infoWindow.open(map, marker));
     },
     // In case of error.
-    () => {displayGeolocationError('The Geolocation service failed');},
+    () => displayGeolocationError('The Geolocation service failed'),
     // Options.
     {timeout: FIVE_SECONDS}
   );
@@ -280,11 +280,11 @@ function displayGeolocationError(errorText) {
 /** Creates a map and adds it to the page. */
 function createMap() {
   const ZOOM_OUT = 12;
-  const USER_LOCATION = { lat: 32.080576, lng: 34.780641 }; //TODO(M1): change to user's location
+  const USER_LOCATION = {lat: 32.080576, lng: 34.780641}; //TODO(M1): change to user's location
   const map = new window.google.maps.Map(
     document.getElementById('map-container'), {
-        center: USER_LOCATION,
-        zoom: ZOOM_OUT,
+      center: USER_LOCATION,
+      zoom: ZOOM_OUT,
     }
   );
   return map;
