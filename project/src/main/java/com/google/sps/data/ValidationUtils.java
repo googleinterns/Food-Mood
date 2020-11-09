@@ -14,7 +14,7 @@
 
 package com.google.sps.data;
 
-import static com.google.appengine.repackaged.com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A utility class for validation.
