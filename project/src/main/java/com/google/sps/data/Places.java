@@ -65,12 +65,11 @@ public final class Places {
             //TODO(M1): also chack about having a google maps link, when attribute added
             .filter(place -> !(filterIfNoWebsite && Strings.isNullOrEmpty(place.websiteUrl())))
             .collect(ImmutableList.toImmutableList());
-        if (filterBranchesOfSamePlace) {
-          result = result.stream().collect(collectingAndThen(toCollection(() -> new TreeSet<>
-              (comparing(Place::name))),ImmutableList::copyOf));
-        }
+    if (filterBranchesOfSamePlace) {
+      result = result.stream().collect(collectingAndThen(toCollection(() -> new TreeSet<>
+          (comparing(Place::name))),ImmutableList::copyOf));
+    }
     return result;
   }
-
   private Places() { }
 }
