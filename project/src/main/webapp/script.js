@@ -207,11 +207,11 @@ function addSearchBoxToMap(map, searchBoxElement) {
   });
 }
 
-  /**
-   * Creates a marker for the given place in the given map. If the marker is clicked, it becomes
-   * the map's center and updates the user's location in our storage.
-   */
-  function createInteractiveMarkerForPlace(place, map) {
+/**
+ * Creates a marker for the given place in the given map. If the marker is clicked, it becomes
+ * the map's center and updates the user's location in our storage.
+ */
+function createInteractiveMarkerForPlace(place, map) {
   const currentMarker = createMapMarker(map, place.geometry.location, place.name);
   var infoWindow = new window.google.maps.InfoWindow({content: place.name});
   currentMarker.addListener("click", () => {
@@ -231,7 +231,7 @@ function createMapMarker(map, placePosition, placeTitle) {
   })
 }
 
-/** Displays a Google Maps map that allows the user to search fo his location. */
+/** Displays a Google Maps map that allows the user to search for his location. */
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
