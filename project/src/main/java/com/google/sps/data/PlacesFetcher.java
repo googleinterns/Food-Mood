@@ -70,8 +70,8 @@ public class PlacesFetcher {
                 throw new FetcherException("Couldn't fetch places from Places API", e);
             }
         } while (
-            placesSearchResult.length < MIN_NUM_OF_RESULTS &&
-            attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
+            placesSearchResult.length < MIN_NUM_OF_RESULTS
+            && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
         return createPlacesList(placesSearchResult);
     }
 
