@@ -24,8 +24,9 @@ function fetchFromQuery() {
   document.getElementById('map-error-container').innerText = '';
   const inputErrorElement = document.getElementById('input-error-container');
   inputErrorElement.innerText = '';
+  let params;
   try {
-    const params = [
+    params = [
       `cuisines=${getUsercuisinesFromUi()}`,
       `rating=${getUserRatingFromUi()}`,
       `price=${getUserPriceFromUi()}`,
@@ -61,7 +62,7 @@ function getUsercuisinesFromUi() {
     throw new Error("Choose at least one cuisine.");
   }
   // Remove obselete comma
-  result = checkedCuisines.join(',');
+  let result = checkedCuisines.join(',');
   return result;
 }
 
@@ -290,10 +291,10 @@ function createMap() {
   return map;
 }
 
-/** Adds to the map a place's marker. */
+/** Adds to the map a marker for the given place. */
 function addPlaceMarker(map, place) {
   const ZOOM_IN = 15;
-  new window.google.maps.Marker({
+  let marker = new window.google.maps.Marker({
       title: place.name,
       position: place.location,
       description: place.name.link(place.websiteUrl),
