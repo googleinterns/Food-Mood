@@ -66,8 +66,12 @@ public final class Places {
             .filter(place -> !(filterIfNoWebsite && Strings.isNullOrEmpty(place.websiteUrl())))
             .collect(ImmutableList.toImmutableList());
     if (filterBranchesOfSamePlace) {
-      result = result.stream().collect(collectingAndThen(toCollection(() -> new TreeSet<>
-          (comparing(Place::name))),ImmutableList::copyOf));
+      result = result.stream().collect(
+          collectingAndThen(
+              toCollection(() -> new TreeSet<>(comparing(Place::name))),
+              ImmutableList::copyOf
+          )
+      );
     }
     return result;
   }
