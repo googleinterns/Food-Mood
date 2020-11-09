@@ -31,22 +31,21 @@ import java.util.List;
 
 public class PlacesFetcher {
 
-    /** The type of places that will be searched is RESTAURANT. Since most places
-     * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
-     * rather as "RESTAURANT" this is the most suitable type to search for.
-     */
+    // The type of places that will be searched is RESTAURANT. Since most places
+    // that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
+    // rather as "RESTAURANT" this is the most suitable type to search for.
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** In this radius (in meters) around "LOCATION" places will be searched initially.*/
-    private static final int INIT_SEARCH_RADIUS = 5000;
+    // The initial search radius in meters.
+    private static final int INIT_SEARCH_RADIUS_M = 5000;
 
-    /** The minimum number of results to be fetched. */
+    // The minimum number of results to be fetched.
     private static final int MIN_NUM_OF_RESULTS = 10;
 
-    /** The maximum number of times the search radius will be extended. */
+    // The maximum number of times the search radius will be extended.
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
-    /** The entry point for a Google GEO API request. */
+    // The entry point for a Google GEO API request.
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
         .apiKey(System.getenv("API_KEY"))
         .build();
@@ -61,18 +60,18 @@ public class PlacesFetcher {
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         PlacesSearchResult[] placesSearchResult;
-        int radiusMult = 1;
+        int attemptsCounter = 0;
         do {
+            attemptsCounter++;
             try {
                 placesSearchResult = getPlacesSearchResults(
                     genTextSearchRequest(preferences, INIT_SEARCH_RADIUS * radiusMult));
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException("Couldn't fetch places from Places API", e);
             }
-            radiusMult++;
         } while (
             placesSearchResult.length < MIN_NUM_OF_RESULTS &&
-            radiusMult <= MAX_NUM_OF_RADIUS_EXTENSIONS);
+            attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
         return createPlacesList(placesSearchResult);
     }
 
