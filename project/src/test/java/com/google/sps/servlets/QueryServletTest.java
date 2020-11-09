@@ -80,7 +80,7 @@ public final class QueryServletTest {
 
   @Test
   // This test only makes sure that the servlets accepts the format of sending more than one
-  // cuisine, seperated by commas. 
+  // cuisine, seperated by commas.
   public void getRequest_fetchMoreThanOneCuisine_success() throws Exception {
     setRequestParameters(/*cuisines*/ "sushi,hamburger");
     ImmutableList<Place> places = createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
