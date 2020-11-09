@@ -17,10 +17,17 @@
  */
 package com.google.sps.data;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.TreeSet;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 /**
  * A utility class for Place objects.
@@ -38,5 +45,35 @@ public final class Places {
     return ImmutableList.copyOf(mutablePlaces);
   }
 
+  /**
+   * Filters the given list of places according to the given parameters.
+   * @param places the list we want to filter.
+   * @param minRating The minimal rating we want to limit the list by. A number between 1 and 5.
+   * @param filterIfNoWebsite Specifies whether we should filter if there is no available website
+   *        for the restaurant.
+   * @param filterBranchesOfSamePlace Specifies whether we should remove different branches of the
+   *        same place from the results. Places are considered the same if they have the same name.
+   * @return the filtered list.
+   */
+  public static ImmutableList<Place> filter(ImmutableList<Place> places, int minRating, Boolean
+      filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
+    //TODO(M1): also filter by place's status when the attribute is added
+    ImmutableList<Place> result =
+        places.stream()
+            .sorted(Comparator.comparing(Place::rating).reversed())
+            .filter(place -> place.rating() >= minRating)
+            //TODO(M1): also chack about having a google maps link, when attribute added
+            .filter(place -> !(filterIfNoWebsite && Strings.isNullOrEmpty(place.websiteUrl())))
+            .collect(ImmutableList.toImmutableList());
+    if (filterBranchesOfSamePlace) {
+      result = result.stream().collect(
+          collectingAndThen(
+              toCollection(() -> new TreeSet<>(comparing(Place::name))),
+              ImmutableList::copyOf
+          )
+      );
+    }
+    return result;
+  }
   private Places() { }
 }
