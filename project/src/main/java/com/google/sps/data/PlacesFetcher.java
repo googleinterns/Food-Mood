@@ -16,6 +16,7 @@ package com.google.sps.data;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -47,12 +48,10 @@ public class PlacesFetcher {
     private static final int SEARCH_RADIUS = 5000;
 
     // The entry point for a Google GEO API request.
-    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
-        .apiKey(System.getenv("API_KEY"))
-        .build();
+    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder().apiKey(System.getenv("API_KEY")).build();
 
     // A mapping between cuisines and text search words. */
-    private static final Map<String, String[]> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
+    private static final Map<String, ArrayList<String>> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
@@ -60,15 +59,12 @@ public class PlacesFetcher {
      * @param preferences the UserPreferences as specified by the user
      * @return an immutable list of places that supply the query
      * @throws FetcherException when an error occurs in querying the Places API for
-     *     places or for places details
+     *                          places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        TextSearchRequest query =
-            PlacesApi.textSearchQuery(
-                CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
-                .radius(SEARCH_RADIUS)
-                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
-                .type(TYPE);
+        TextSearchRequest query = PlacesApi
+                .textSearchQuery(CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
+                .radius(SEARCH_RADIUS).maxPrice(PriceLevel.values()[preferences.maxPriceLevel()]).type(TYPE);
         if (preferences.openNow()) {
             query.openNow(preferences.openNow());
         }
@@ -94,8 +90,7 @@ public class PlacesFetcher {
         return query.await().results;
     }
 
-    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
-            throws FetcherException {
+    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr) throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
@@ -105,56 +100,47 @@ public class PlacesFetcher {
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException("Couldn't get place details from Places API", e);
             }
-            places.add(
-                Place.builder()
-                    .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null
-                            ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null
-                            ? "" : placeDetails.formattedPhoneNumber.toString())
-                    .setRating(placeDetails.rating)
-                    .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
-                    .setLocation(placeDetails.geometry.location)
-                    .build());
+            places.add(Place.builder().setName(placeDetails.name)
+                    .setWebsiteUrl(placeDetails.website == null ? "" : placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber == null ? ""
+                            : placeDetails.formattedPhoneNumber.toString())
+                    .setRating(placeDetails.rating).setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
+                    .setLocation(placeDetails.geometry.location).build());
         }
         return ImmutableList.copyOf(places);
     }
 
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
-        return PlacesApi.placeDetails(CONTEXT, placeId)
-            .fields(
-                PlaceDetailsRequest.FieldMask.NAME,
-                PlaceDetailsRequest.FieldMask.WEBSITE,
-                PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
-                PlaceDetailsRequest.FieldMask.RATING,
-                PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+        return PlacesApi.placeDetails(CONTEXT, placeId).fields(PlaceDetailsRequest.FieldMask.NAME,
+                PlaceDetailsRequest.FieldMask.WEBSITE, PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+                PlaceDetailsRequest.FieldMask.RATING, PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
                 PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
     }
 
     /**
      * Queries Google Places API to recieve requested details about a certain place.
      *
-     * @param request A PlaceDetailsRequest to query certain details on a certain place
+     * @param request A PlaceDetailsRequest to query certain details on a certain
+     *                place
      * @return PlacesDetails containig requested details about the place
      */
     @VisibleForTesting
-    PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
-            throws ApiException, InterruptedException, IOException {
+    PlaceDetails getPlaceDetails(PlaceDetailsRequest request) throws ApiException, InterruptedException, IOException {
         return request.await();
     }
 
     private static String createCuisinesQuery(ImmutableList<String> cuisines) {
-        return cuisines.stream()
-            .map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine)))
-            .collect(Collectors.joining("|"));
+        return cuisines.stream().map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine)))
+                .collect(Collectors.joining("|"));
     }
 
-    private static final Map<String, String[]> getCuisinesMap() {
-        Type mapType = new TypeToken<Map<String, String[]>>() {
+    private static final ImmutableMap<String, ArrayList<String>> getCuisinesMap() {
+        Type mapType = new TypeToken<Map<String, ArrayList<String>>>() {
         }.getType();
-        return new Gson().fromJson(new JsonReader(
+        Map<String, ArrayList<String>> map = new Gson().fromJson(new JsonReader(
             new InputStreamReader(
                 PlacesFetcher.class.getResourceAsStream("cuisinesSearchWords.json"))),
-            mapType);
+                mapType);
+        return ImmutableMap.copyOf(map);
     }
 }
