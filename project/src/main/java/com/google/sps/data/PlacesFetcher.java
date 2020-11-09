@@ -38,22 +38,21 @@ import java.util.stream.Collectors;
 
 public class PlacesFetcher {
 
-    /** The type of places that will be searched is RESTAURANT. Since most places
-     * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
-     * rather as "RESTAURANT" this is the most suitable type to search for.
-     */
+    // The type of places that will be searched is RESTAURANT. Since most places
+    // that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
+    // rather as "RESTAURANT" this is the most suitable type to search for.
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** In this radius around "LOCATION" places will be searched. */
+    // In this radius around "LOCATION" places will be searched.
     private static final int SEARCH_RADIUS = 5000;
 
-    /** The entry point for a Google GEO API request. */
+    // The entry point for a Google GEO API request.
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
         .apiKey(System.getenv("API_KEY"))
         .build();
 
-    /** A mapping between cuisines and text search words. */
-    private static final Map<String, String[]> CUISINE_TO_SEARCH_WORDS_MAP = getCuisinesMap();
+    // A mapping between cuisines and text search words. */
+    private static final Map<String, String[]> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
@@ -61,7 +60,7 @@ public class PlacesFetcher {
      * @param preferences the UserPreferences as specified by the user
      * @return an immutable list of places that supply the query
      * @throws FetcherException when an error occurs in querying the Places API for
-     *                          places or for places details
+     *     places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         TextSearchRequest query =
@@ -146,12 +145,11 @@ public class PlacesFetcher {
 
     private static String createCuisinesQuery(ImmutableList<String> cuisines) {
         return cuisines.stream()
-            .map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS_MAP.get(cuisine)))
+            .map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine)))
             .collect(Collectors.joining("|"));
     }
 
-    private static Map<String, String[]> getCuisinesMap() {
-        System.out.println(PlacesFetcher.class.getClassLoader());
+    private static final Map<String, String[]> getCuisinesMap() {
         Type mapType = new TypeToken<Map<String, String[]>>() {
         }.getType();
         return new Gson().fromJson(new JsonReader(
