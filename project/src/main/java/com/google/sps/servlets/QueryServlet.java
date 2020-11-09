@@ -71,9 +71,9 @@ public final class QueryServlet extends HttpServlet {
       response.setContentType("application/json");
       response.getWriter().write(new Gson().toJson(
           Places.randomSort(filteredPlaces)
-          .stream()
-          .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-          .collect(Collectors.toList())
+              .stream()
+              .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+              .collect(Collectors.toList())
       ));
     } catch (Exception e) {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,

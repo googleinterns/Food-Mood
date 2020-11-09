@@ -40,8 +40,7 @@ function fetchFromQuery() {
   const placesDiv = document.getElementById('place');
   displayResultsPage();
   const map = createMap();
-  const placesDiv = document.getElementById('place');
-  fetch('/query')
+  fetch('/query?' + params)
       .then(response => response.json())
       .then((places) => {
         places.forEach((singlePlace) => {

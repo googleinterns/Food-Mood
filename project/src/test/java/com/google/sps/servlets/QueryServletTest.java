@@ -56,6 +56,7 @@ public final class QueryServletTest {
 
   @Test
   public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
+    setRequestParameters(/*cuisines*/ "sushi");
     ImmutableList<Place> placesListWithMoreThanMaxNum =
         createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithMoreThanMaxNum);
@@ -67,6 +68,7 @@ public final class QueryServletTest {
 
   @Test
   public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
+    setRequestParameters(/*cuisines*/ "sushi");
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithLessThanMaxNum);
@@ -74,6 +76,19 @@ public final class QueryServletTest {
     servlet.doGet(REQUEST, RESPONSE);
 
     assertEquals(getPlacesAmountInResponse(), numOfFetchedPlaces);
+  }
+
+  @Test
+  // This test only makes sure that the servlets accepts the format of sending more than one
+  // cuisine, seperated by commas. 
+  public void getRequest_fetchMoreThanOneCuisine_success() throws Exception {
+    setRequestParameters(/*cuisines*/ "sushi,hamburger");
+    ImmutableList<Place> places = createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
   }
 
   // Returns an immutable list that has the required number of Place elements. All elements are
@@ -97,8 +112,20 @@ public final class QueryServletTest {
 
   // Returns the number of json elements in the servlet's response
   private int getPlacesAmountInResponse() {
+    System.out.println(responseStringWriter.getBuffer());
+    System.out.println(responseStringWriter.getBuffer().toString());
+    System.out.println(new Gson()
+    .fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class));
     return new Gson()
         .fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class)
         .size();
+  }
+
+  private void setRequestParameters(String quisines) {
+    when(REQUEST.getParameter("rating")).thenReturn("4");
+    when(REQUEST.getParameter("price")).thenReturn("3");
+    when(REQUEST.getParameter("open")).thenReturn("1");
+    when(REQUEST.getParameter("location")).thenReturn("30.30,35.35");
+    when(REQUEST.getParameter("quisines")).thenReturn(quisines);
   }
 }
