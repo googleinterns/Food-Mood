@@ -40,8 +40,10 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class PlacesFetcherTest {
 
-  private static final String PLACE_URL = "https://www.google.com/"; // used for Places
-  private static final URL PLACES_DETAILS_URL = createTestURL(PLACE_URL); // used for PlaceDetails
+  private static final String PLACE_WEBSITE = "https://www.google.com/"; // used for Places
+  private static final String PLACE_GOOGLE_URL = "https://www.google.com/"; // used for Places
+  private static final URL PLACES_DETAILS_WEBSITE = createTestURL(PLACE_WEBSITE); // used for PlaceDetails
+  private static final URL PLACE_DETAILS_GOOGLE_URL = createTestURL(PLACE_GOOGLE_URL); // used for PlaceDetails
   private static final String PHONE = "+97250-0000-000";
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final float RATING = 4;
@@ -49,26 +51,37 @@ public final class PlacesFetcherTest {
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
   private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
   private static final boolean OPEN_NOW = true;
+  private static final String BUSINESS_STATUS = "OPERATIONAL";
+
+  /** Place IDs for valid PlacesSearchResults used in tests. */
+  private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+  private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
   /** Valid Place objects. */
   private static final Place PLACE_1 =
       Place.builder()
       .setName("name1")
-      .setWebsiteUrl(PLACE_URL)
+      .setWebsiteUrl(PLACE_WEBSITE)
       .setPhone(PHONE)
       .setRating(RATING)
       .setPriceLevel(PRICELEVEL_INT)
       .setLocation(LOCATION)
+      .setGoogleUrl(PLACE_GOOGLE_URL)
+      .setPlaceId(PLACEID_1)
+      .setBusinessStatus(BUSINESS_STATUS)
       .build();
   private static final Place PLACE_2 =
-      Place.builder()
-      .setName("name2")
-      .setWebsiteUrl(PLACE_URL)
-      .setPhone(PHONE)
-      .setRating(RATING)
-      .setPriceLevel(PRICELEVEL_INT)
-      .setLocation(LOCATION)
-      .build();
+  Place.builder()
+  .setName("name2")
+  .setWebsiteUrl(PLACE_WEBSITE)
+  .setPhone(PHONE)
+  .setRating(RATING)
+  .setPriceLevel(PRICELEVEL_INT)
+  .setLocation(LOCATION)
+  .setGoogleUrl(PLACE_GOOGLE_URL)
+  .setPlaceId(PLACEID_2)
+  .setBusinessStatus(BUSINESS_STATUS)
+  .build();
 
   /** Valid UserPreferences builder. */
    private static final UserPreferences.Builder PREFERENCES_BUILDER =
@@ -78,10 +91,6 @@ public final class PlacesFetcherTest {
       .setLocation(LOCATION)
       .setCuisines(CUISINES)
       .setOpenNow(OPEN_NOW);
-
-  /** Place IDs for valid PlacesSearchResults used in tests. */
-  private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
-  private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
   /** Valid PlacesSearchResult. */
   private static final PlacesSearchResult SEARCH_RESULT_1 =
@@ -95,9 +104,13 @@ public final class PlacesFetcherTest {
 
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
-      createTestPlaceDetails("name1", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+      createTestPlaceDetails(
+          "name1", PLACES_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS);
   private static final PlaceDetails PLACE_DETAILS_2 =
-      createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+      createTestPlaceDetails(
+          "name2", PLACES_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS);
 
   private static URL createTestURL(String s) {
     try {
@@ -109,15 +122,19 @@ public final class PlacesFetcherTest {
   }
 
   private static PlaceDetails createTestPlaceDetails(
-        String name, URL url, String phone, float rating, PriceLevel priceLevel, LatLng location) {
+        String name, URL website, String phone, float rating,
+        PriceLevel priceLevel, LatLng location, URL url, String id, String status) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
-    placeDetails.website = url;
+    placeDetails.website = website;
     placeDetails.formattedPhoneNumber = phone;
     placeDetails.rating = rating;
     placeDetails.priceLevel = priceLevel;
     placeDetails.geometry = new Geometry();
     placeDetails.geometry.location = location;
+    placeDetails.url = url;
+    placeDetails.placeId = id;
+    placeDetails.businessStatus = status;
     return placeDetails;
   }
 

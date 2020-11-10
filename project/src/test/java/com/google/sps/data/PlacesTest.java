@@ -131,6 +131,9 @@ public final class PlacesTest {
         .setPhone("+97250-0000-000")
         .setRating(4)
         .setPriceLevel(3)
-        .setLocation(new LatLng(35.35, 30.30));
+        .setLocation(new LatLng(35.35, 30.30))
+        .setGoogleUrl("googleurl.com")
+        .setPlaceId("ChIJN1t_tDeuEmsRUsoyG83frY4")
+        .setBusinessStatus("OPERATIONAL");
   }
 }
