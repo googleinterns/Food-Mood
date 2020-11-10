@@ -112,20 +112,18 @@ public final class QueryServletTest {
 
   // Returns the number of json elements in the servlet's response
   private int getPlacesAmountInResponse() {
-    System.out.println(responseStringWriter.getBuffer());
-    System.out.println(responseStringWriter.getBuffer().toString());
-    System.out.println(new Gson()
-    .fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class));
     return new Gson()
         .fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class)
         .size();
   }
 
-  private void setRequestParameters(String quisines) {
+  // Set the parameters for the mocked http request. Most parameter are contant valid values, and
+  // the cuisines parameter is supplied by the calling function.
+  private void setRequestParameters(String cuisines) {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
     when(REQUEST.getParameter("location")).thenReturn("30.30,35.35");
-    when(REQUEST.getParameter("quisines")).thenReturn(quisines);
+    when(REQUEST.getParameter("cuisines")).thenReturn(cuisines);
   }
 }

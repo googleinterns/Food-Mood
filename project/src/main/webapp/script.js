@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The user location map. the map has to be accessed from different functions, so it has to be kept
- // globally.
+// The user location map. the map has to be accessed from different functions.
 let globalUserMap;
 
 /**
@@ -78,13 +77,11 @@ function getUsercuisinesFromUi() {
 }
 
 function getUserRatingFromUi() {
-  return getCheckedValueByElementId('rating-form',
-      'Choose exactly one rating.');
+  return getCheckedValueByElementId('rating-form', 'Choose exactly one rating.');
 }
 
 function getUserPriceFromUi() {
-  return getCheckedValueByElementId('price-form',
-      'Choose exactly one price level.');
+  return getCheckedValueByElementId('price-form', 'Choose exactly one price level.');
 }
 
 function getUserOpenNowFromUi() {
@@ -97,7 +94,7 @@ function getCheckedValueByElementId(elementId, errorMessage) {
   const options = document.getElementById(elementId).elements;
   const chosenOption = Array.prototype.find.call(options, option => option.checked).value;
   if (chosenOption) {
-    return chosenOption.value;
+    return chosenOption;
   }
   // If no item was checked and returned, there is an error
   throw new Error(errorMessage);

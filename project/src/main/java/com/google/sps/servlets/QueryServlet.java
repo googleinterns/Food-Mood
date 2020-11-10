@@ -53,6 +53,7 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    ImmutableList<Place> filteredPlaces;
     try {
       UserPreferences userPrefs =
           UserPreferences.builder()
@@ -60,25 +61,26 @@ public final class QueryServlet extends HttpServlet {
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
               .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
               .setLocation(getLatLngFromString(request.getParameter("location")))
-              .setCuisines(ImmutableList.copyOf(request.getParameter("quisines").split(",")))
+              .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
               .build();
-      ImmutableList<Place> filteredPlaces = Places.filter(
+      filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* min rating */,
           true /* filter if no website */,
           true /* filter branches of same place */
       );
-      response.setContentType("application/json");
-      response.getWriter().write(new Gson().toJson(
-          Places.randomSort(filteredPlaces)
-              .stream()
-              .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-              .collect(Collectors.toList())
-      ));
     } catch (Exception e) {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "Fetching from Google Places API encountered a problem");
+      return;
     }
+    response.setContentType("application/json");
+    response.getWriter().write(new Gson().toJson(
+        Places.randomSort(filteredPlaces)
+            .stream()
+            .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+            .collect(Collectors.toList())
+    ));
   }
 
   private LatLng getLatLngFromString(String coordinates) {
