@@ -159,7 +159,7 @@ public class PlacesFetcher {
             .collect(Collectors.joining("|"));
     }
 
-    private static String getSearchWords (String cuisine) throws FetcherException{
+    private static String getSearchWords(String cuisine) throws FetcherException {
         try {
             return String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine));
         } catch (NullPointerException e) {
