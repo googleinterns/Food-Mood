@@ -49,13 +49,13 @@ function fetchFromQuery() {
         });
         displayAfterResults();
         if (places.length < 3) {
-          document.getElementById('num-results').innerHTML =
+          document.getElementById('message-container').innerHTML =
               'Your search had ' + places.length + ' results. You are welcome to try again, \
               and maybe try to change some of the entered parameters.'
         }
       })
       .catch((error) => {
-        document.getElementById('num-results').innerHTML = "Oops, we encountered a problem! \
+        document.getElementById('message-container').innerHTML = "Oops, we encountered a problem! \
             Could you please try again?";
       });
 }
