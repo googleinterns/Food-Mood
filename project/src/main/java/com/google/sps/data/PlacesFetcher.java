@@ -48,7 +48,9 @@ public class PlacesFetcher {
     private static final int SEARCH_RADIUS = 5000;
 
     // The entry point for a Google GEO API request.
-    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder().apiKey(System.getenv("API_KEY")).build();
+    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
+        .apiKey(System.getenv("API_KEY"))
+        .build();
 
     // A mapping between cuisines and text search words. */
     private static final Map<String, ArrayList<String>> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
@@ -62,9 +64,12 @@ public class PlacesFetcher {
      *                          places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        TextSearchRequest query = PlacesApi
-                .textSearchQuery(CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
-                .radius(SEARCH_RADIUS).maxPrice(PriceLevel.values()[preferences.maxPriceLevel()]).type(TYPE);
+        TextSearchRequest query =
+            PlacesApi.textSearchQuery(
+                CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
+                .radius(SEARCH_RADIUS)
+                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
+                .type(TYPE);
         if (preferences.openNow()) {
             query.openNow(preferences.openNow());
         }
@@ -90,7 +95,8 @@ public class PlacesFetcher {
         return query.await().results;
     }
 
-    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr) throws FetcherException {
+    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
+            throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (PlacesSearchResult searchResult : searchResultsArr) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
@@ -100,20 +106,29 @@ public class PlacesFetcher {
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException("Couldn't get place details from Places API", e);
             }
-            places.add(Place.builder().setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null ? ""
-                            : placeDetails.formattedPhoneNumber.toString())
-                    .setRating(placeDetails.rating).setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
-                    .setLocation(placeDetails.geometry.location).build());
+            places.add(
+                Place.builder()
+                    .setName(placeDetails.name)
+                    .setWebsiteUrl(placeDetails.website == null
+                            ? "" : placeDetails.website.toString())
+                    .setPhone(placeDetails.formattedPhoneNumber == null
+                            ? "" : placeDetails.formattedPhoneNumber.toString())
+                    .setRating(placeDetails.rating)
+                    .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
+                    .setLocation(placeDetails.geometry.location)
+                    .build());
         }
         return ImmutableList.copyOf(places);
     }
 
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
-        return PlacesApi.placeDetails(CONTEXT, placeId).fields(PlaceDetailsRequest.FieldMask.NAME,
-                PlaceDetailsRequest.FieldMask.WEBSITE, PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
-                PlaceDetailsRequest.FieldMask.RATING, PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
+        return PlacesApi.placeDetails(CONTEXT, placeId)
+            .fields(
+                PlaceDetailsRequest.FieldMask.NAME,
+                PlaceDetailsRequest.FieldMask.WEBSITE,
+                PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
+                PlaceDetailsRequest.FieldMask.RATING,
+                PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
                 PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
     }
 
@@ -125,13 +140,15 @@ public class PlacesFetcher {
      * @return PlacesDetails containig requested details about the place
      */
     @VisibleForTesting
-    PlaceDetails getPlaceDetails(PlaceDetailsRequest request) throws ApiException, InterruptedException, IOException {
+    PlaceDetails getPlaceDetails(PlaceDetailsRequest request)
+            throws ApiException, InterruptedException, IOException {
         return request.await();
     }
 
     private static String createCuisinesQuery(ImmutableList<String> cuisines) {
-        return cuisines.stream().map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine)))
-                .collect(Collectors.joining("|"));
+        return cuisines.stream()
+            .map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine)))
+            .collect(Collectors.joining("|"));
     }
 
     private static final ImmutableMap<String, ArrayList<String>> getCuisinesMap() {
