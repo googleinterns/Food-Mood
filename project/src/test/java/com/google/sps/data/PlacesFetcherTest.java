@@ -107,11 +107,11 @@ public final class PlacesFetcherTest {
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
       createTestPlaceDetails(
-          "name1", PLACES_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
+          "name1", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
           LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS);
   private static final PlaceDetails PLACE_DETAILS_2 =
       createTestPlaceDetails(
-          "name2", PLACES_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
+          "name2", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
           LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS);
 
   private static URL createTestURL(String s) {
