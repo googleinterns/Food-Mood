@@ -145,13 +145,29 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisinesQuery(ImmutableList<String> cuisines) {
+     /**
+     * Creates a String query that includes all text search words matching the specified cuisines.
+     *
+     * @param cuisines A list of the cuisines we want to query
+     * @return A String of text search words to query on
+     * @throws FetcherException when an invalid cuisine is queried
+     */
+    @VisibleForTesting
+    String createCuisinesQuery(ImmutableList<String> cuisines) throws FetcherException {
         return cuisines.stream()
-            .map(cuisine -> String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine)))
+            .map(cuisine -> getSearchWords(cuisine))
             .collect(Collectors.joining("|"));
     }
 
-    private static final ImmutableMap<String, ArrayList<String>> getCuisinesMap() {
+    private static String getSearchWords (String cuisine) throws FetcherException{
+        try {
+            return String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine));
+        } catch (NullPointerException e) {
+            throw new FetcherException("Couldn't query on invalid cuisine", e);
+        }
+    }
+
+    private static ImmutableMap<String, ArrayList<String>> getCuisinesMap() {
         Type mapType = new TypeToken<Map<String, ArrayList<String>>>() {
         }.getType();
         Map<String, ArrayList<String>> map = new Gson().fromJson(new JsonReader(

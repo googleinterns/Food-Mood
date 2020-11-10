@@ -17,7 +17,7 @@ package com.google.sps.data;
  * FetcherException represents an error returned by the PlacesFetcher.
  */
 @SuppressWarnings("serial")
- public final class FetcherException extends Exception {
+ public final class FetcherException extends RuntimeException {
 
   /**
    * @param message the message shown when the exception is thrown

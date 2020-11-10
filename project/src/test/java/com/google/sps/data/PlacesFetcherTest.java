@@ -209,4 +209,26 @@ public final class PlacesFetcherTest {
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("place details"));
   }
+
+  @Test
+  public void createCuisinesQuery_getsValidCuisines_returnsQuery() throws Exception {
+    assertEquals(
+      "sushi|burger|hamburger", placesFetcher.createCuisinesQuery(CUISINES));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsAnEmptyListOfCuisines_returnsEmptyQuery() throws Exception {
+    assertEquals("", placesFetcher.createCuisinesQuery(ImmutableList.of()));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsInvalidCuisines_throwsFetcherException() throws Exception {
+    FetcherException thrown =
+        assertThrows(
+            FetcherException.class,
+            () -> placesFetcher.createCuisinesQuery(ImmutableList.of("blah")));
+    assertTrue(thrown.getCause() instanceof NullPointerException);
+    assertTrue(thrown.getMessage().contains("invalid cuisine"));
+  }
+
 }
