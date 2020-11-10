@@ -34,8 +34,9 @@ public final class ValidationUtils {
     /** The minimal valid price level value. */
     private static final int MIN_PRICE_LEVEL = 0;
     /** The optional business statuses. */
-    private static final List<String> optionalStatuses =
-        new ArrayList<String>(Arrays.asList("OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", null));
+    private static final List<String> OPTIONAL_STATUS =
+        new ArrayList<String>(
+            Arrays.asList("OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", null));
 
     /**
      * @param rating the rating of a place, should be represented by a number between 1-5.
@@ -62,7 +63,7 @@ public final class ValidationUtils {
      */
     public static void validatebusinessStatus(String businessStatus)
         throws IllegalArgumentException {
-            checkArgument(optionalStatuses.contains(businessStatus), "Unknown business status");
+            checkArgument(OPTIONAL_STATUS.contains(businessStatus), "Unknown business status");
     }
 
     private ValidationUtils() {

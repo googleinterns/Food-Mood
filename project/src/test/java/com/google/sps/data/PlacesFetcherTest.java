@@ -42,8 +42,10 @@ public final class PlacesFetcherTest {
 
   private static final String PLACE_WEBSITE = "https://www.google.com/"; // used for Places
   private static final String PLACE_GOOGLE_URL = "https://www.google.com/"; // used for Places
-  private static final URL PLACES_DETAILS_WEBSITE = createTestURL(PLACE_WEBSITE); // used for PlaceDetails
-  private static final URL PLACE_DETAILS_GOOGLE_URL = createTestURL(PLACE_GOOGLE_URL); // used for PlaceDetails
+  private static final URL PLACE_DETAILS_WEBSITE =
+      createTestURL(PLACE_WEBSITE); // used for PlaceDetails
+  private static final URL PLACE_DETAILS_GOOGLE_URL =
+      createTestURL(PLACE_GOOGLE_URL); // used for PlaceDetails
   private static final String PHONE = "+97250-0000-000";
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final float RATING = 4;
