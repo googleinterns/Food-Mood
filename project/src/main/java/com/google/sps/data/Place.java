@@ -54,8 +54,23 @@ public abstract class Place {
 
   /**
    * @return the coordinates of the physical place.
-  */
+   */
   public abstract LatLng location();
+
+  /**
+   * @return the URL of the place’s google page.
+   */
+  public abstract String googleUrl();
+
+  /**
+    * @return the place's placeId as defiened on Google Places.
+    */
+  public abstract String placeId();
+
+  /**
+    * @return the place's business status
+    */
+  public abstract String businessStatus();
 
   /**
    * @return a builder that enables to build a new Place object.
@@ -111,6 +126,26 @@ public abstract class Place {
     public abstract Builder setPriceLevel(int priceLevel);
 
     /**
+     * @param googleUrl the URL of the place’s google page.
+     * @return a Place builder that enables to continue building
+     */
+    public abstract Builder setGoogleUrl(String googleUrl);
+
+    /**
+     * @param placeId the place's placeId as defiened on Google Places.
+     * @return a Place builder that enables to continue building
+     */
+    public abstract Builder setPlaceId(String placeId);
+
+    /**
+     * @param businessStatus the place's status, represented by one of the following Strings:
+     * "OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY" and null if the information
+     * isn't available.
+     * @return a Place builder that enables to continue building
+     */
+    public abstract Builder setBusinessStatus(String businessStatus);
+
+    /**
      * Builds the Place object according to the data that was set so far.
      *
      * @return the object that was built
@@ -126,6 +161,7 @@ public abstract class Place {
       Place place = autoBuild();
       ValidationUtils.validateRating(place.rating());
       ValidationUtils.validatePriceLevel(place.priceLevel());
+      ValidationUtils.validatebusinessStatus(place.businessStatus());
       return place;
     }
   }

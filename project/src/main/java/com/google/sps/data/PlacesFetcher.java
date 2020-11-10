@@ -108,6 +108,10 @@ public class PlacesFetcher {
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
+                    .setPlaceId(placeDetails.placeId)
+                    .setGoogleUrl(placeDetails.url == null
+                            ? "" : placeDetails.url.toString())
+                    .setBusinessStatus(placeDetails.businessStatus)
                     .build());
         }
         return ImmutableList.copyOf(places);
@@ -121,7 +125,10 @@ public class PlacesFetcher {
                 PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
                 PlaceDetailsRequest.FieldMask.RATING,
                 PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
+                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION,
+                PlaceDetailsRequest.FieldMask.PLACE_ID,
+                PlaceDetailsRequest.FieldMask.URL,
+                PlaceDetailsRequest.FieldMask.BUSINESS_STATUS);
     }
 
     /**
