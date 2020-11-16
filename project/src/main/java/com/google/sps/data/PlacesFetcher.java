@@ -56,7 +56,8 @@ public class PlacesFetcher {
     private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
 
     // A mapping between cuisines and text search words. */
-    private static final Map<String, List<String>> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
+    private static final ImmutableMap<String, List<String>> CUISINE_TO_SEARCH_WORDS =
+        getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
