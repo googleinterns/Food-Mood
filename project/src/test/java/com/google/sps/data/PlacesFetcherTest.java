@@ -21,6 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableList;
 import com.google.maps.PlaceDetailsRequest;
@@ -49,6 +51,7 @@ public final class PlacesFetcherTest {
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
   private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
   private static final boolean OPEN_NOW = true;
+  private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
   /** Valid Place objects. */
   private static final Place PLACE_1 =
@@ -136,7 +139,10 @@ public final class PlacesFetcherTest {
     doReturn(new PlacesSearchResult[0])
       .when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
-    assertEquals(ImmutableList.of(), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
+    ImmutableList<Place> output = spiedFetcher.fetch(PREFERENCES_BUILDER.build());
+    verify(spiedFetcher, times(MAX_NUM_OF_RADIUS_EXTENSIONS))
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    assertEquals(ImmutableList.of(), output);
   }
 
   @Test
@@ -208,5 +214,19 @@ public final class PlacesFetcherTest {
         assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("place details"));
+  }
+
+  @Test
+  public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doReturn(new PlacesSearchResult[0])
+      .doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(PLACE_DETAILS_1)
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
+    assertEquals(
+      ImmutableList.of(PLACE_1), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
   }
 }
