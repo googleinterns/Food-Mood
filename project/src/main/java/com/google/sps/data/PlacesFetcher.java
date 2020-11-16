@@ -39,10 +39,10 @@ public class PlacesFetcher {
     // The initial search radius in meters.
     private static final int INIT_SEARCH_RADIUS_M = 5000;
 
-    // The minimum number of results to be fetched.
+    // The minimal number of results to be fetched.
     private static final int MIN_NUM_OF_RESULTS = 10;
 
-    // The maximum number of times the search radius will be extended.
+    // The maximal number of times the search radius will be extended.
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
     // The entry point for a Google GEO API request.
@@ -65,7 +65,7 @@ public class PlacesFetcher {
             attemptsCounter++;
             try {
                 placesSearchResult = getPlacesSearchResults(
-                    genTextSearchRequest(preferences, INIT_SEARCH_RADIUS * radiusMult));
+                    genTextSearchRequest(preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException("Couldn't fetch places from Places API", e);
             }
