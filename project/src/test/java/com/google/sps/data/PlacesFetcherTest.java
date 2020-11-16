@@ -73,17 +73,17 @@ public final class PlacesFetcherTest {
       .setBusinessStatus(BUSINESS_STATUS)
       .build();
   private static final Place PLACE_2 =
-  Place.builder()
-  .setName("name2")
-  .setWebsiteUrl(PLACE_WEBSITE)
-  .setPhone(PHONE)
-  .setRating(RATING)
-  .setPriceLevel(PRICELEVEL_INT)
-  .setLocation(LOCATION)
-  .setGoogleUrl(PLACE_GOOGLE_URL)
-  .setPlaceId(PLACEID_2)
-  .setBusinessStatus(BUSINESS_STATUS)
-  .build();
+      Place.builder()
+      .setName("name2")
+      .setWebsiteUrl(PLACE_WEBSITE)
+      .setPhone(PHONE)
+      .setRating(RATING)
+      .setPriceLevel(PRICELEVEL_INT)
+      .setLocation(LOCATION)
+      .setGoogleUrl(PLACE_GOOGLE_URL)
+      .setPlaceId(PLACEID_2)
+      .setBusinessStatus(BUSINESS_STATUS)
+      .build();
 
   /** Valid UserPreferences builder. */
    private static final UserPreferences.Builder PREFERENCES_BUILDER =
@@ -125,7 +125,7 @@ public final class PlacesFetcherTest {
 
   private static PlaceDetails createTestPlaceDetails(
         String name, URL website, String phone, float rating,
-        PriceLevel priceLevel, LatLng location, URL url, String id, String status) {
+        PriceLevel priceLevel, LatLng location, URL google_url, String id, String status) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
     placeDetails.website = website;
@@ -134,7 +134,7 @@ public final class PlacesFetcherTest {
     placeDetails.priceLevel = priceLevel;
     placeDetails.geometry = new Geometry();
     placeDetails.geometry.location = location;
-    placeDetails.url = url;
+    placeDetails.url = google_url;
     placeDetails.placeId = id;
     placeDetails.businessStatus = status;
     return placeDetails;

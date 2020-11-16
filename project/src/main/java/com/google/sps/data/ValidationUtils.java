@@ -34,7 +34,7 @@ public final class ValidationUtils {
     /** The minimal valid price level value. */
     private static final int MIN_PRICE_LEVEL = 0;
     /** The optional business statuses. */
-    private static final List<String> OPTIONAL_STATUS =
+    private static final List<String> VALID_STATUS =
         new ArrayList<String>(
             Arrays.asList("OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", null));
 
@@ -63,7 +63,7 @@ public final class ValidationUtils {
      */
     public static void validatebusinessStatus(String businessStatus)
         throws IllegalArgumentException {
-            checkArgument(OPTIONAL_STATUS.contains(businessStatus), "Unknown business status");
+            checkArgument(VALID_STATUS.contains(businessStatus), "Unknown business status");
     }
 
     private ValidationUtils() {
