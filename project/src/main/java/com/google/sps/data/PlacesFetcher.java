@@ -56,7 +56,7 @@ public class PlacesFetcher {
     private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
 
     // A mapping between cuisines and text search words. */
-    private static final Map<String, ArrayList<String>> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
+    private static final Map<String, List<String>> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
@@ -171,10 +171,10 @@ public class PlacesFetcher {
         }
     }
 
-    private static ImmutableMap<String, ArrayList<String>> getCuisinesMap() {
-        Type mapType = new TypeToken<Map<String, ArrayList<String>>>() {
+    private static ImmutableMap<String, List<String>> getCuisinesMap() {
+        Type mapType = new TypeToken<Map<String, List<String>>>() {
         }.getType();
-        Map<String, ArrayList<String>> map = new Gson().fromJson(new JsonReader(
+        Map<String, List<String>> map = new Gson().fromJson(new JsonReader(
             new InputStreamReader(
                 PlacesFetcher.class.getResourceAsStream(CUISINES_SEARCH_WORDS_CONFIG_PATH))),
                 mapType);
