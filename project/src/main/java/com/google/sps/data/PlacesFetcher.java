@@ -52,6 +52,9 @@ public class PlacesFetcher {
         .apiKey(System.getenv("API_KEY"))
         .build();
 
+    // The path of the configuration file containing the mapping of cuisines to search words.
+    private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
+
     // A mapping between cuisines and text search words. */
     private static final Map<String, ArrayList<String>> CUISINE_TO_SEARCH_WORDS = getCuisinesMap();
 
@@ -60,8 +63,8 @@ public class PlacesFetcher {
      *
      * @param preferences the UserPreferences as specified by the user
      * @return an immutable list of places that supply the query
-     * @throws FetcherException when an error occurs in querying the Places API for
-     *                          places or for places details
+     * @throws FetcherException when an error occurs in querying the Places API
+     *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         TextSearchRequest query =
@@ -104,7 +107,8 @@ public class PlacesFetcher {
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
             } catch (ApiException | InterruptedException | IOException e) {
-                throw new FetcherException("Couldn't get place details from Places API", e);
+                throw new FetcherException(
+                    "Couldn't get place details from Places API", e);
             }
             places.add(
                 Place.builder()
@@ -172,7 +176,7 @@ public class PlacesFetcher {
         }.getType();
         Map<String, ArrayList<String>> map = new Gson().fromJson(new JsonReader(
             new InputStreamReader(
-                PlacesFetcher.class.getResourceAsStream("cuisinesSearchWords.json"))),
+                PlacesFetcher.class.getResourceAsStream(CUISINES_SEARCH_WORDS_CONFIG_PATH))),
                 mapType);
         return ImmutableMap.copyOf(map);
     }
