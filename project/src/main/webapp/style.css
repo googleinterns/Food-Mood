@@ -80,7 +80,8 @@ li {
   margin: 0 auto;
 }
 
-#location-form, #map-error-container {
+#location-form,
+#map-error-container {
   margin-left: 50px;
 }
 
@@ -108,7 +109,6 @@ li {
 
 #results-content {
   float: left;
-  margin-left: 0px;
   width: 80%;
 }
 
@@ -130,7 +130,6 @@ li {
 }
 
 #query-form {
-  padding: 0px;
   width: 80%;
   float: left;
   margin-left: -200px;
