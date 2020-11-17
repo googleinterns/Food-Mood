@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.maps.model.LatLng;
 
 /**
  * A utility class for Place objects.
@@ -51,9 +52,9 @@ public final class Places {
    * @param places the list we want to sort.
    * @return a new list containing the original list's elements arranged by descending order of their scores.
    */
-  ImmutableList<Place> scoreSort(ImmutableList<Place> places) {
+  ImmutableList<Place> scoreSort(ImmutableList<Place> places, LatLng userLocation) {
     List<Place> mutablePlaces = new ArrayList<>(places);
-    Map<String, Double> placesScores = new PlacesScorer().getScores(places);
+    Map<String, Double> placesScores = new PlacesScorer().getScores(places, userLocation);
     Collections.sort(mutablePlaces, (p1, p2) -> {
       return placesScores.get(p2).compareTo(placesScores.get(p1));
     });
