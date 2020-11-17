@@ -25,9 +25,11 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
+import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PlacesFetcher {
 
@@ -94,6 +96,7 @@ public class PlacesFetcher {
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
+                System.out.println(placeDetails.businessStatus);
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException(
                     "Couldn't get place details from Places API", e);
@@ -101,17 +104,15 @@ public class PlacesFetcher {
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null
-                            ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null
-                            ? "" : placeDetails.formattedPhoneNumber.toString())
+                    .setWebsiteUrl(Objects.toString(placeDetails.website, ""))
+                    .setPhone(Strings.nullToEmpty(placeDetails.formattedPhoneNumber))
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
                     .setPlaceId(placeDetails.placeId)
-                    .setGoogleUrl(placeDetails.url == null
-                            ? "" : placeDetails.url.toString())
-                    .setBusinessStatus(placeDetails.businessStatus)
+                    .setGoogleUrl(Objects.toString(placeDetails.url, ""))
+                    .setBusinessStatus(BusinessStatus.valueOf(
+                        Objects.toString(placeDetails.businessStatus, "UNKNOWN")))
                     .build());
         }
         return ImmutableList.copyOf(places);

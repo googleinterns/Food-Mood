@@ -68,9 +68,10 @@ public abstract class Place {
   public abstract String placeId();
 
   /**
-    * @return the place's business status
+    * @return the place's business status, represented by one of the following:
+    * "OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", "UNKNOWN"
     */
-  public abstract String businessStatus();
+  public abstract BusinessStatus businessStatus();
 
   /**
    * @return a builder that enables to build a new Place object.
@@ -138,12 +139,11 @@ public abstract class Place {
     public abstract Builder setPlaceId(String placeId);
 
     /**
-     * @param businessStatus the place's status, represented by one of the following Strings:
-     * "OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY" and null if the information
-     * isn't available.
+     * @param businessStatus the place's status, represented by one of the following:
+     * "OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", "UNKNOWN"
      * @return a Place builder that enables to continue building
      */
-    public abstract Builder setBusinessStatus(String businessStatus);
+    public abstract Builder setBusinessStatus(BusinessStatus businessStatus);
 
     /**
      * Builds the Place object according to the data that was set so far.
@@ -161,7 +161,6 @@ public abstract class Place {
       Place place = autoBuild();
       ValidationUtils.validateRating(place.rating());
       ValidationUtils.validatePriceLevel(place.priceLevel());
-      ValidationUtils.validatebusinessStatus(place.businessStatus());
       return place;
     }
   }

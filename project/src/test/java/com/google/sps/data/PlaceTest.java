@@ -33,7 +33,7 @@ public final class PlaceTest {
   private static final String WEBSITE = "website.com";
   private static final String GOOGLE_URL = "googleurl.com";
   private static final String PLACE_ID = "ChIJN1t_tDeuEmsRUsoyG83frY4";
-  private static final String BUSINESS_STATUS = "OPERATIONAL";
+  private static final BusinessStatus BUSINESS_STATUS = BusinessStatus.OPERATIONAL;
 
   @Test
   public void build_invalidLowRating_throwsIllegalArgumentException() {
@@ -68,15 +68,6 @@ public final class PlaceTest {
 
     assertThrows(IllegalArgumentException.class, () -> {
       getValidPlaceBuilder().setPriceLevel(invalidHighPriceLevel).build();
-    });
-  }
-
-  @Test
-  public void build_invalidBusinessStatus_throwsIllegalArgumentException() {
-    String invalidBusinessStatus = "closed";
-
-    assertThrows(IllegalArgumentException.class, () -> {
-      getValidPlaceBuilder().setBusinessStatus(invalidBusinessStatus).build();
     });
   }
 

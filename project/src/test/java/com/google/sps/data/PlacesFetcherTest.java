@@ -40,7 +40,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class PlacesFetcherTest {
 
-  private static final String PLACE_WEBSITE = "https://www.google.com/"; // used for Places
+  private static final String PLACE_WEBSITE = "https://www.wikipedia.org/"; // used for Places
   private static final String PLACE_GOOGLE_URL = "https://www.google.com/"; // used for Places
   private static final URL PLACE_DETAILS_WEBSITE =
       createTestURL(PLACE_WEBSITE); // used for PlaceDetails
@@ -49,11 +49,12 @@ public final class PlacesFetcherTest {
   private static final String PHONE = "+97250-0000-000";
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final float RATING = 4;
-  private static final int PRICELEVEL_INT = 2; // used for Places and UserPreferences
-  private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
+  private static final int PRICE_LEVEL_INT = 2; // used for Places and UserPreferences
+  private static final PriceLevel PRICE_LEVEL = PriceLevel.MODERATE; // used for PlaceDetails
   private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
   private static final boolean OPEN_NOW = true;
-  private static final String BUSINESS_STATUS = "OPERATIONAL";
+  private static final BusinessStatus BUSINESS_STATUS_1 = BusinessStatus.OPERATIONAL;
+  private static final BusinessStatus BUSINESS_STATUS_2 = BusinessStatus.UNKNOWN;
 
   /** Place IDs for valid PlacesSearchResults used in tests. */
   private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
@@ -66,11 +67,11 @@ public final class PlacesFetcherTest {
       .setWebsiteUrl(PLACE_WEBSITE)
       .setPhone(PHONE)
       .setRating(RATING)
-      .setPriceLevel(PRICELEVEL_INT)
+      .setPriceLevel(PRICE_LEVEL_INT)
       .setLocation(LOCATION)
       .setGoogleUrl(PLACE_GOOGLE_URL)
       .setPlaceId(PLACEID_1)
-      .setBusinessStatus(BUSINESS_STATUS)
+      .setBusinessStatus(BUSINESS_STATUS_1)
       .build();
   private static final Place PLACE_2 =
       Place.builder()
@@ -78,18 +79,18 @@ public final class PlacesFetcherTest {
       .setWebsiteUrl(PLACE_WEBSITE)
       .setPhone(PHONE)
       .setRating(RATING)
-      .setPriceLevel(PRICELEVEL_INT)
+      .setPriceLevel(PRICE_LEVEL_INT)
       .setLocation(LOCATION)
       .setGoogleUrl(PLACE_GOOGLE_URL)
       .setPlaceId(PLACEID_2)
-      .setBusinessStatus(BUSINESS_STATUS)
+      .setBusinessStatus(BUSINESS_STATUS_2)
       .build();
 
   /** Valid UserPreferences builder. */
    private static final UserPreferences.Builder PREFERENCES_BUILDER =
       UserPreferences.builder()
       .setMinRating(RATING)
-      .setMaxPriceLevel(PRICELEVEL_INT)
+      .setMaxPriceLevel(PRICE_LEVEL_INT)
       .setLocation(LOCATION)
       .setCuisines(CUISINES)
       .setOpenNow(OPEN_NOW);
@@ -107,12 +108,12 @@ public final class PlacesFetcherTest {
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
       createTestPlaceDetails(
-          "name1", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
-          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS);
+          "name1", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS_1);
   private static final PlaceDetails PLACE_DETAILS_2 =
       createTestPlaceDetails(
-          "name2", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICELEVEL,
-          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, BUSINESS_STATUS);
+          "name2", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_2, BUSINESS_STATUS_2);
 
   private static URL createTestURL(String s) {
     try {
@@ -125,7 +126,7 @@ public final class PlacesFetcherTest {
 
   private static PlaceDetails createTestPlaceDetails(
         String name, URL website, String phone, float rating,
-        PriceLevel priceLevel, LatLng location, URL google_url, String id, String status) {
+        PriceLevel priceLevel, LatLng location, URL google_url, String id, BusinessStatus status) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
     placeDetails.website = website;
@@ -136,7 +137,7 @@ public final class PlacesFetcherTest {
     placeDetails.geometry.location = location;
     placeDetails.url = google_url;
     placeDetails.placeId = id;
-    placeDetails.businessStatus = status;
+    placeDetails.businessStatus = status.toString();
     return placeDetails;
   }
 
