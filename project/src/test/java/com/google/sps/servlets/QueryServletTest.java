@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -29,6 +30,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
+import com.google.sps.data.FetcherException;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -52,11 +54,11 @@ public final class QueryServletTest {
     servlet = new QueryServlet();
     servlet.init(FETCHER);
     when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
+    initializeRequestParameters();
   }
 
   @Test
   public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
-    setRequestParameters(/*cuisines*/ "sushi");
     ImmutableList<Place> placesListWithMoreThanMaxNum =
         createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithMoreThanMaxNum);
@@ -68,7 +70,6 @@ public final class QueryServletTest {
 
   @Test
   public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
-    setRequestParameters(/*cuisines*/ "sushi");
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithLessThanMaxNum);
@@ -82,7 +83,7 @@ public final class QueryServletTest {
   // This test only makes sure that the servlets accepts the format of sending more than one
   // cuisine, seperated by commas.
   public void getRequest_fetchMoreThanOneCuisine_success() throws Exception {
-    setRequestParameters(/*cuisines*/ "sushi,hamburger");
+    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
     ImmutableList<Place> places = createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
 
@@ -91,23 +92,74 @@ public final class QueryServletTest {
     assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
   }
 
+  @Test
+  public void getRequest_fetchedPlacesShouldBeFiltered_filterPlaces() throws Exception {
+    when(REQUEST.getParameter("rating")).thenReturn("4");
+    Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
+    Place lowRating = createValidPlaceBuilder().setRating(3).setName("lowRatingPlace").build();
+    Place noWebsite = createValidPlaceBuilder().setWebsiteUrl("").setName("noWebsitePlace").build();
+    // The following place purposely has the same name as the valid place, so that we make sure that
+    // we end up with only one of them.
+    Place anotherBranchOfValidPlace = createValidPlaceBuilder().setName("validPlace").build();
+    ImmutableList<Place> places =
+        ImmutableList.of(validPlace, lowRating, noWebsite, anotherBranchOfValidPlace);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    assertEquals(getPlacesAmountInResponse(), 1);
+    assertEquals(
+        new Gson().fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class)
+            .get(0) // The first element in the array (first place)
+            .getAsJsonObject()
+            .get("name")
+            .getAsString(),
+        "validPlace");
+  }
+
+  @Test
+  public void getRequest_fetcherException_forwardException() throws Exception {
+    when(FETCHER.fetch(any(UserPreferences.class))).thenThrow(FetcherException.class);
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    verify(RESPONSE).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+        "Fetching from Google Places API encountered a problem");
+  }
+
+  @Test
+  public void getRequest_userPreferencesBuildException_forwardException() throws Exception {
+    // The rating parameter cannot be negative, so this should cause the UserPreferences builder to
+    // throw an IllegalArgumentException
+    when(REQUEST.getParameter("rating")).thenReturn("-5");
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    verify(RESPONSE).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+        "Parsing the user preferences encountered a problem");
+  }
+
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.
   private static ImmutableList<Place> createPlacesListBySize(int numOfPlaces) {
     ImmutableList.Builder<Place> places = ImmutableList.builder();
     for (int i = 0; i < numOfPlaces; ++i) {
-      String name = String.valueOf(i);
-      places.add(Place.builder()
-          .setName(name)
-          .setWebsiteUrl("website@google.com")
-          .setPhone("+97250-0000-000")
-          .setRating(4)
-          .setPriceLevel(3)
-          .setLocation(new LatLng(35.35, 30.30))
+      places.add(createValidPlaceBuilder()
+          .setName(String.valueOf(i))
           .build()
       );
     }
     return places.build();
+  }
+
+  private static Place.Builder createValidPlaceBuilder() {
+    return Place.builder()
+          .setName("name")
+          .setWebsiteUrl("website@google.com")
+          .setPhone("+97250-0000-000")
+          .setRating(4)
+          .setPriceLevel(3)
+          .setLocation(new LatLng(35.35, 30.30));
   }
 
   // Returns the number of json elements in the servlet's response
@@ -117,13 +169,12 @@ public final class QueryServletTest {
         .size();
   }
 
-  // Set the parameters for the mocked http request. Most parameter are contant valid values, and
-  // the cuisines parameter is supplied by the calling function.
-  private void setRequestParameters(String cuisines) {
+  // Initialize the parameters for the mocked http request, with constant valid values.
+  private void initializeRequestParameters() {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
     when(REQUEST.getParameter("location")).thenReturn("30.30,35.35");
-    when(REQUEST.getParameter("cuisines")).thenReturn(cuisines);
+    when(REQUEST.getParameter("cuisines")).thenReturn("sushi");
   }
 }

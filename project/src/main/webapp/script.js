@@ -165,7 +165,7 @@ function tryAgain() {
 
 /**
  * Adds a search box to the map, and allows it to keep the user's updating location according to
- * his search box activity
+ * their search box activity
  */
 function addSearchBoxToMap(map, searchBoxElement) {
   // Create the search box and link it to the UI element.
@@ -228,7 +228,7 @@ function createMapMarker(map, placePosition, placeTitle) {
   })
 }
 
-/** Displays a Google Maps map that allows the user to search for his location. */
+/** Displays a Google Maps map that allows the user to search for their location. */
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
@@ -244,7 +244,7 @@ function addMapWithSearchBox() {
 }
 
 /**
- * Prompts the user with a request to get his location, and adds the location map to the
+ * Prompts the user with a request to get their location, and adds the location map to the
  * query page.
  */
 function getDeviceLocationAndShowOnMap() {

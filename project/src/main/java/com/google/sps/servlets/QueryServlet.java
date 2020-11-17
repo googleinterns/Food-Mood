@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.sps.data.FetcherException;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
@@ -31,7 +32,7 @@ import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
 
 /**
- * A servlet that handles the user query. Currently accepts no input, and responds with a list of
+ * A servlet that handles the user's food-mood recommendation query, and responds with a list of
  * recommended places (in Json format).
  */
 @WebServlet("/query")
@@ -69,9 +70,13 @@ public final class QueryServlet extends HttpServlet {
           true /* filter if no website */,
           true /* filter branches of same place */
       );
-    } catch (Exception e) {
+    } catch (FetcherException e) {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "Fetching from Google Places API encountered a problem");
+      return;
+    } catch (IllegalArgumentException e) {
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Parsing the user preferences encountered a problem");
       return;
     }
     response.setContentType("application/json");
@@ -83,7 +88,7 @@ public final class QueryServlet extends HttpServlet {
     ));
   }
 
-  private LatLng getLatLngFromString(String coordinates) {
+  private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
     return new LatLng(Float.parseFloat(latLng[0]), Float.parseFloat(latLng[1]));
   }
