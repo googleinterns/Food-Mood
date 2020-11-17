@@ -80,19 +80,6 @@ public final class QueryServletTest {
   }
 
   @Test
-  // This test only makes sure that the servlets accepts the format of sending more than one
-  // cuisine, seperated by commas.
-  public void getRequest_fetchMoreThanOneCuisine_success() throws Exception {
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
-    ImmutableList<Place> places = createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
-
-    servlet.doGet(REQUEST, RESPONSE);
-
-    assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
-  }
-
-  @Test
   public void getRequest_fetchedPlacesShouldBeFiltered_filterPlaces() throws Exception {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
