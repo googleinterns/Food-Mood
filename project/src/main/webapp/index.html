@@ -29,7 +29,7 @@
         <label for="cuisine-homemade">Homemade</label>
       </form>
       <form id="rating-form" class="form-element-toolbar">
-        <p>Min rating (out of 5):</p>
+        <p>Mininal rating (out of 5):</p>
         <input type="radio" id="rating-0" name="rating" value="1" checked="checked">
         <label for="rating-0">I don't mind</label>
         <input type="radio" id="rating-1" name="rating" value="1">
@@ -44,7 +44,7 @@
         <label for="rating-5">5 star</label>
       </form>
       <form id="price-form" class="form-element-toolbar">
-        <p>Max price level:</p>
+        <p>Maximal price level:</p>
         <input type="radio" id="price-all" name="price" value="4" checked="checked">
         <label for="price-all">I don't mind</label>
         <input type="radio" id="price-1" name="price" value="1">
@@ -83,8 +83,8 @@
       <div id="results-content-and-map">
         <div id="results-content" class="results-content">
           <h2>Food Mood's recommendation:</h2>
-          <p id="waiting-message">Please wait as we are finding the best results for you</p>
-          <p id="message-container"></p>
+          <div id="waiting-message">Please wait while we are finding the best results for you</div>
+          <div id="problem-message-container" class="error-text"></div>
           <ol id="place"> </ol>
         </div>
         <div id="results-map-container"> </div>
@@ -92,9 +92,11 @@
       <div id="feedback-box">
         <label for="liking-feedback">Like these options?<br> Let us know what you chose: <br></label>
         <select class="button" name="feedback" id="feedback">
-        <option value="1">First option</option>
-        <option value="2">Second option</option>
-        <option value="3">Third option</option>
+          <option value="1">First option</option>
+          <option value="2">Second option</option>
+          <option value="3">Third option</option>
+          <br>
+          <input type="submit" value="Submit" style="font-weight: bold">
         </select>
         <br><br>
         <label for="disliking-feedback">Don't like these options? <br></label>

@@ -20,9 +20,7 @@ let globalUserMap;
  * results elements in order to display them to the user.
  */
 function fetchFromQuery() {
-  document.getElementById('map-error-container').innerText = '';
-  const inputErrorElement = document.getElementById('input-error-container');
-  inputErrorElement.innerText = '';
+  clearAllMessages();
   let params;
   try {
     params = [
@@ -49,13 +47,11 @@ function fetchFromQuery() {
         });
         displayAfterResults();
         if (places.length < 3) {
-          document.getElementById('message-container').innerHTML =
-              'Your search had ' + places.length + ' results. You are welcome to try again, \
-              and maybe try to change some of the entered parameters.'
+          displayNumResultsMessage(places.length);
         }
       })
       .catch((error) => {
-        document.getElementById('message-container').innerHTML = "Oops, we encountered a problem! \
+        document.getElementById('problem-message-container').innerText = "Oops, we encountered a problem! \
             Could you please try again?";
       });
 }
@@ -106,6 +102,20 @@ function getUserLocationFromUi() {
   const coords = JSON.parse(localStorage.getItem('userLocation'));
   console.log(coords.lat + "," + coords.lng);
   return coords.lat + "," + coords.lng;
+}
+
+/** Displays a message to the user for a low number of results. */
+function displayNumResultsMessage(numResults) {
+  let messageElement = document.getElementById('problem-message-container');
+  const tryAgainMessage =
+      'You are welcome to try again, and maybe try to change some of the entered parameters.';
+  if (numResults === 0) {
+    messageElement.innerHTML = 'Your search had no results. ' + '<br>' + tryAgainMessage
+  } else if (numResults === 1) {
+    messageElement.innerHTML = 'Your search had only 1 result. ' + '<br>' + tryAgainMessage
+  } else if (numResults === 2) {
+    messageElement.innerHTML = 'Your search had only 2 results. ' + '<br>' + tryAgainMessage
+  }
 }
 
 /** Displays the results page. */
@@ -162,6 +172,16 @@ function tryAgain() {
   document.getElementById('results').style.display = 'none';
   document.getElementById('waiting-message').style.display = 'block'
   document.getElementById('place').innerText = '';
+  document.getElementById('map-error-container').innerText = '';
+  document.getElementById('input-error-container').innerText = '';
+}
+
+/** Clears all the messages that are displayed to the user during the user session. */
+function clearAllMessages() {
+  document.getElementById('place').innerText = '';
+  document.getElementById('map-error-container').innerText = '';
+  document.getElementById('input-error-container').innerText = '';
+  document.getElementById('problem-message-container').innerText = '';
 }
 
 /**
