@@ -146,7 +146,7 @@ public final class QueryServletTest {
 
     servlet.doGet(REQUEST, RESPONSE);
 
-    // TODO: this test fails because float is unstable for that kind of a test.
+    // TODO(M1): this test fails because float is unstable for that kind of a test.
     // This test will be run once we refactor the float to be a double.
 
     // verify(FETCHER).fetch(expectedUserPrefs);
