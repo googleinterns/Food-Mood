@@ -47,9 +47,13 @@ function fetchFromQuery() {
           addPlaceMarker(map, singlePlace)
         });
         displayAfterResults();
-        if (places.length < 3) {
+        if (places.length === 0) {
           document.getElementById('message-container').innerHTML =
-              'Your search had ' + places.length + ' results. You are welcome to try again, \
+              'Your search didn\'t have any results. You are welcome to try again, \
+              and maybe try to change some of the entered parameters.'
+        } else if (places.length < 3) {
+          document.getElementById('message-container').innerHTML =
+              'Your search had only ' + places.length + ' results. You are welcome to try again, \
               and maybe try to change some of the entered parameters.'
         }
       })
