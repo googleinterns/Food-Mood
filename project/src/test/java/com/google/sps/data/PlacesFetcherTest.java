@@ -21,6 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableList;
 import com.google.maps.PlaceDetailsRequest;
@@ -51,7 +53,7 @@ public final class PlacesFetcherTest {
   private static final float RATING = 4;
   private static final int PRICE_LEVEL_INT = 2; // used for Places and UserPreferences
   private static final PriceLevel PRICE_LEVEL = PriceLevel.MODERATE; // used for PlaceDetails
-  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "hamburger");
   private static final boolean OPEN_NOW = true;
   private static final BusinessStatus BUSINESS_STATUS_1 =
       BusinessStatus.OPERATIONAL; // used for Places and UserPreferences
@@ -59,6 +61,7 @@ public final class PlacesFetcherTest {
       BusinessStatus.UNKNOWN; // used for Places and UserPreferences
   private static final String STRING_BUSINESS_STATUS_1 = "OPERATIONAL"; // used for PlaceDetails
   private static final String STRING_BUSINESS_STATUS_2 = null; // used for PlaceDetails
+  private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
   /** Place IDs for valid PlacesSearchResults used in tests. */
   private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
@@ -160,7 +163,10 @@ public final class PlacesFetcherTest {
     doReturn(new PlacesSearchResult[0])
       .when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
-    assertEquals(ImmutableList.of(), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
+    ImmutableList<Place> output = spiedFetcher.fetch(PREFERENCES_BUILDER.build());
+    verify(spiedFetcher, times(MAX_NUM_OF_RADIUS_EXTENSIONS))
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    assertEquals(ImmutableList.of(), output);
   }
 
   @Test
@@ -232,5 +238,40 @@ public final class PlacesFetcherTest {
         assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("place details"));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsValidCuisines_returnsQuery() throws Exception {
+    assertEquals(
+      "sushi|burger|hamburger", placesFetcher.createCuisinesQuery(CUISINES));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsAnEmptyListOfCuisines_returnsEmptyQuery() throws Exception {
+    assertEquals("", placesFetcher.createCuisinesQuery(ImmutableList.of()));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsInvalidCuisines_throwsFetcherException() throws Exception {
+    FetcherException thrown =
+        assertThrows(
+            FetcherException.class,
+            () -> placesFetcher.createCuisinesQuery(ImmutableList.of("blah")));
+    assertTrue(thrown.getCause() instanceof NullPointerException);
+    assertTrue(thrown.getMessage().contains("invalid cuisine"));
+  }
+
+  @Test
+  public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
+    PlacesFetcher spiedFetcher = spy(placesFetcher);
+    doReturn(new PlacesSearchResult[0])
+      .doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
+      .when(spiedFetcher)
+      .getPlacesSearchResults(any(TextSearchRequest.class));
+    doReturn(PLACE_DETAILS_1)
+      .when(spiedFetcher)
+      .getPlaceDetails(any(PlaceDetailsRequest.class));
+    assertEquals(
+      ImmutableList.of(PLACE_1), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
   }
 }
