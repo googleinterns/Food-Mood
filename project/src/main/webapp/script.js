@@ -38,7 +38,8 @@ function fetchFromQuery() {
   }
   const placesDiv = document.getElementById('place');
   displayResultsPage();
-  const map = createMap();
+  const userCoords = JSON.parse(localStorage.getItem('userLocation'));
+  const map = createMap({lat: userCoords.lat, lng: userCoords.lng});
   fetch('/query?' + params)
       .then(response => response.json())
       .then((places) => {
@@ -109,16 +110,16 @@ function getUserLocationFromUi() {
 
 /** Displays the results page. */
 function displayResultsPage() {
-  document.getElementById('query-form').style.display = 'none';
+  document.getElementById('user-input').style.display = 'none';
   document.getElementById('results').style.display = 'block';
-  document.getElementById('map-container').style.display = 'none';
+  document.getElementById('results-map-container').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
 }
 
 /** Displays the map and the feedback box in the results page after the results are ready. */
 function displayAfterResults() {
   document.getElementById('waiting-message').style.display = 'none';
-  document.getElementById('map-container').style.display = 'block';
+  document.getElementById('results-map-container').style.display = 'block';
   document.getElementById('feedback-box').style.display = 'block';
 }
 
@@ -136,7 +137,7 @@ function createPlaceElement(place) {
     const websiteLink = document.createElement('a');
     websiteLink.href = place.websiteUrl;
     websiteLink.title = place.websiteUrl;
-    websiteLink.innerText = 'Restaurant\'s website';
+    websiteLink.innerText = place.name + '\'s website';
     placeElement.appendChild(websiteLink);
   } else {
     const noSite = document.createTextNode('We don\'t have a link to the restaurant\'s website.');
@@ -157,7 +158,7 @@ function createPlaceElement(place) {
  * results.
  */
 function tryAgain() {
-  document.getElementById('query-form').style.display = 'block';
+  document.getElementById('user-input').style.display = 'block';
   document.getElementById('results').style.display = 'none';
   document.getElementById('waiting-message').style.display = 'block'
   document.getElementById('place').innerText = '';
@@ -283,17 +284,18 @@ function getDeviceLocationAndShowOnMap() {
 function displayGeolocationError(errorText) {
   document.getElementById('map-error-container').innerHTML =
       errorText + ', so we can\'t use your location.' + '<br>' +
-      'Use the map to find your location.' + '<br>';
+      'Use the map to find your location.' + '<br> <br>';
 }
 
-/** Creates a map and adds it to the page. */
-function createMap() {
+/**
+ *  Creates a map and adds it to the page.
+ */
+function createMap(userLocation) {
   const ZOOM_OUT = 12;
-  const USER_LOCATION = {lat: 32.080576, lng: 34.780641}; //TODO(M1): change to user's location
   const map = new window.google.maps.Map(
-    document.getElementById('map-container'), {
-      center: USER_LOCATION,
-      zoom: ZOOM_OUT,
+    document.getElementById('results-map-container'), {
+        center: userLocation,
+        zoom: ZOOM_OUT,
     }
   );
   return map;
