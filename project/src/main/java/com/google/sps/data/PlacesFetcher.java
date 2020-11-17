@@ -44,8 +44,14 @@ public class PlacesFetcher {
     // rather as "RESTAURANT" this is the most suitable type to search for.
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    // In this radius around "LOCATION" places will be searched.
-    private static final int SEARCH_RADIUS = 5000;
+    // The initial search radius in meters.
+    private static final int INIT_SEARCH_RADIUS_M = 5000;
+
+    // The minimal number of results to be fetched.
+    private static final int MIN_NUM_OF_RESULTS = 10;
+
+    // The maximal number of times the search radius will be extended.
+    private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
     // The entry point for a Google GEO API request.
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
@@ -68,20 +74,32 @@ public class PlacesFetcher {
      *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        TextSearchRequest query =
-            PlacesApi.textSearchQuery(
-                CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
-                .radius(SEARCH_RADIUS)
+        PlacesSearchResult[] placesSearchResult;
+        int attemptsCounter = 0;
+        do {
+            attemptsCounter++;
+            try {
+                placesSearchResult = getPlacesSearchResults(
+                    genTextSearchRequest(preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
+            } catch (ApiException | InterruptedException | IOException e) {
+                throw new FetcherException("Couldn't fetch places from Places API", e);
+            }
+        } while (
+            placesSearchResult.length < MIN_NUM_OF_RESULTS
+            && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
+        return createPlacesList(placesSearchResult);
+    }
+
+    private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
+        TextSearchRequest request = PlacesApi.textSearchQuery(
+            CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
+                .radius(radius)
                 .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
         if (preferences.openNow()) {
-            query.openNow(preferences.openNow());
+            request.openNow(preferences.openNow());
         }
-        try {
-            return createPlacesList(getPlacesSearchResults(query));
-        } catch (ApiException | InterruptedException | IOException e) {
-            throw new FetcherException("Couldn't fetch places from Places API", e);
-        }
+        return request;
     }
 
     /**

@@ -29,8 +29,8 @@ import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
-import com.google.appengine.repackaged.com.google.gson.Gson;
-import com.google.appengine.repackaged.com.google.gson.JsonArray;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
