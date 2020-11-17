@@ -236,7 +236,7 @@ public final class PlacesFetcherTest {
     assertTrue(thrown.getCause() instanceof NullPointerException);
     assertTrue(thrown.getMessage().contains("invalid cuisine"));
   }
-  
+
   @Test
   public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
