@@ -1,0 +1,10 @@
+{
+    "sushi": ["sushi"],
+    "italian": ["italian", "pasta"],
+    "asian": ["asian", "noodles", "thai"],
+    "hamburger": ["burger", "hamburger"],
+    "salad": ["salad"],
+    "homemade": ["homemade", "home"],
+    "hummus": ["hummus"],
+    "pizza": ["pizza"]
+}

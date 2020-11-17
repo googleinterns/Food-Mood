@@ -49,7 +49,7 @@ public final class PlacesFetcherTest {
   private static final float RATING = 4;
   private static final int PRICELEVEL_INT = 2; // used for Places and UserPreferences
   private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
-  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "hamburger");
   private static final boolean OPEN_NOW = true;
   private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
@@ -214,6 +214,27 @@ public final class PlacesFetcherTest {
         assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("place details"));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsValidCuisines_returnsQuery() throws Exception {
+    assertEquals(
+      "sushi|burger|hamburger", placesFetcher.createCuisinesQuery(CUISINES));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsAnEmptyListOfCuisines_returnsEmptyQuery() throws Exception {
+    assertEquals("", placesFetcher.createCuisinesQuery(ImmutableList.of()));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsInvalidCuisines_throwsFetcherException() throws Exception {
+    FetcherException thrown =
+        assertThrows(
+            FetcherException.class,
+            () -> placesFetcher.createCuisinesQuery(ImmutableList.of("blah")));
+    assertTrue(thrown.getCause() instanceof NullPointerException);
+    assertTrue(thrown.getMessage().contains("invalid cuisine"));
   }
 
   @Test
