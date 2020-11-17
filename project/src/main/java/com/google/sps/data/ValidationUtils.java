@@ -16,10 +16,6 @@ package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * A utility class for validation.
  */

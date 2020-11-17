@@ -68,8 +68,7 @@ public abstract class Place {
   public abstract String placeId();
 
   /**
-    * @return the place's business status, represented by one of the following:
-    * "OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", "UNKNOWN"
+    * @return the place's business status.
     */
   public abstract BusinessStatus businessStatus();
 
@@ -139,8 +138,7 @@ public abstract class Place {
     public abstract Builder setPlaceId(String placeId);
 
     /**
-     * @param businessStatus the place's status, represented by one of the following:
-     * "OPERATIONAL", "CLOSED_TEMPORARILY", "CLOSED_PERMANENTLY", "UNKNOWN"
+     * @param businessStatus the place's business status.
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setBusinessStatus(BusinessStatus businessStatus);

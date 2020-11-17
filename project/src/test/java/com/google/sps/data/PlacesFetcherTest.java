@@ -133,7 +133,7 @@ public final class PlacesFetcherTest {
 
   private static PlaceDetails createTestPlaceDetails(
         String name, URL website, String phone, float rating,
-        PriceLevel priceLevel, LatLng location, URL google_url, String id, String status) {
+        PriceLevel priceLevel, LatLng location, URL googleUrl, String id, String status) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
     placeDetails.website = website;
@@ -142,7 +142,7 @@ public final class PlacesFetcherTest {
     placeDetails.priceLevel = priceLevel;
     placeDetails.geometry = new Geometry();
     placeDetails.geometry.location = location;
-    placeDetails.url = google_url;
+    placeDetails.url = googleUrl;
     placeDetails.placeId = id;
     placeDetails.businessStatus = status;
     return placeDetails;
