@@ -31,7 +31,7 @@ function fetchFromQuery() {
       `location=${getUserLocationFromUi()}`
     ].join('&');
   } catch (error) {
-    inputErrorElement.innerText = 'ERROR: ' + error.message;
+    document.getElementById('input-error-container').innerText = 'ERROR: ' + error.message;
     return;
   }
   const placesDiv = document.getElementById('place');
