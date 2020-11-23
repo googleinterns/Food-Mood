@@ -91,6 +91,7 @@
     <module name="JavadocType"/>
     <module name="JavadocVariable">
       <property name="scope" value="public"/>
+      <property name="tokens" value="VARIABLE_DEF"/>
     </module>
     <module name="JavadocStyle"/>
     <module name="MissingJavadocMethod">
