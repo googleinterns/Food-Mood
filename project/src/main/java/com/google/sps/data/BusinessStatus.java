@@ -13,17 +13,14 @@
 // limitations under the License.
 
 package com.google.sps.data;
-/**
- * FetcherException represents an error returned by the PlacesFetcher.
- */
-@SuppressWarnings("serial")
- public final class FetcherException extends RuntimeException {
 
-  /**
-   * @param message the message shown when the exception is thrown
-   * @param cause the cause of the exception
-   */
-    public FetcherException(String message, Throwable cause) {
-      super(message, cause);
-    }
+/** Used by Places builder to restrict the buisiness statuses
+ *  to match those returned by Google Places API.
+ */
+public enum BusinessStatus  {
+    OPERATIONAL,
+    CLOSED_TEMPORARILY,
+    CLOSED_PERMANENTLY,
+    UNKNOWN;
 }
+

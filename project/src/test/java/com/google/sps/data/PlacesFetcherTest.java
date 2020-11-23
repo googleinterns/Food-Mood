@@ -42,49 +42,65 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class PlacesFetcherTest {
 
-  private static final String PLACE_URL = "https://www.google.com/"; // used for Places
-  private static final URL PLACES_DETAILS_URL = createTestURL(PLACE_URL); // used for PlaceDetails
+  private static final String PLACE_WEBSITE = "https://www.wikipedia.org/"; // used for Places
+  private static final String PLACE_GOOGLE_URL = "https://www.google.com/"; // used for Places
+  private static final URL PLACE_DETAILS_WEBSITE =
+      createTestURL(PLACE_WEBSITE); // used for PlaceDetails
+  private static final URL PLACE_DETAILS_GOOGLE_URL =
+      createTestURL(PLACE_GOOGLE_URL); // used for PlaceDetails
   private static final String PHONE = "+97250-0000-000";
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final float RATING = 4;
-  private static final int PRICELEVEL_INT = 2; // used for Places and UserPreferences
-  private static final PriceLevel PRICELEVEL = PriceLevel.MODERATE; // used for PlaceDetails
-  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
+  private static final int PRICE_LEVEL_INT = 2; // used for Places and UserPreferences
+  private static final PriceLevel PRICE_LEVEL = PriceLevel.MODERATE; // used for PlaceDetails
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "hamburger");
   private static final boolean OPEN_NOW = true;
+  private static final BusinessStatus BUSINESS_STATUS_1 =
+      BusinessStatus.OPERATIONAL; // used for Places and UserPreferences
+  private static final BusinessStatus BUSINESS_STATUS_2 =
+      BusinessStatus.UNKNOWN; // used for Places and UserPreferences
+  private static final String STRING_BUSINESS_STATUS_1 = "OPERATIONAL"; // used for PlaceDetails
+  private static final String STRING_BUSINESS_STATUS_2 = null; // used for PlaceDetails
   private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
+
+  /** Place IDs for valid PlacesSearchResults used in tests. */
+  private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+  private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
   /** Valid Place objects. */
   private static final Place PLACE_1 =
       Place.builder()
       .setName("name1")
-      .setWebsiteUrl(PLACE_URL)
+      .setWebsiteUrl(PLACE_WEBSITE)
       .setPhone(PHONE)
       .setRating(RATING)
-      .setPriceLevel(PRICELEVEL_INT)
+      .setPriceLevel(PRICE_LEVEL_INT)
       .setLocation(LOCATION)
+      .setGoogleUrl(PLACE_GOOGLE_URL)
+      .setPlaceId(PLACEID_1)
+      .setBusinessStatus(BUSINESS_STATUS_1)
       .build();
   private static final Place PLACE_2 =
       Place.builder()
       .setName("name2")
-      .setWebsiteUrl(PLACE_URL)
+      .setWebsiteUrl(PLACE_WEBSITE)
       .setPhone(PHONE)
       .setRating(RATING)
-      .setPriceLevel(PRICELEVEL_INT)
+      .setPriceLevel(PRICE_LEVEL_INT)
       .setLocation(LOCATION)
+      .setGoogleUrl(PLACE_GOOGLE_URL)
+      .setPlaceId(PLACEID_2)
+      .setBusinessStatus(BUSINESS_STATUS_2)
       .build();
 
   /** Valid UserPreferences builder. */
    private static final UserPreferences.Builder PREFERENCES_BUILDER =
       UserPreferences.builder()
       .setMinRating(RATING)
-      .setMaxPriceLevel(PRICELEVEL_INT)
+      .setMaxPriceLevel(PRICE_LEVEL_INT)
       .setLocation(LOCATION)
       .setCuisines(CUISINES)
       .setOpenNow(OPEN_NOW);
-
-  /** Place IDs for valid PlacesSearchResults used in tests. */
-  private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
-  private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
   /** Valid PlacesSearchResult. */
   private static final PlacesSearchResult SEARCH_RESULT_1 =
@@ -98,9 +114,13 @@ public final class PlacesFetcherTest {
 
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
-      createTestPlaceDetails("name1", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+      createTestPlaceDetails(
+          "name1", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, STRING_BUSINESS_STATUS_1);
   private static final PlaceDetails PLACE_DETAILS_2 =
-      createTestPlaceDetails("name2", PLACES_DETAILS_URL, PHONE, RATING, PRICELEVEL, LOCATION);
+      createTestPlaceDetails(
+          "name2", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_2, STRING_BUSINESS_STATUS_2);
 
   private static URL createTestURL(String s) {
     try {
@@ -112,15 +132,19 @@ public final class PlacesFetcherTest {
   }
 
   private static PlaceDetails createTestPlaceDetails(
-        String name, URL url, String phone, float rating, PriceLevel priceLevel, LatLng location) {
+        String name, URL website, String phone, float rating,
+        PriceLevel priceLevel, LatLng location, URL googleUrl, String id, String status) {
     PlaceDetails placeDetails = new PlaceDetails();
     placeDetails.name = name;
-    placeDetails.website = url;
+    placeDetails.website = website;
     placeDetails.formattedPhoneNumber = phone;
     placeDetails.rating = rating;
     placeDetails.priceLevel = priceLevel;
     placeDetails.geometry = new Geometry();
     placeDetails.geometry.location = location;
+    placeDetails.url = googleUrl;
+    placeDetails.placeId = id;
+    placeDetails.businessStatus = status;
     return placeDetails;
   }
 
@@ -214,6 +238,27 @@ public final class PlacesFetcherTest {
         assertThrows(FetcherException.class, () -> spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
     assertTrue(thrown.getCause() instanceof IOException);
     assertTrue(thrown.getMessage().contains("place details"));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsValidCuisines_returnsQuery() throws Exception {
+    assertEquals(
+      "sushi|burger|hamburger", placesFetcher.createCuisinesQuery(CUISINES));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsAnEmptyListOfCuisines_returnsEmptyQuery() throws Exception {
+    assertEquals("", placesFetcher.createCuisinesQuery(ImmutableList.of()));
+  }
+
+  @Test
+  public void createCuisinesQuery_getsInvalidCuisines_throwsFetcherException() throws Exception {
+    FetcherException thrown =
+        assertThrows(
+            FetcherException.class,
+            () -> placesFetcher.createCuisinesQuery(ImmutableList.of("blah")));
+    assertTrue(thrown.getCause() instanceof NullPointerException);
+    assertTrue(thrown.getMessage().contains("invalid cuisine"));
   }
 
   @Test

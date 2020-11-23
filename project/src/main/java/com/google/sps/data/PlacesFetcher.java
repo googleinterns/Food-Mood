@@ -16,6 +16,7 @@ package com.google.sps.data;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -25,9 +26,18 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlacesFetcher {
 
@@ -49,6 +59,13 @@ public class PlacesFetcher {
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
         .apiKey(System.getenv("API_KEY"))
         .build();
+
+    // The path of the configuration file containing the mapping of cuisines to search words.
+    private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
+
+    // A mapping between cuisines and text search words. */
+    private static final ImmutableMap<String, List<String>> CUISINE_TO_SEARCH_WORDS =
+        getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
@@ -110,6 +127,7 @@ public class PlacesFetcher {
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
+                System.out.println(placeDetails.businessStatus);
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException(
                     "Couldn't get place details from Places API", e);
@@ -117,13 +135,15 @@ public class PlacesFetcher {
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null
-                            ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null
-                            ? "" : placeDetails.formattedPhoneNumber.toString())
+                    .setWebsiteUrl(Objects.toString(placeDetails.website, ""))
+                    .setPhone(Strings.nullToEmpty(placeDetails.formattedPhoneNumber))
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
+                    .setPlaceId(placeDetails.placeId)
+                    .setGoogleUrl(Objects.toString(placeDetails.url, ""))
+                    .setBusinessStatus(BusinessStatus.valueOf(
+                        Objects.toString(placeDetails.businessStatus, "UNKNOWN")))
                     .build());
         }
         return ImmutableList.copyOf(places);
@@ -137,13 +157,17 @@ public class PlacesFetcher {
                 PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
                 PlaceDetailsRequest.FieldMask.RATING,
                 PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
+                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION,
+                PlaceDetailsRequest.FieldMask.PLACE_ID,
+                PlaceDetailsRequest.FieldMask.URL,
+                PlaceDetailsRequest.FieldMask.BUSINESS_STATUS);
     }
 
     /**
      * Queries Google Places API to recieve requested details about a certain place.
      *
-     * @param request A PlaceDetailsRequest to query certain details on a certain place
+     * @param request A PlaceDetailsRequest to query certain details on a certain
+     *                place
      * @return PlacesDetails containig requested details about the place
      */
     @VisibleForTesting
@@ -152,7 +176,35 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisinesQuery(ImmutableList<String> cuisines) {
-        return String.join("|", cuisines);
+     /**
+     * Creates a String query that includes all text search words matching the specified cuisines.
+     *
+     * @param cuisines A list of the cuisines we want to query
+     * @return A String of text search words to query on
+     * @throws FetcherException when an invalid cuisine is queried
+     */
+    @VisibleForTesting
+    String createCuisinesQuery(ImmutableList<String> cuisines) throws FetcherException {
+        return cuisines.stream()
+            .map(cuisine -> getSearchWords(cuisine))
+            .collect(Collectors.joining("|"));
+    }
+
+    private static String getSearchWords(String cuisine) throws FetcherException {
+        try {
+            return String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine));
+        } catch (NullPointerException e) {
+            throw new FetcherException("Couldn't query on invalid cuisine", e);
+        }
+    }
+
+    private static ImmutableMap<String, List<String>> getCuisinesMap() {
+        Type mapType = new TypeToken<Map<String, List<String>>>() {
+        }.getType();
+        Map<String, List<String>> map = new Gson().fromJson(new JsonReader(
+            new InputStreamReader(
+                PlacesFetcher.class.getResourceAsStream(CUISINES_SEARCH_WORDS_CONFIG_PATH))),
+                mapType);
+        return ImmutableMap.copyOf(map);
     }
 }

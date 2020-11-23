@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The user location map. the map has to be accessed from different functions, so it has to be kept
- // globally.
+// The user location map. the map has to be accessed from different functions.
 let globalUserMap;
 
 /**
@@ -40,13 +39,28 @@ function fetchFromQuery() {
   const placesDiv = document.getElementById('place');
   displayResultsPage();
   const map = createMap();
-  fetch('/query?' + params).then(response => response.json()).then((places) => {
-    places.forEach((singlePlace) => {
-      placesDiv.appendChild(createPlaceElement(singlePlace));
-      addPlaceMarker(map, singlePlace)
-    });
-    displayAfterResults();
-  });
+  fetch('/query?' + params)
+      .then(response => response.json())
+      .then((places) => {
+        places.forEach((singlePlace) => {
+          placesDiv.appendChild(createPlaceElement(singlePlace));
+          addPlaceMarker(map, singlePlace)
+        });
+        displayAfterResults();
+        if (places.length === 0) {
+          document.getElementById('message-container').innerHTML =
+              'Your search didn\'t have any results. You are welcome to try again, \
+              and maybe try to change some of the entered parameters.'
+        } else if (places.length < 3) {
+          document.getElementById('message-container').innerHTML =
+              'Your search had only ' + places.length + ' results. You are welcome to try again, \
+              and maybe try to change some of the entered parameters.'
+        }
+      })
+      .catch((error) => {
+        document.getElementById('message-container').innerHTML = "Oops, we encountered a problem! \
+            Could you please try again?";
+      });
 }
 
 /** Gets the information about the cuisines that the user selected. */
@@ -67,13 +81,11 @@ function getUsercuisinesFromUi() {
 }
 
 function getUserRatingFromUi() {
-  return getCheckedValueByElementId('rating-form',
-      'Choose exactly one rating.');
+  return getCheckedValueByElementId('rating-form', 'Choose exactly one rating.');
 }
 
 function getUserPriceFromUi() {
-  return getCheckedValueByElementId('price-form',
-      'Choose exactly one price level.');
+  return getCheckedValueByElementId('price-form', 'Choose exactly one price level.');
 }
 
 function getUserOpenNowFromUi() {
@@ -86,7 +98,7 @@ function getCheckedValueByElementId(elementId, errorMessage) {
   const options = document.getElementById(elementId).elements;
   const chosenOption = Array.prototype.find.call(options, option => option.checked).value;
   if (chosenOption) {
-    return chosenOption.value;
+    return chosenOption;
   }
   // If no item was checked and returned, there is an error
   throw new Error(errorMessage);
@@ -157,7 +169,7 @@ function tryAgain() {
 
 /**
  * Adds a search box to the map, and allows it to keep the user's updating location according to
- * his search box activity
+ * their search box activity
  */
 function addSearchBoxToMap(map, searchBoxElement) {
   // Create the search box and link it to the UI element.
@@ -196,11 +208,11 @@ function addSearchBoxToMap(map, searchBoxElement) {
   });
 }
 
-  /**
-   * Creates a marker for the given place in the given map. If the marker is clicked, it becomes
-   * the map's center and updates the user's location in our storage.
-   */
-  function createInteractiveMarkerForPlace(place, map) {
+/**
+ * Creates a marker for the given place in the given map. If the marker is clicked, it becomes
+ * the map's center and updates the user's location in our storage.
+ */
+function createInteractiveMarkerForPlace(place, map) {
   const currentMarker = createMapMarker(map, place.geometry.location, place.name);
   var infoWindow = new window.google.maps.InfoWindow({content: place.name});
   currentMarker.addListener("click", () => {
@@ -220,7 +232,7 @@ function createMapMarker(map, placePosition, placeTitle) {
   })
 }
 
-/** Displays a Google Maps map that allows the user to search fo his location. */
+/** Displays a Google Maps map that allows the user to search for their location. */
 function addMapWithSearchBox() {
   const DEFAULT_COORDINATES_GOOGLE_TEL_AVIV_OFFICE = {lat: 32.070058, lng:34.794347};
   const LOW_ZOOM_LEVEL = 9;
@@ -236,7 +248,7 @@ function addMapWithSearchBox() {
 }
 
 /**
- * Prompts the user with a request to get his location, and adds the location map to the
+ * Prompts the user with a request to get their location, and adds the location map to the
  * query page.
  */
 function getDeviceLocationAndShowOnMap() {
