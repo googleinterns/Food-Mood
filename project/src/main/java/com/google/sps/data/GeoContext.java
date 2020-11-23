@@ -23,7 +23,7 @@ import com.google.maps.GeoApiContext;
  *
  */
 
-public class GeoContext {
+public final class GeoContext {
 
     private static GeoContext singleInstance = null;
 
@@ -38,10 +38,11 @@ public class GeoContext {
     /**
      * Creates a GeoContext instance if not yet been anitialized and returns the
      * intance's contex. The double check of the instance being null is for thread safety.
+     * @return a GeoApiContext object used for Google GEO API requests
      */
     public static GeoApiContext getContext() {
-        if (singleInstance == null){
-            synchronized(GeoContext.class) {
+        if (singleInstance == null) {
+            synchronized (GeoContext.class) {
                 if (singleInstance == null) {
                     singleInstance = new GeoContext();
                 }
