@@ -20,13 +20,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.sps.data.FetcherException;
+import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.UserPreferences;
 
 /**
- * A servlet that handles the user query. Currently accepts no input, and responds with a list of
+ * A servlet that handles the user's food-mood recommendation query, and responds with a list of
  * recommended places (in Json format).
  */
 @WebServlet("/query")
@@ -48,17 +54,42 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    ImmutableList<Place> filteredPlaces;
     try {
-      //TODO(M1): add call to filterer
-      response.setContentType("application/json");
-      response.getWriter().write(new Gson().toJson(
-          Places.randomSort(fetcher.fetch())
-          .stream()
-          .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-          .collect(Collectors.toList())
-      ));
-    } catch (Exception e) {
-      //TODO(M1): handle errors - TBD
+      UserPreferences userPrefs =
+          UserPreferences.builder()
+              .setMinRating(Float.parseFloat(request.getParameter("rating")))
+              .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
+              .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
+              .setLocation(getLatLngFromString(request.getParameter("location")))
+              .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
+              .build();
+      filteredPlaces = Places.filter(
+          fetcher.fetch(userPrefs) /* places */,
+          Integer.parseInt(request.getParameter("rating")) /* min rating */,
+          true /* filter if no website */,
+          true /* filter branches of same place */
+      );
+    } catch (FetcherException e) {
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Fetching from Google Places API encountered a problem");
+      return;
+    } catch (IllegalArgumentException e) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+          "Parsing the user preferences encountered a problem");
+      return;
     }
+    response.setContentType("application/json");
+    response.getWriter().write(new Gson().toJson(
+        Places.randomSort(filteredPlaces)
+            .stream()
+            .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+            .collect(Collectors.toList())
+    ));
   }
-}
+
+  private static LatLng getLatLngFromString(String coordinates) {
+    String[] latLng = coordinates.split(",");
+    return new LatLng(Float.parseFloat(latLng[0]), Float.parseFloat(latLng[1]));
+  }
+ }
