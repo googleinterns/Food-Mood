@@ -30,7 +30,10 @@ public final class PlaceTest {
   private static final LatLng LOCATION = new LatLng(32.08074, 34.78059);
   private static final String NAME = "name";
   private static final String PHONE = "+97250-0000-000";
-  private static final String WEBSITE = "website@google.com";
+  private static final String WEBSITE = "website.com";
+  private static final String GOOGLE_URL = "googleurl.com";
+  private static final String PLACE_ID = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+  private static final BusinessStatus BUSINESS_STATUS = BusinessStatus.OPERATIONAL;
 
   @Test
   public void build_invalidLowRating_throwsIllegalArgumentException() {
@@ -77,7 +80,10 @@ public final class PlaceTest {
           () -> assertEquals(PHONE, place.phone()),
           () -> assertEquals(RATING, place.rating()),
           () -> assertEquals(PRICE_LEVEL, place.priceLevel()),
-          () -> assertEquals(LOCATION, place.location())
+          () -> assertEquals(LOCATION, place.location()),
+          () -> assertEquals(GOOGLE_URL, place.googleUrl()),
+          () -> assertEquals(PLACE_ID, place.placeId()),
+          () -> assertEquals(BUSINESS_STATUS, place.businessStatus())
       );
   }
 
@@ -89,6 +95,9 @@ public final class PlaceTest {
         .setPhone(PHONE)
         .setRating(RATING)
         .setPriceLevel(PRICE_LEVEL)
-        .setLocation(LOCATION);
+        .setLocation(LOCATION)
+        .setGoogleUrl(GOOGLE_URL)
+        .setPlaceId(PLACE_ID)
+        .setBusinessStatus(BUSINESS_STATUS);
   }
 }

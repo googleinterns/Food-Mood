@@ -26,6 +26,7 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -34,6 +35,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -125,6 +127,7 @@ public class PlacesFetcher {
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
+                System.out.println(placeDetails.businessStatus);
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException(
                     "Couldn't get place details from Places API", e);
@@ -132,13 +135,15 @@ public class PlacesFetcher {
             places.add(
                 Place.builder()
                     .setName(placeDetails.name)
-                    .setWebsiteUrl(placeDetails.website == null
-                            ? "" : placeDetails.website.toString())
-                    .setPhone(placeDetails.formattedPhoneNumber == null
-                            ? "" : placeDetails.formattedPhoneNumber.toString())
+                    .setWebsiteUrl(Objects.toString(placeDetails.website, ""))
+                    .setPhone(Strings.nullToEmpty(placeDetails.formattedPhoneNumber))
                     .setRating(placeDetails.rating)
                     .setPriceLevel(Integer.parseInt(placeDetails.priceLevel.toString()))
                     .setLocation(placeDetails.geometry.location)
+                    .setPlaceId(placeDetails.placeId)
+                    .setGoogleUrl(Objects.toString(placeDetails.url, ""))
+                    .setBusinessStatus(BusinessStatus.valueOf(
+                        Objects.toString(placeDetails.businessStatus, "UNKNOWN")))
                     .build());
         }
         return ImmutableList.copyOf(places);
@@ -152,7 +157,10 @@ public class PlacesFetcher {
                 PlaceDetailsRequest.FieldMask.FORMATTED_PHONE_NUMBER,
                 PlaceDetailsRequest.FieldMask.RATING,
                 PlaceDetailsRequest.FieldMask.PRICE_LEVEL,
-                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION);
+                PlaceDetailsRequest.FieldMask.GEOMETRY_LOCATION,
+                PlaceDetailsRequest.FieldMask.PLACE_ID,
+                PlaceDetailsRequest.FieldMask.URL,
+                PlaceDetailsRequest.FieldMask.BUSINESS_STATUS);
     }
 
     /**
