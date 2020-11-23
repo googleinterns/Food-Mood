@@ -36,14 +36,14 @@ public class PlacesScorer {
     }
 
    /**
-   * Returns a map of place IDs to the score the place gets based on a scoring  algorithm.
+   * Returns a map of places to the score the place gets based on a scoring  algorithm.
    * @param places: A list of places we want to calculate their score
-   * @return A map between a place ID to a double representing the place’s score
+   * @return A map between a place to a double representing the place’s score
    */
-    public ImmutableMap<String, Double> getScores() {
-        Map<String, Double> scores = new HashMap<>();
+    public ImmutableMap<Place, Double> getScores() {
+        Map<Place, Double> scores = new HashMap<>();
         for (Place place: places) {
-            scores.put("placeId", calcScore(place));
+            scores.put(place, calcScore(place));
         }
         return ImmutableMap.copyOf(scores);
     }
@@ -51,7 +51,7 @@ public class PlacesScorer {
     private double calcScore(Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING) +
-            DURATION_WEIGHT * Math.max((durations.get("placeId" )/ MAX_DURATION), 1);
+            DURATION_WEIGHT * Math.max(1 - (durations.get("placeId" ) / MAX_DURATION), 0);
     }
 
     private ImmutableMap<String, Double> getDurations(ImmutableList<Place> places, LatLng destination) {
