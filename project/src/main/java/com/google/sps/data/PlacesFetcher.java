@@ -46,9 +46,7 @@ public class PlacesFetcher {
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
     // The entry point for a Google GEO API request.
-    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
-        .apiKey(System.getenv("API_KEY"))
-        .build();
+    private static final GeoApiContext CONTEXT = GeoContext.getContext();
 
     /**
      * Builds a query and requests it from Google Places API.
