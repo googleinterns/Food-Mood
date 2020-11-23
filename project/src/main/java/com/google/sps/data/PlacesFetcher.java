@@ -16,6 +16,7 @@ package com.google.sps.data;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -25,26 +26,44 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.PlacesApi;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlacesFetcher {
 
-    /** The type of places that will be searched is RESTAURANT. Since most places
-     * that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
-     * rather as "RESTAURANT" this is the most suitable type to search for.
-     */
+    // The type of places that will be searched is RESTAURANT. Since most places
+    // that deliver food are not tagged as "MEAL-DELIVERY" type at Google Places but
+    // rather as "RESTAURANT" this is the most suitable type to search for.
     private static final PlaceType TYPE = PlaceType.RESTAURANT;
 
-    /** In this radius around "LOCATION" places will be searched. */
-    private static final int SEARCH_RADIUS = 5000;
-    // TODO(M1): check at least 10 results, and if less extend radius
+    // The initial search radius in meters.
+    private static final int INIT_SEARCH_RADIUS_M = 5000;
 
-    /** The entry point for a Google GEO API request. */
+    // The minimal number of results to be fetched.
+    private static final int MIN_NUM_OF_RESULTS = 10;
+
+    // The maximal number of times the search radius will be extended.
+    private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
+
+    // The entry point for a Google GEO API request.
     private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
         .apiKey(System.getenv("API_KEY"))
         .build();
+
+    // The path of the configuration file containing the mapping of cuisines to search words.
+    private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
+
+    // A mapping between cuisines and text search words. */
+    private static final ImmutableMap<String, List<String>> CUISINE_TO_SEARCH_WORDS =
+        getCuisinesMap();
 
     /**
      * Builds a query and requests it from Google Places API.
@@ -55,20 +74,32 @@ public class PlacesFetcher {
      *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        TextSearchRequest query =
-            PlacesApi.textSearchQuery(
-                CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
-                .radius(SEARCH_RADIUS)
+        PlacesSearchResult[] placesSearchResult;
+        int attemptsCounter = 0;
+        do {
+            attemptsCounter++;
+            try {
+                placesSearchResult = getPlacesSearchResults(
+                    genTextSearchRequest(preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
+            } catch (ApiException | InterruptedException | IOException e) {
+                throw new FetcherException("Couldn't fetch places from Places API", e);
+            }
+        } while (
+            placesSearchResult.length < MIN_NUM_OF_RESULTS
+            && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
+        return createPlacesList(placesSearchResult);
+    }
+
+    private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
+        TextSearchRequest request = PlacesApi.textSearchQuery(
+            CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
+                .radius(radius)
                 .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
         if (preferences.openNow()) {
-            query.openNow(preferences.openNow());
+            request.openNow(preferences.openNow());
         }
-        try {
-            return createPlacesList(getPlacesSearchResults(query));
-        } catch (ApiException | InterruptedException | IOException e) {
-            throw new FetcherException("Couldn't fetch places from Places API", e);
-        }
+        return request;
     }
 
     /**
@@ -127,7 +158,8 @@ public class PlacesFetcher {
     /**
      * Queries Google Places API to recieve requested details about a certain place.
      *
-     * @param request A PlaceDetailsRequest to query certain details on a certain place
+     * @param request A PlaceDetailsRequest to query certain details on a certain
+     *                place
      * @return PlacesDetails containig requested details about the place
      */
     @VisibleForTesting
@@ -136,7 +168,35 @@ public class PlacesFetcher {
         return request.await();
     }
 
-    private static String createCuisinesQuery(ImmutableList<String> cuisines) {
-        return String.join("|", cuisines);
+     /**
+     * Creates a String query that includes all text search words matching the specified cuisines.
+     *
+     * @param cuisines A list of the cuisines we want to query
+     * @return A String of text search words to query on
+     * @throws FetcherException when an invalid cuisine is queried
+     */
+    @VisibleForTesting
+    String createCuisinesQuery(ImmutableList<String> cuisines) throws FetcherException {
+        return cuisines.stream()
+            .map(cuisine -> getSearchWords(cuisine))
+            .collect(Collectors.joining("|"));
+    }
+
+    private static String getSearchWords(String cuisine) throws FetcherException {
+        try {
+            return String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine));
+        } catch (NullPointerException e) {
+            throw new FetcherException("Couldn't query on invalid cuisine", e);
+        }
+    }
+
+    private static ImmutableMap<String, List<String>> getCuisinesMap() {
+        Type mapType = new TypeToken<Map<String, List<String>>>() {
+        }.getType();
+        Map<String, List<String>> map = new Gson().fromJson(new JsonReader(
+            new InputStreamReader(
+                PlacesFetcher.class.getResourceAsStream(CUISINES_SEARCH_WORDS_CONFIG_PATH))),
+                mapType);
+        return ImmutableMap.copyOf(map);
     }
 }

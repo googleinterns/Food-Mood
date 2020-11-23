@@ -80,19 +80,6 @@ public final class QueryServletTest {
   }
 
   @Test
-  // This test only makes sure that the servlets accepts the format of sending more than one
-  // cuisine, seperated by commas.
-  public void getRequest_fetchMoreThanOneCuisine_success() throws Exception {
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
-    ImmutableList<Place> places = createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
-
-    servlet.doGet(REQUEST, RESPONSE);
-
-    assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
-  }
-
-  @Test
   public void getRequest_fetchedPlacesShouldBeFiltered_filterPlaces() throws Exception {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
@@ -100,9 +87,9 @@ public final class QueryServletTest {
     Place noWebsite = createValidPlaceBuilder().setWebsiteUrl("").setName("noWebsitePlace").build();
     // The following place purposely has the same name as the valid place, so that we make sure that
     // we end up with only one of them.
-    Place anotherBranchOfValidPlace = createValidPlaceBuilder().setName("validPlace").build();
+    Place validPlace2 = createValidPlaceBuilder().setName("validPlace").build();
     ImmutableList<Place> places =
-        ImmutableList.of(validPlace, lowRating, noWebsite, anotherBranchOfValidPlace);
+        ImmutableList.of(validPlace, lowRating, noWebsite, validPlace2);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
 
     servlet.doGet(REQUEST, RESPONSE);
@@ -135,8 +122,34 @@ public final class QueryServletTest {
 
     servlet.doGet(REQUEST, RESPONSE);
 
-    verify(RESPONSE).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+    verify(RESPONSE).sendError(HttpServletResponse.SC_BAD_REQUEST,
         "Parsing the user preferences encountered a problem");
+  }
+
+  @Test
+  // This test checks that the user preferences are processed correctly based on the given
+  // parameters. The crucial point of the test is that the strings that are given as parameters
+  // match the expect user preferences.
+  public void getRequest_userPreferencesForwardedToFetcher() throws Exception {
+    when(REQUEST.getParameter("rating")).thenReturn("4");
+    when(REQUEST.getParameter("price")).thenReturn("3");
+    when(REQUEST.getParameter("open")).thenReturn("1");
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
+    UserPreferences expectedUserPrefs = UserPreferences.builder()
+        .setMinRating(4)
+        .setMaxPriceLevel(3)
+        .setOpenNow(true)
+        .setLocation(new LatLng(00, 00))
+        .setCuisines(ImmutableList.of("sushi", "hamburger"))
+        .build();
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    // TODO(M1): this test fails with semi-real ccordinates, because float is unstable.
+    // When we refactor the float to be a double, we'll need to add real values (instead of 0).
+
+    verify(FETCHER).fetch(expectedUserPrefs);
   }
 
   // Returns an immutable list that has the required number of Place elements. All elements are

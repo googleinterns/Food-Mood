@@ -75,7 +75,7 @@ public final class QueryServlet extends HttpServlet {
           "Fetching from Google Places API encountered a problem");
       return;
     } catch (IllegalArgumentException e) {
-      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
           "Parsing the user preferences encountered a problem");
       return;
     }
