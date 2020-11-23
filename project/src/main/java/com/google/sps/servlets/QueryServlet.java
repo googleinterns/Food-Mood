@@ -20,7 +20,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.sps.data.FetcherException;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
@@ -90,6 +89,6 @@ public final class QueryServlet extends HttpServlet {
 
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
-    return new LatLng(Float.parseFloat(latLng[0]), Float.parseFloat(latLng[1]));
+    return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
  }
