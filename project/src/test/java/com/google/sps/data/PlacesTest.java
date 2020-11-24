@@ -17,8 +17,6 @@ package com.google.sps.data;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -109,8 +107,8 @@ public final class PlacesTest {
   }
 
   @Test
-  public void filter_filterByWebsitePresense() {
-    ImmutableList<Place> validPlaces = ImmutableList.of(
+  public void filter_filterByWebsitePresence() {
+    ImmutableList<Place> placesToKeep = ImmutableList.of(
         // Place has both a website URL and a google URL
         createValidPlaceBuilderByName("name1").build(),
         // Place has a website URL and doesn't have a google URL
@@ -118,11 +116,11 @@ public final class PlacesTest {
         // Place doesn't have a website URL and has a google URL
         createValidPlaceBuilderByName("name3").setWebsiteUrl("").build()
     );
-    // Place doesn't have both a website URL and a google URL
-    Place invalidPlace =
+    // Place doesn't have a website URL or a google URL
+    Place placeToFilter =
         createValidPlaceBuilderByName("name4").setWebsiteUrl("").setGoogleUrl("").build();
     ImmutableList<Place> allPlaces =
-        ImmutableList.<Place>builder().addAll(validPlaces).add(invalidPlace).build();
+        ImmutableList.<Place>builder().addAll(placesToKeep).add(placeToFilter).build();
 
     ImmutableList<Place> result = Places.filter(
         allPlaces /* places */,
@@ -131,14 +129,14 @@ public final class PlacesTest {
         false /* filter branches of same place */
     );
 
-    assertEquals(result, validPlaces);
+    assertEquals(result, placesToKeep);
   }
 
   @Test
   public void filter_filterByStatus() {
-    Place validPlace =
-    createValidPlaceBuilderByName("name1").setBusinessStatus(BusinessStatus.OPERATIONAL).build();
-    ImmutableList<Place> invalidPlaces = ImmutableList.of(
+    Place placeToKeep = createValidPlaceBuilderByName("name1")
+        .setBusinessStatus(BusinessStatus.OPERATIONAL).build();
+    ImmutableList<Place> placesToFilter = ImmutableList.of(
         createValidPlaceBuilderByName("name2")
             .setBusinessStatus(BusinessStatus.CLOSED_TEMPORARILY).build(),
         createValidPlaceBuilderByName("name3")
@@ -146,7 +144,7 @@ public final class PlacesTest {
         createValidPlaceBuilderByName("name4").setBusinessStatus(BusinessStatus.UNKNOWN).build()
     );
     ImmutableList<Place> allPlaces =
-        ImmutableList.<Place>builder().addAll(invalidPlaces).add(validPlace).build();
+        ImmutableList.<Place>builder().addAll(placesToFilter).add(placeToKeep).build();
 
     ImmutableList<Place> result = Places.filter(
         allPlaces /* places */,
@@ -155,7 +153,7 @@ public final class PlacesTest {
         false /* filter branches of same place */
     );
 
-    assertEquals(result, ImmutableList.of(validPlace));
+    assertEquals(result, ImmutableList.of(placeToKeep));
   }
 
   // Returns a Place builder that has valid values of all attributes.
