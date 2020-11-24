@@ -68,7 +68,7 @@ public class PlacesFetcher {
     /**
      * PlacesFetcher constructor.
      *
-     * @param context the GeoApiContext used for all Google GEO API requests
+     * @param geoApiContext the GeoApiContext used for all Google GEO API requests
      */
     public PlacesFetcher(GeoApiContext geoApiContext) {
         this.context = geoApiContext;
