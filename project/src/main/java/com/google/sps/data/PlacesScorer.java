@@ -17,10 +17,9 @@ public class PlacesScorer {
     private ImmutableMap<Place, Double> durations;
     private ImmutableList<Place> places;
 
-
     /**
-     * Constructor for PlacesScorer, calculates the durations map used for scoring
-     * @param places: A list of places we want to calculate their score
+     * Constructor for PlacesScorer, calculates the durations map used for scoring.
+     * @param placesToScore: A list of places we want to calculate their score
      * @param userLocation: The user's physical location used for duration calculations
      */
     public PlacesScorer(ImmutableList<Place> placesToScore, LatLng userLocation) {
