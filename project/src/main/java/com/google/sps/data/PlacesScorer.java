@@ -10,11 +10,21 @@ import com.google.maps.model.LatLng;
 
 public class PlacesScorer {
 
+    // The coefficients for the scoring algorithm, sum up to 1.
     private static final double RATING_WEIGHT = 0.7;
     private static final double DURATION_WEIGHT = 0.3;
+
+    // The maximum possible rating as defined by the Google Places API
     private static final double MAX_RATING = 5;
+
+    // The maximum durations in seconds,
+    // so that any duration higher than that will not contribute to the place's score.
     private static final double MAX_DURATION_SECONDS = 40 * 60;
+
+    // A mapping between a place and the driving duration from the place to the user's location.
     private ImmutableMap<Place, Double> durations;
+
+    // The list of places which their score is calculated.
     private ImmutableList<Place> places;
 
     /**
@@ -33,11 +43,11 @@ public class PlacesScorer {
    * @return A map between a place to a double representing the place’s score
    */
     public ImmutableMap<Place, Double> getScores() {
-        Map<Place, Double> scores = new HashMap<>();
-        for (Place place: places) {
+        ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
+        for (Place place : places) {
             scores.put(place, calcScore(place));
         }
-        return ImmutableMap.copyOf(scores);
+        return scores.build();
     }
 
     private double calcScore(Place place) {
@@ -48,12 +58,10 @@ public class PlacesScorer {
 
     // Returns the duration in seconds from each place on places list to the destination
     private ImmutableMap<Place, Double> getDurations(LatLng destination) {
-        //TODO (M2): This function will call the Distance matrix API to calculate the durations.
+        // TODO (M2): This function will call the Distance matrix API to calculate the durations.
         //Duration are hardcoded to 30 minutes temporarly.
         Double duration = 1800D;
-        Map<Place, Double> placesDurations = places.stream()
-            .collect(Collectors.toMap(place -> place, place -> duration));
-
-        return ImmutableMap.copyOf(placesDurations);
+        return places.stream()
+            .collect(ImmutableMap.toImmutableMap(place -> place, place -> duration));
     }
 }

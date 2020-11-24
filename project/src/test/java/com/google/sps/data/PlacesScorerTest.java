@@ -26,12 +26,8 @@ import com.google.maps.model.LatLng;
 @RunWith(JUnit4.class)
 public class PlacesScorerTest {
 
+    // Used for double comparasions to avoid differences resulting from double representations
     private static final double DELTA = 0.0001;
-    private static final double RATING_WEIGHT = 0.7;
-    private static final double DURATIONS_WEIGHT = 0.3;
-    private static final double MAX_RATING = 5;
-    private static final double MAX_DURATION_MIN = 40;
-    private static final double DURATION_MIN = 30;
 
     /** Place builder without name and rating to be used on tests. */
     private static final Place.Builder PLACE_BUILDER =
@@ -52,19 +48,17 @@ public class PlacesScorerTest {
         // Score(place) = rating*0.7 + drivingETA*0.3, such that:
         // rating = place's rating / Max Rating
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
-        Place placeLowRating = PLACE_BUILDER.setName("lowRating").setRating(3).build();
-        Place placeHighRating = PLACE_BUILDER.setName("highRating").setRating(5).build();
+        Place place1 = PLACE_BUILDER.setName("name1").setRating(3).build();
+        Place place2 = PLACE_BUILDER.setName("name2").setRating(5).build();
+
         ImmutableMap<Place, Double> result =
-            new PlacesScorer(ImmutableList.of(placeLowRating, placeHighRating), USER_LOCATION)
+            new PlacesScorer(ImmutableList.of(place1, place2), USER_LOCATION)
             .getScores();
-        Double expectedScoreLowRatingPlace =
-                RATING_WEIGHT * 3 / MAX_RATING
-                + DURATIONS_WEIGHT * (1 - DURATION_MIN / MAX_DURATION_MIN);
-        Double expectedScoreHighRatingPlace =
-                RATING_WEIGHT * 5 / MAX_RATING
-                + DURATIONS_WEIGHT * (1 - DURATION_MIN / MAX_DURATION_MIN);
-        assertEquals(expectedScoreLowRatingPlace, result.get(placeLowRating), DELTA);
-        assertEquals(expectedScoreHighRatingPlace, result.get(placeHighRating), DELTA);
+
+        Double expectedScorePlace1 = 0.495;
+        Double expectedScorePlace2 = 0.775;
+        assertEquals(expectedScorePlace1, result.get(place1), DELTA);
+        assertEquals(expectedScorePlace2, result.get(place2), DELTA);
     }
 
     @Test
