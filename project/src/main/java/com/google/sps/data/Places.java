@@ -52,7 +52,7 @@ public final class Places {
    * @param places the list we want to sort.
    * @return a new list containing the original list's elements arranged by descending order of their scores.
    */
-  ImmutableList<Place> scoreSort(ImmutableList<Place> places, LatLng userLocation) {
+  public static ImmutableList<Place> scoreSort(ImmutableList<Place> places, LatLng userLocation) {
     List<Place> mutablePlaces = new ArrayList<>(places);
     Map<Place, Double> placesScores = new PlacesScorer(places, userLocation).getScores();
     Collections.sort(mutablePlaces, (p1, p2) -> {

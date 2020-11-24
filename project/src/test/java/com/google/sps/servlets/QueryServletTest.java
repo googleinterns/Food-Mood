@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
+import com.google.sps.data.BusinessStatus;
 import com.google.sps.data.FetcherException;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
@@ -172,7 +173,10 @@ public final class QueryServletTest {
           .setPhone("+97250-0000-000")
           .setRating(4)
           .setPriceLevel(3)
-          .setLocation(new LatLng(35.35, 30.30));
+          .setLocation(new LatLng(35.35, 30.30))
+          .setBusinessStatus(BusinessStatus.OPERATIONAL)
+          .setGoogleUrl("google.com")
+          .setPlaceId("placeId");
   }
 
   // Returns the number of json elements in the servlet's response

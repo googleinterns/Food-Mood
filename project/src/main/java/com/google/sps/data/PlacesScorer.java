@@ -2,41 +2,29 @@ package com.google.sps.data;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.io.IOException;
+import java.util.stream.Collectors;
 import java.lang.Math;
-
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.maps.DistanceMatrixApi;
-import com.google.maps.DistanceMatrixApiRequest;
-import com.google.maps.GeoApiContext;
-import com.google.maps.errors.ApiException;
-import com.google.maps.model.DistanceMatrix;
+
 import com.google.maps.model.LatLng;
-import com.google.maps.model.TravelMode;
 
 public class PlacesScorer {
 
     private static final double RATING_WEIGHT = 0.7;
     private static final double DURATION_WEIGHT = 0.3;
     private static final double MAX_RATING = 5;
-    private static final double MAX_DURATION = 60;
-    private ImmutableMap<String, Double> durations;
+    private static final double MAX_DURATION_SECONDS = 60 * 60;
+    private ImmutableMap<Place, Double> durations;
     private ImmutableList<Place> places;
 
-    // The entry point for a Google GEO API request.
-    private static final GeoApiContext CONTEXT = new GeoApiContext.Builder()
-        .apiKey(System.getenv("API_KEY"))
-        .build();
-
-    PlacesScorer(ImmutableList<Place> places, LatLng userLocation) {
+    public PlacesScorer(ImmutableList<Place> places, LatLng userLocation) {
         this.durations = getDurations(places, userLocation);
         this.places = places;
     }
 
    /**
-   * Returns a map of places to the score the place gets based on a scoring  algorithm.
+   * Returns a map of a place and the score the place gets based on a scoring algorithm.
    * @param places: A list of places we want to calculate their score
    * @return A map between a place to a double representing the place’s score
    */
@@ -51,42 +39,17 @@ public class PlacesScorer {
     private double calcScore(Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING) +
-            DURATION_WEIGHT * Math.max(1 - (durations.get("placeId" ) / MAX_DURATION), 0);
+            DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
-    private ImmutableMap<String, Double> getDurations(ImmutableList<Place> places, LatLng destination) {
-        LatLng[] origins = places.stream().map(place -> place.location()).toArray(LatLng[]::new);
-        DistanceMatrixApiRequest distanceRequest =
-            DistanceMatrixApi.newRequest(CONTEXT)
-                .origins(origins)
-                .destinations(destination)
-                .mode(TravelMode.DRIVING);
-        DistanceMatrix distanceMatrix = getDistanceResults(distanceRequest);
-        // iterate over the rows of the matrix and get the duration from row[0].element
-        // translate it to minutes and store on the map
-        return ImmutableMap.copyOf();
+    // Returns the duration in seconds from each place on places list to the destination
+    private ImmutableMap<Place, Double> getDurations(ImmutableList<Place> places, LatLng destination) {
+        //TODO (M2): This function will call the Distance matrix API to calculate the durations.
+        //Duration are hardcoded to 30 minutes temporarly.
+        Double duration = 1800D;
+        Map<Place, Double> placesDurations = places.stream()
+            .collect(Collectors.toMap(place -> place, place -> duration));
+
+        return ImmutableMap.copyOf(placesDurations);
     }
-
-
-     /**
-     * Queries Google Places API according to given query.
-     *
-     * @param distanceMatRequest A DistanceMatrixApiRequest with all places as origins
-     *     and the user's location as the destination
-     * @return A DistanceMatrix containig the distance and duration from each origin
-     *     to the destination, each row in the matrix corresponds to an origin
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ApiException
-     */
-    @VisibleForTesting
-    DistanceMatrix getDistanceResults(DistanceMatrixApiRequest distanceMatRequest)
-            throws ApiException, InterruptedException, IOException {
-        return distanceMatRequest.await();
-    }
-
-
-// TODO: understand how to translate te int into minutes and how to implement bucketing
-// TODO: move context setup to servlet and pass context to fetcher and scorer
-
 }

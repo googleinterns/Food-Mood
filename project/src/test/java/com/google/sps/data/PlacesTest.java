@@ -37,6 +37,15 @@ public final class PlacesTest {
   }
 
   @Test
+  public void scoreSort_sortedByScoringAlgorithm() {
+    Place placeLowRating = createValidPlaceBuilderByName("name1").setRating(1).build();
+    Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
+    ImmutableList<Place> result = Places.scoreSort(
+        ImmutableList.of(placeLowRating, placeHighRating), new LatLng(32.09, 34.78));
+    assertEquals(ImmutableList.of(placeHighRating, placeLowRating),result);
+  }
+
+  @Test
   public void filter_noNeedToFilter_noFilter() {
     ImmutableList<Place> twoPlaces = ImmutableList.of(
         createValidPlaceBuilderByName("name1").build(),

@@ -55,8 +55,9 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     ImmutableList<Place> filteredPlaces;
+    UserPreferences userPrefs;
     try {
-      UserPreferences userPrefs =
+      userPrefs =
           UserPreferences.builder()
               .setMinRating(Float.parseFloat(request.getParameter("rating")))
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
@@ -81,10 +82,10 @@ public final class QueryServlet extends HttpServlet {
     }
     response.setContentType("application/json");
     response.getWriter().write(new Gson().toJson(
-        Places.randomSort(filteredPlaces)
-            .stream()
-            .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-            .collect(Collectors.toList())
+      Places.scoreSort(filteredPlaces, userPrefs.location())
+          .stream()
+          .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+          .collect(Collectors.toList())
     ));
   }
 
