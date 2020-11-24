@@ -23,30 +23,24 @@ import com.google.maps.GeoApiContext;
  */
 public final class GeoContext {
 
-    private static GeoContext singleInstance = null;
-
-    private GeoApiContext context;
-
-    private GeoContext() {
-        context = new GeoApiContext.Builder()
-            .apiKey(System.getenv("API_KEY"))
-            .build();
-    }
+    private static GeoApiContext singleContextInstance = null;
 
     /**
-     * Creates a GeoContext instance if not yet been anitialized and returns the intance's context.
+     * Creates a GeoApiContext instance if not yet been initialized and returns it.
      *
      * @return a GeoApiContext object used for Google GEO API requests
      */
     public static GeoApiContext getGeoApiContext() {
         // Double check if initialized for thread safety.
-        if (singleInstance == null) {
+        if (singleContextInstance == null) {
             synchronized (GeoContext.class) {
-                if (singleInstance == null) {
-                    singleInstance = new GeoContext();
+                if (singleContextInstance == null) {
+                    singleContextInstance = new GeoApiContext.Builder()
+                        .apiKey(System.getenv("API_KEY"))
+                        .build();;
                 }
             }
         }
-        return singleInstance.context;
+        return singleContextInstance;
     }
 }

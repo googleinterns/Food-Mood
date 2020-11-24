@@ -69,7 +69,7 @@ public final class QueryServlet extends HttpServlet {
               .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
               .build();
       filteredPlaces = Places.filter(
-          fetcher.fetch(userPrefs, CONTEXT) /* places */,
+          fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* min rating */,
           true /* filter if no website */,
           true /* filter branches of same place */

@@ -66,9 +66,9 @@ public class PlacesFetcher {
         getCuisinesMap();
 
     /**
-     * PlacesFetcher constructor
+     * PlacesFetcher constructor.
      *
-     * @param context the GeoApiContext used for all
+     * @param context the GeoApiContext used for all Google GEO API requests
      */
     public PlacesFetcher(GeoApiContext context) {
         this.context = context;
