@@ -13,14 +13,15 @@ public class PlacesScorer {
     private static final double RATING_WEIGHT = 0.7;
     private static final double DURATION_WEIGHT = 0.3;
     private static final double MAX_RATING = 5;
-    private static final double MAX_DURATION_SECONDS = 60 * 60;
+    private static final double MAX_DURATION_SECONDS = 40 * 60;
     private ImmutableMap<Place, Double> durations;
     private ImmutableList<Place> places;
 
     /**
      * Constructor for PlacesScorer, calculates the durations map used for scoring.
-     * @param placesToScore: A list of places we want to calculate their score
-     * @param userLocation: The user's physical location used for duration calculations
+     *
+     * @param placesToScore A list of places we want to calculate their score
+     * @param userLocation The user's physical location used for duration calculations
      */
     public PlacesScorer(ImmutableList<Place> placesToScore, LatLng userLocation) {
         this.places = placesToScore;

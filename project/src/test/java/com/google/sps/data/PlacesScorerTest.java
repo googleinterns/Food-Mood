@@ -26,6 +26,13 @@ import com.google.maps.model.LatLng;
 @RunWith(JUnit4.class)
 public class PlacesScorerTest {
 
+    private static final double DELTA = 0.0001;
+    private static final double RATING_WEIGHT = 0.7;
+    private static final double DURATIONS_WEIGHT = 0.3;
+    private static final double MAX_RATING = 5;
+    private static final double MAX_DURATION_MIN = 40;
+    private static final double DURATION_MIN = 30;
+
     /** Place builder without name and rating to be used on tests. */
     private static final Place.Builder PLACE_BUILDER =
         Place.builder()
@@ -44,16 +51,20 @@ public class PlacesScorerTest {
         // Expected scores are calculated by the following algorithm:
         // Score(place) = rating*0.7 + drivingETA*0.3, such that:
         // rating = place's rating / Max Rating
-        // drivingETA = max{1 - durationInMinutes(=30) / 60, 0}
+        // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
         Place placeLowRating = PLACE_BUILDER.setName("lowRating").setRating(3).build();
-        Place placeHighRating = PLACE_BUILDER.setName("highRating").setRating(4).build();
+        Place placeHighRating = PLACE_BUILDER.setName("highRating").setRating(5).build();
         ImmutableMap<Place, Double> result =
             new PlacesScorer(ImmutableList.of(placeLowRating, placeHighRating), USER_LOCATION)
             .getScores();
-        ImmutableMap<Place, Double> expectedResult = ImmutableMap.of(
-            placeLowRating, 0.57,
-            placeHighRating, 0.71);
-        assertEquals(expectedResult, result);
+        Double expectedScoreLowRatingPlace =
+                RATING_WEIGHT * 3 / MAX_RATING
+                + DURATIONS_WEIGHT * (1 - DURATION_MIN / MAX_DURATION_MIN);
+        Double expectedScoreHighRatingPlace =
+                RATING_WEIGHT * 5 / MAX_RATING
+                + DURATIONS_WEIGHT * (1 - DURATION_MIN / MAX_DURATION_MIN);
+        assertEquals(expectedScoreLowRatingPlace, result.get(placeLowRating), DELTA);
+        assertEquals(expectedScoreHighRatingPlace, result.get(placeHighRating), DELTA);
     }
 
     @Test
