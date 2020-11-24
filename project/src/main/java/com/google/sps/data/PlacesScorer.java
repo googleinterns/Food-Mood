@@ -3,7 +3,6 @@ package com.google.sps.data;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.lang.Math;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -18,14 +17,19 @@ public class PlacesScorer {
     private ImmutableMap<Place, Double> durations;
     private ImmutableList<Place> places;
 
-    public PlacesScorer(ImmutableList<Place> places, LatLng userLocation) {
-        this.durations = getDurations(places, userLocation);
-        this.places = places;
+
+    /**
+     * Constructor for PlacesScorer, calculates the durations map used for scoring
+     * @param places: A list of places we want to calculate their score
+     * @param userLocation: The user's physical location used for duration calculations
+     */
+    public PlacesScorer(ImmutableList<Place> placesToScore, LatLng userLocation) {
+        this.places = placesToScore;
+        this.durations = getDurations(userLocation);
     }
 
    /**
    * Returns a map of a place and the score the place gets based on a scoring algorithm.
-   * @param places: A list of places we want to calculate their score
    * @return A map between a place to a double representing the place’s score
    */
     public ImmutableMap<Place, Double> getScores() {
@@ -38,12 +42,12 @@ public class PlacesScorer {
 
     private double calcScore(Place place) {
         return
-            RATING_WEIGHT * (place.rating() / MAX_RATING) +
-            DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
+            RATING_WEIGHT * (place.rating() / MAX_RATING)
+            + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
     // Returns the duration in seconds from each place on places list to the destination
-    private ImmutableMap<Place, Double> getDurations(ImmutableList<Place> places, LatLng destination) {
+    private ImmutableMap<Place, Double> getDurations(LatLng destination) {
         //TODO (M2): This function will call the Distance matrix API to calculate the durations.
         //Duration are hardcoded to 30 minutes temporarly.
         Double duration = 1800D;

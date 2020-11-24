@@ -42,7 +42,7 @@ public final class PlacesTest {
     Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
     ImmutableList<Place> result = Places.scoreSort(
         ImmutableList.of(placeLowRating, placeHighRating), new LatLng(32.09, 34.78));
-    assertEquals(ImmutableList.of(placeHighRating, placeLowRating),result);
+    assertEquals(ImmutableList.of(placeHighRating, placeLowRating), result);
   }
 
   @Test

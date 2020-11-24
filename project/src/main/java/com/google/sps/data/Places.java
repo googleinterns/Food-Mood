@@ -50,7 +50,9 @@ public final class Places {
   /**
    * Sorts the given list of Places by score.
    * @param places the list we want to sort.
-   * @return a new list containing the original list's elements arranged by descending order of their scores.
+   * @param userLocation the user's loaction, used for scores calculations
+   * @return a new list containing the original list's elements
+   *     arranged by descending order of their scores.
    */
   public static ImmutableList<Place> scoreSort(ImmutableList<Place> places, LatLng userLocation) {
     List<Place> mutablePlaces = new ArrayList<>(places);
