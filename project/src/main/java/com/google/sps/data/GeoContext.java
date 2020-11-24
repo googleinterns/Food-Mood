@@ -20,9 +20,7 @@ import com.google.maps.GeoApiContext;
  * GeoContext holds the entry point for a Google GEO API request.
  * It is initiated once and used for all Google GEO EPI requests,
  * including Google Places API and Google Distance Matrix API.
- *
  */
-
 public final class GeoContext {
 
     private static GeoContext singleInstance = null;
@@ -38,6 +36,7 @@ public final class GeoContext {
     /**
      * Creates a GeoContext instance if not yet been anitialized and returns the
      * intance's contex. The double check of the instance being null is for thread safety.
+     *
      * @return a GeoApiContext object used for Google GEO API requests
      */
     public static GeoApiContext getContext() {

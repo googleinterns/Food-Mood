@@ -81,7 +81,7 @@ public class PlacesFetcher {
             try {
                 placesSearchResult = getPlacesSearchResults(
                     genTextSearchRequest(preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
-            } catch (ApiException | InterruptedException | IOException e) {
+            } catch (ApiException | InterruptedException | IOException | IllegalStateException e) {
                 throw new FetcherException("Couldn't fetch places from Places API", e);
             }
         } while (
@@ -125,7 +125,6 @@ public class PlacesFetcher {
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);
-                System.out.println(placeDetails.businessStatus);
             } catch (ApiException | InterruptedException | IOException e) {
                 throw new FetcherException(
                     "Couldn't get place details from Places API", e);
