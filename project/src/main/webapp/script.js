@@ -134,26 +134,38 @@ function createPlaceElement(place) {
   const name = document.createElement('li');
   name.innerText = place.name;
   placeElement.appendChild(name);
-  placeElement.appendChild(document.createElement('br'));
   // Add link to website
   if (place.websiteUrl) {
-    const websiteLink = document.createElement('a');
-    websiteLink.href = place.websiteUrl;
-    websiteLink.title = place.websiteUrl;
-    websiteLink.innerText = 'Restaurant\'s website';
-    placeElement.appendChild(websiteLink);
-  } else {
-    const noSite = document.createTextNode('We don\'t have a link to the restaurant\'s website.');
-    placeElement.appendChild(noSite);
+    addLinkToPlaceElement(placeElement, place.websiteUrl, 'Website');
+  }
+  if (place.googleUrl) {
+    addLinkToPlaceElement(placeElement, place.googleUrl, 'Google Maps link');
+  }
+  if (!place.websiteUrl && !place.googleUrl) {
+    placeElement.appendChild(document.createElement('br'));
+    placeElement.appendChild(document.createTextNode(
+        'We don\'t have a link to the restaurant\'s website.'));
   }
   placeElement.appendChild(document.createElement('br'));
   // Add phone number
   if (place.phone) {
-    const phone = document.createTextNode('Phone number:' + place.phone);
+    const phone = document.createTextNode('Phone number: ' + place.phone);
     placeElement.appendChild(phone);
     placeElement.appendChild(document.createElement('br'));
   }
   return placeElement;
+}
+
+/**
+ * Returns a link that represents the given url and shows the given text.
+ */
+function addLinkToPlaceElement(placeElement, url, linkText) {
+  placeElement.appendChild(document.createElement('br'));
+  const link = document.createElement('a');
+  link.href = url;
+  link.title = url;
+  link.innerText = linkText;
+  placeElement.appendChild(link);
 }
 
 /**
