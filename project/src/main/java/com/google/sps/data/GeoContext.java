@@ -37,10 +37,12 @@ public final class GeoContext {
                 if (singleContextInstance == null) {
                     singleContextInstance = new GeoApiContext.Builder()
                         .apiKey(System.getenv("API_KEY"))
-                        .build();;
+                        .build();
                 }
             }
         }
         return singleContextInstance;
     }
+
+    private GeoContext() { }
 }
