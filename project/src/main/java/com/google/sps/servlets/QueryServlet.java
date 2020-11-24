@@ -22,11 +22,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.sps.data.FetcherException;
+import com.google.sps.data.GeoContext;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.google.maps.GeoApiContext;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
@@ -42,10 +44,12 @@ public final class QueryServlet extends HttpServlet {
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
 
+    // The entry point for a Google GEO API request.
+  private static final GeoApiContext CONTEXT = GeoContext.getGeoApiContext();
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher();
+    fetcher = new PlacesFetcher(CONTEXT);
   }
 
   void init(PlacesFetcher inputFetcher) {
@@ -65,7 +69,7 @@ public final class QueryServlet extends HttpServlet {
               .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
               .build();
       filteredPlaces = Places.filter(
-          fetcher.fetch(userPrefs) /* places */,
+          fetcher.fetch(userPrefs, CONTEXT) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* min rating */,
           true /* filter if no website */,
           true /* filter branches of same place */

@@ -56,7 +56,7 @@ public class PlacesFetcher {
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
     // The entry point for a Google GEO API request.
-    private static final GeoApiContext CONTEXT = GeoContext.getContext();
+    private GeoApiContext context;
 
     // The path of the configuration file containing the mapping of cuisines to search words.
     private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
@@ -65,6 +65,14 @@ public class PlacesFetcher {
     private static final ImmutableMap<String, List<String>> CUISINE_TO_SEARCH_WORDS =
         getCuisinesMap();
 
+    /**
+     * PlacesFetcher constructor
+     *
+     * @param context the GeoApiContext used for all
+     */
+    public PlacesFetcher(GeoApiContext context) {
+        this.context = context;
+    }
     /**
      * Builds a query and requests it from Google Places API.
      *
@@ -92,7 +100,7 @@ public class PlacesFetcher {
 
     private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
         TextSearchRequest request = PlacesApi.textSearchQuery(
-            CONTEXT, createCuisinesQuery(preferences.cuisines()), preferences.location())
+            context, createCuisinesQuery(preferences.cuisines()), preferences.location())
                 .radius(radius)
                 .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
@@ -147,7 +155,7 @@ public class PlacesFetcher {
     }
 
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
-        return PlacesApi.placeDetails(CONTEXT, placeId)
+        return PlacesApi.placeDetails(context, placeId)
             .fields(
                 PlaceDetailsRequest.FieldMask.NAME,
                 PlaceDetailsRequest.FieldMask.WEBSITE,

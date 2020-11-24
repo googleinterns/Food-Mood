@@ -34,12 +34,12 @@ public final class GeoContext {
     }
 
     /**
-     * Creates a GeoContext instance if not yet been anitialized and returns the
-     * intance's contex. The double check of the instance being null is for thread safety.
+     * Creates a GeoContext instance if not yet been anitialized and returns the intance's context.
      *
      * @return a GeoApiContext object used for Google GEO API requests
      */
-    public static GeoApiContext getContext() {
+    public static GeoApiContext getGeoApiContext() {
+        // Double check if initialized for thread safety.
         if (singleInstance == null) {
             synchronized (GeoContext.class) {
                 if (singleInstance == null) {
