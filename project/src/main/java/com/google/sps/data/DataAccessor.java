@@ -25,6 +25,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.repackaged.com.google.api.client.util.Strings;
 
 public class DataAccessor {
 
@@ -44,7 +45,7 @@ public class DataAccessor {
   * @return whether the user is registered to our system, by checking whether their id was
   *     previously added to datastore.
   */
-  public boolean isRegistered(String userId) {
+  public boolean isRegisteredId(String userId) {
     Key userIdKey = KeyFactory.createKey("User", userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
@@ -58,7 +59,10 @@ public class DataAccessor {
   *
   * @param userId the id of the user that we want to check the registration status about
   */
-  public void registerUser(String userId) {
+  public void registerUserId(String userId) {
+    if (Strings.isNullOrEmpty(userId)) {
+      return;
+    }
     Entity userEntity = new Entity("User", userId);
     userEntity.setProperty("RegistrationTime", System.currentTimeMillis());
     datastoreService.put(userEntity);
