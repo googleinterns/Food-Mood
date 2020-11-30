@@ -59,7 +59,7 @@ public class DataAccessor {
   /**
   * Registers the user in our system, by adding an entity that represents them to datastore.
   *
-  * @param userId the id of the user that we want to check the registration status about
+  * @param userId the id of the user that we want to register to our system
   */
   public void registerUserId(String userId) {
     if (Strings.isNullOrEmpty(userId)) {
