@@ -81,6 +81,7 @@ public final class DataAccessorTest {
     assertFalse(dataAccessor.isRegisteredId(unRegisteredUserId));
   }
 
+  @Test
   public void isRegisteredId_invalidUserId_false() {
     assertFalse(dataAccessor.isRegisteredId(""));
     assertFalse(dataAccessor.isRegisteredId(null));
