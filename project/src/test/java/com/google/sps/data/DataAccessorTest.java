@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -80,8 +81,13 @@ public final class DataAccessorTest {
     assertFalse(dataAccessor.isRegisteredId(unRegisteredUserId));
   }
 
+  public void isRegisteredId_invalidUserId_false() {
+    assertFalse(dataAccessor.isRegisteredId(""));
+    assertFalse(dataAccessor.isRegisteredId(null));
+  }
+
   @Test
-  public void registerUserId_validUser_registerUser() {
+  public void registerUserId_validUserId_registerUser() {
     String userId = "12345";
 
     dataAccessor.registerUserId(userId);
@@ -99,12 +105,8 @@ public final class DataAccessorTest {
   }
 
   @Test
-  public void registerUserId_invalidUser_notRegistering() {
-    dataAccessor.registerUserId(null);
-    dataAccessor.registerUserId("");
-    Query query = new Query(dataAccessor.userEntityName).setKeysOnly();
-
-    assertEquals(
-        datastoreService.prepare(query).asList(FetchOptions.Builder.withDefaults()).size(), 0);
+  public void registerUserId_invalidUserId_throwIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUserId(null));
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUserId(""));
   }
 }

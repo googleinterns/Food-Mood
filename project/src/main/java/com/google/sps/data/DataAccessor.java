@@ -48,6 +48,9 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegisteredId(String userId) {
+    if (Strings.isNullOrEmpty(userId)) {
+      return false;
+    }
     Key userIdKey = KeyFactory.createKey(userEntityName, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
@@ -63,7 +66,7 @@ public class DataAccessor {
   */
   public void registerUserId(String userId) {
     if (Strings.isNullOrEmpty(userId)) {
-      return;
+      throw new IllegalArgumentException("Can't register a user without a user ID");
     }
     Entity userEntity = new Entity(userEntityName, userId);
     datastoreService.put(userEntity);
