@@ -39,16 +39,20 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class DataAccessorTest {
 
+  // A helper that enables us to test datastore locally.
+  // Has to be set up and teared down for each test.
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
-  private DatastoreService datastoreService;
+  // A datastore service instance, that shall be created locally
+  private final DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+
+  // The tested dataaccessor, which will be initialized with a datastore service instance.
   private DataAccessor dataAccessor;
 
   @Before
   public void setUp() {
       helper.setUp();
-      datastoreService = DatastoreServiceFactory.getDatastoreService();
       dataAccessor = new DataAccessor(datastoreService);
   }
 
@@ -68,7 +72,12 @@ public final class DataAccessorTest {
 
   @Test
   public void isRegisteredId_notRegistered_false() {
-    assertFalse(dataAccessor.isRegisteredId("12345"));
+    String registeredUserId = "12345";
+    String unRegisteredUserId = "54321";
+    Entity userEntity = new Entity(dataAccessor.userEntityName, registeredUserId);
+    datastoreService.put(userEntity);
+
+    assertFalse(dataAccessor.isRegisteredId(unRegisteredUserId));
   }
 
   @Test
@@ -98,40 +107,4 @@ public final class DataAccessorTest {
     assertEquals(
         datastoreService.prepare(query).asList(FetchOptions.Builder.withDefaults()).size(), 0);
   }
-
-  //   import static org.mockito.ArgumentMatchers.any;
-  // import static org.mockito.Mockito.mock;
-  // import static org.mockito.Mockito.never;
-  // import static org.mockito.Mockito.verify;
-  // import static org.mockito.Mockito.when;
-  // import java.util.List;
-  // @Test
-  // public void isRegisteredId_registered_true() {
-  //   // PreparedQuery mockedPreparedQuery = mock(PreparedQuery.class);
-  //   // when(datastoreService.prepare(any(Query.class))).thenReturn(mockedPreparedQuery);
-  //   // when(mockedPreparedQuery.asList(any(FetchOptions.class)))
-  //   //     .thenReturn(List.of(new Entity("User", "12345")));
-
-  //   // assertTrue(dataAccessor.isRegisteredId("12345"));
-  // }
-
-  // @Test
-  // public void isRegisteredId_notRegistered_false() {
-  //   assertFalse(dataAccessor.isRegisteredId("12345"));
-  // }
-
-  // @Test
-  // public void registerUserId_validUser_registerUser() {
-  //   dataAccessor.registerUserId("12345");
-
-  //   verify(datastoreService).put(any(Entity.class));
-  // }
-
-  // @Test
-  // public void registerUserId_invalidUser_notRegistering() {
-  //   dataAccessor.registerUserId(null);
-  //   dataAccessor.registerUserId("");
-
-  //   verify(datastoreService, never()).put(any(Entity.class));
-  // }
 }
