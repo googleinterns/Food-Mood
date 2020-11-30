@@ -15,6 +15,8 @@
 package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -26,6 +28,11 @@ public class GeoContextTest {
     @Test
     public void getGeoApiContext_subsequentCalls_returnSameGeoApiContext() {
       assertEquals(GeoContext.getGeoApiContext(), GeoContext.getGeoApiContext());
+    }
+
+    @Test
+    public void getGeoApiContext_returnNonNullInstance() {
+      assertNotNull(GeoContext.getGeoApiContext());
     }
 
 }
