@@ -155,7 +155,7 @@ public final class PlacesFetcherTest {
   }
 
   /** A PlacesFetcher instance to be tested. */
-  private static PlacesFetcher placesFetcher = new PlacesFetcher();
+  private static PlacesFetcher placesFetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
 
   @Test
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
