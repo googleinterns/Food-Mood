@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
+import com.google.sps.data.BusinessStatus;
 
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
@@ -169,7 +170,10 @@ public final class QueryServletTest {
           .setPhone("+97250-0000-000")
           .setRating(4)
           .setPriceLevel(3)
-          .setLocation(new LatLng(35.35, 30.30));
+          .setLocation(new LatLng(35.35, 30.30))
+          .setBusinessStatus(BusinessStatus.OPERATIONAL)
+          .setGoogleUrl("google.com")
+          .setPlaceId("placeId");
   }
 
   // Returns the number of json elements in the servlet's response
