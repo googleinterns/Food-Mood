@@ -28,7 +28,6 @@ import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
-import com.google.maps.GeoApiContext;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
