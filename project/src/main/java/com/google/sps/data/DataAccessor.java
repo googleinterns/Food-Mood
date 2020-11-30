@@ -30,6 +30,8 @@ import com.google.appengine.repackaged.com.google.api.client.util.Strings;
 public class DataAccessor {
 
   private final DatastoreService datastoreService;
+  @VisibleForTesting
+  final String userEntityName = "User";
 
   DataAccessor() {
     this.datastoreService = DatastoreServiceFactory.getDatastoreService();
@@ -46,10 +48,10 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegisteredId(String userId) {
-    Key userIdKey = KeyFactory.createKey("User", userId);
+    Key userIdKey = KeyFactory.createKey(userEntityName, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
-    Query query = new Query("User").setFilter(userIdFilter).setKeysOnly();
+    Query query = new Query(userEntityName).setFilter(userIdFilter).setKeysOnly();
     PreparedQuery results = datastoreService.prepare(query);
     return results.asList(FetchOptions.Builder.withDefaults()).size() > 0;
   }
@@ -63,8 +65,7 @@ public class DataAccessor {
     if (Strings.isNullOrEmpty(userId)) {
       return;
     }
-    Entity userEntity = new Entity("User", userId);
-    userEntity.setProperty("RegistrationTime", System.currentTimeMillis());
+    Entity userEntity = new Entity(userEntityName, userId);
     datastoreService.put(userEntity);
   }
 }
