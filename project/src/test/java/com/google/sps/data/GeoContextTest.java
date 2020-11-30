@@ -24,7 +24,7 @@ import org.junit.runners.JUnit4;
 public class GeoContextTest {
 
     @Test
-    public void getGeoApiContext_followingCalls_returnSameGeoApiContext() {
+    public void getGeoApiContext_subsequentCalls_returnSameGeoApiContext() {
       assertEquals(GeoContext.getGeoApiContext(), GeoContext.getGeoApiContext());
     }
 

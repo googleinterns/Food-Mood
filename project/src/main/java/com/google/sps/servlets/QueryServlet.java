@@ -44,12 +44,10 @@ public final class QueryServlet extends HttpServlet {
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
 
-    // The entry point for a Google GEO API request.
-  private static final GeoApiContext CONTEXT = GeoContext.getGeoApiContext();
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher(CONTEXT);
+    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
   }
 
   void init(PlacesFetcher inputFetcher) {
