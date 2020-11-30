@@ -163,7 +163,6 @@ function addLinkToPlaceElement(placeElement, url, linkText) {
   placeElement.appendChild(document.createElement('br'));
   const link = document.createElement('a');
   link.href = url;
-  link.title = url;
   link.innerText = linkText;
   placeElement.appendChild(link);
 }
