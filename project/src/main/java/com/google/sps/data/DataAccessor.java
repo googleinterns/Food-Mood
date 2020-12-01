@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -21,7 +23,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -31,7 +32,7 @@ public class DataAccessor {
 
   private final DatastoreService datastoreService;
   @VisibleForTesting
-  final String userEntityName = "User";
+  final static String userEntityName = "User";
 
   DataAccessor() {
     this.datastoreService = DatastoreServiceFactory.getDatastoreService();
@@ -47,16 +48,15 @@ public class DataAccessor {
   * @return whether the user is registered to our system, by checking whether their id was
   *     previously added to datastore.
   */
-  public boolean isRegisteredId(String userId) {
-    if (Strings.isNullOrEmpty(userId)) {
-      return false;
-    }
+  public boolean isRegistered(String userId) {
+    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
     Key userIdKey = KeyFactory.createKey(userEntityName, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
     Query query = new Query(userEntityName).setFilter(userIdFilter).setKeysOnly();
-    PreparedQuery results = datastoreService.prepare(query);
-    return results.asList(FetchOptions.Builder.withDefaults()).size() > 0;
+    return datastoreService.prepare(query)
+        .asList(FetchOptions.Builder.withDefaults())
+        .size() > 0;
   }
 
   /**
@@ -64,10 +64,8 @@ public class DataAccessor {
   *
   * @param userId the id of the user that we want to register to our system
   */
-  public void registerUserId(String userId) {
-    if (Strings.isNullOrEmpty(userId)) {
-      throw new IllegalArgumentException("Can't register a user without a user ID");
-    }
+  public void registerUser(String userId) {
+    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
     Entity userEntity = new Entity(userEntityName, userId);
     datastoreService.put(userEntity);
   }

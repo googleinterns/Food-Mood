@@ -63,51 +63,51 @@ public final class DataAccessorTest {
   }
 
   @Test
-  public void isRegisteredId_registered_true() {
+  public void isRegistered_registered_true() {
     String userId = "12345";
-    Entity userEntity = new Entity(dataAccessor.userEntityName, userId);
+    Entity userEntity = new Entity(DataAccessor.userEntityName, userId);
     datastoreService.put(userEntity);
 
-    assertTrue(dataAccessor.isRegisteredId(userId));
+    assertTrue(dataAccessor.isRegistered(userId));
   }
 
   @Test
-  public void isRegisteredId_notRegistered_false() {
+  public void isRegistered_notRegistered_false() {
     String registeredUserId = "12345";
     String unRegisteredUserId = "54321";
-    Entity userEntity = new Entity(dataAccessor.userEntityName, registeredUserId);
+    Entity userEntity = new Entity(DataAccessor.userEntityName, registeredUserId);
     datastoreService.put(userEntity);
 
-    assertFalse(dataAccessor.isRegisteredId(unRegisteredUserId));
+    assertFalse(dataAccessor.isRegistered(unRegisteredUserId));
   }
 
   @Test
-  public void isRegisteredId_invalidUserId_false() {
-    assertFalse(dataAccessor.isRegisteredId(""));
-    assertFalse(dataAccessor.isRegisteredId(null));
+  public void isRegistered_invalidUserId_false() {
+    assertFalse(dataAccessor.isRegistered(""));
+    assertFalse(dataAccessor.isRegistered(null));
   }
 
   @Test
-  public void registerUserId_validUserId_registerUser() {
+  public void registerUser_validUserId_registerUser() {
     String userId = "12345";
 
-    dataAccessor.registerUserId(userId);
+    dataAccessor.registerUser(userId);
     PreparedQuery results = createPreparedQueryByUserId(userId);
 
     assertEquals(results.asList(FetchOptions.Builder.withDefaults()).size(), 1);
   }
 
-  private PreparedQuery createPreparedQueryByUserId(String userId) {
-    Key userIdKey = KeyFactory.createKey(dataAccessor.userEntityName, userId);
-    Filter userIdFilter =
-        new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
-    Query query = new Query(dataAccessor.userEntityName).setFilter(userIdFilter).setKeysOnly();
-    return datastoreService.prepare(query);
+  @Test
+  public void registerUser_invalidUserId_throwIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(null));
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(""));
   }
 
-  @Test
-  public void registerUserId_invalidUserId_throwIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUserId(null));
-    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUserId(""));
+  private PreparedQuery createPreparedQueryByUserId(String userId) {
+    Key userIdKey = KeyFactory.createKey(DataAccessor.userEntityName, userId);
+    Filter userIdFilter =
+        new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
+    Query query = new Query(DataAccessor.userEntityName).setFilter(userIdFilter).setKeysOnly();
+    return datastoreService.prepare(query);
   }
 }
