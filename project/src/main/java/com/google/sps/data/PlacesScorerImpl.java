@@ -42,11 +42,41 @@ public class PlacesScorerImpl implements PlacesScorer {
     }
 
     // Returns the duration in seconds from each place on places list to the destination
-    private ImmutableMap<Place, Double> getDurations(ImmutableList<Place> places, LatLng destination) {
-        // TODO (M2): This function will call the Distance matrix API to calculate the durations.
-        // Duration are hardcoded to 30 minutes temporarly.
-        Double duration = 1800D;
-        return places.stream()
-            .collect(ImmutableMap.toImmutableMap(place -> place, place -> duration));
+    private ImmutableMap<Place, Long> getDurations(LatLng destination) throws ApiException, InterruptedException, IOException {
+        Map<Place, Long> durations = new HashMap<>();
+        LatLng[] origins = places.stream()
+            .map(place -> place.location()).toArray(LatLng[]::new);
+        DistanceMatrixApiRequest distanceRequest =
+            DistanceMatrixApi.newRequest(CONTEXT)
+                .origins(origins)
+                .destinations(destination)
+                .mode(TravelMode.DRIVING); // This is the default, just wrote it to bring to attention there are other options
+        DistanceMatrix distanceMatrix = getDistanceResults(distanceRequest);
+        for (int i = 0; i < places.size(); i++) {
+            durations.put(places.get(i), distanceMatrix.rows[i].elements[0].duration.inSeconds);
+            System.out.println(places.get(i).name() + ":" + distanceMatrix.rows[i].elements[0].duration.humanReadable);
+        }
+        durations.forEach((place, value) -> System.out.println(place.name() + ":" + value));
+        return ImmutableMap.copyOf(durations);
     }
+
+
+    /**
+    * Queries Google Places API according to given query.
+    *
+    * @param distanceMatRequest A DistanceMatrixApiRequest with all places as origins
+    *     and the user's location as the destination
+    * @return A DistanceMatrix containig the distance and duration from each origin
+    *     to the destination, each row in the matrix corresponds to an origin
+    * @throws IOException
+    * @throws InterruptedException
+    * @throws ApiException
+    */
+    @VisibleForTesting
+    DistanceMatrix getDistanceResults(DistanceMatrixApiRequest distanceMatRequest)
+            throws ApiException, InterruptedException, IOException {
+        return distanceMatRequest.await();
+    }
+
+     // TODO: move context setup to servlet and pass context to fetcher and scorer
 }
