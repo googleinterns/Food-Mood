@@ -82,7 +82,7 @@ public final class QueryServlet extends HttpServlet {
     }
     response.setContentType("application/json");
     response.getWriter().write(new Gson().toJson(
-      Places.scoreSort(filteredPlaces, userPrefs.location())
+      Places.scoreSort(filteredPlaces, userPrefs.location(), new PlacesScorer(places, userLocation))
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())

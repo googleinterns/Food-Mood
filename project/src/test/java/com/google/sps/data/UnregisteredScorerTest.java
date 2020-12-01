@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,12 +25,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
-public class PlacesScorerTest {
+public class UnregisteredScorerTest {
 
-    // Used for double comparasions to avoid differences resulting from double representations
+    // Used for double comparasions to avoid differences resulting from double representations.
     private static final double DELTA = 0.0001;
 
-    /** Place builder without name and rating to be used on tests. */
+    // Place builder without name and rating to be used on tests.
     private static final Place.Builder PLACE_BUILDER =
         Place.builder()
         .setWebsiteUrl("place.com")
@@ -41,6 +42,23 @@ public class PlacesScorerTest {
         .setBusinessStatus(BusinessStatus.OPERATIONAL);
 
     private static final LatLng USER_LOCATION = new LatLng(33.12, 34.56);
+    private static final Place PLACE_1 = PLACE_BUILDER.setName("name1").setRating(3).build();
+    private static final Place PLACE_2 = PLACE_BUILDER.setName("name2").setRating(5).build();
+    private static final ImmutableList<Place> PLACES_TO_SCORE = ImmutableList.of(PLACE_1, PLACE_2);
+
+    @Test
+    public void createScorer_returnsValidUnregisteredScorer() {
+        ImmutableMap<Place, Double> expectedDurations =
+            ImmutableMap.of(
+                PLACE_1, 1800d,
+                PLACE_2, 1800d
+            );
+
+        UnregisteredScorer result =
+            UnregisteredScorer.createScorer(PLACES_TO_SCORE, USER_LOCATION);
+
+        assertEquals(expectedDurations, result.getDurations());
+    }
 
     @Test
     public void getScores_validPlaceList_returnsMapOfCorrectScores() {
@@ -48,11 +66,12 @@ public class PlacesScorerTest {
         // Score(place) = rating*0.7 + drivingETA*0.3, such that:
         // rating = place's rating / Max Rating
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
+
         Place place1 = PLACE_BUILDER.setName("name1").setRating(3).build();
         Place place2 = PLACE_BUILDER.setName("name2").setRating(5).build();
 
         ImmutableMap<Place, Double> result =
-            new PlacesScorer(ImmutableList.of(place1, place2), USER_LOCATION)
+            PlacesScorer(ImmutableList.of(place1, place2), USER_LOCATION)
             .getScores();
 
         Double expectedScorePlace1 = 0.495;
@@ -67,4 +86,5 @@ public class PlacesScorerTest {
             ImmutableMap.of(),
             new PlacesScorer(ImmutableList.of(), USER_LOCATION).getScores());
     }
+
 }
