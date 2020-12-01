@@ -3,7 +3,6 @@ package com.google.sps.data;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -41,13 +40,16 @@ public class PlacesScorerImpl implements PlacesScorer {
         this.context = geoApiContext;
     }
 
-   /**
-   * Returns a map of a place and the score the place gets based on a scoring algorithm.
-   * @return A map between a place to a double representing the place’s score
-   */
+    /**
+    * Returns a map of a place and the score the place gets based on a scoring algorithm.
+    * @return A map between a place to a double representing the place’s score
+    * @throws IOException
+    * @throws InterruptedException
+    * @throws ApiException
+    */
     @Override
     public ImmutableMap<Place, Double> getScores(
-            ImmutableList<Place> places, LatLng userLocation) {
+            ImmutableList<Place> places, LatLng userLocation) throws ApiException, InterruptedException, IOException {
         ImmutableMap<Place, Long> durations = getDurations(places, userLocation);
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
@@ -71,7 +73,7 @@ public class PlacesScorerImpl implements PlacesScorer {
         LatLng[] origins = places.stream()
             .map(place -> place.location()).toArray(LatLng[]::new);
         DistanceMatrixApiRequest distanceRequest =
-            DistanceMatrixApi.newRequest(CONTEXT)
+            DistanceMatrixApi.newRequest(context)
                 .origins(origins)
                 .destinations(destination)
                 .mode(TravelMode.DRIVING); // This is the default, just wrote it to bring to attention there are other options
@@ -82,7 +84,7 @@ public class PlacesScorerImpl implements PlacesScorer {
         }
         durations.forEach((place, value) -> System.out.println(place.name() + ":" + value));
         return ImmutableMap.copyOf(durations);
-    }
+        }
 
 
     /**
@@ -101,6 +103,4 @@ public class PlacesScorerImpl implements PlacesScorer {
             throws ApiException, InterruptedException, IOException {
         return distanceMatRequest.await();
     }
-
-     // TODO: move context setup to servlet and pass context to fetcher and scorer
 }
