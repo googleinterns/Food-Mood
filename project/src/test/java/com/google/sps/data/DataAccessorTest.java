@@ -19,6 +19,8 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.util.List;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -82,9 +84,13 @@ public final class DataAccessorTest {
   }
 
   @Test
-  public void isRegistered_invalidUserId_false() {
-    assertFalse(dataAccessor.isRegistered(""));
-    assertFalse(dataAccessor.isRegistered(null));
+  public void isRegistered_emptyUserId_throwIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.isRegistered(""));
+  }
+
+  @Test
+  public void isRegistered_nullUserId_throwIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.isRegistered(null));
   }
 
   @Test
@@ -92,21 +98,46 @@ public final class DataAccessorTest {
     String userId = "12345";
 
     dataAccessor.registerUser(userId);
-    PreparedQuery results = createPreparedQueryByUserId(userId);
+    List<Entity> results = createPreparedQueryByUserId(userId)
+        .asList(FetchOptions.Builder.withDefaults());
 
-    assertEquals(results.asList(FetchOptions.Builder.withDefaults()).size(), 1);
+    assertEquals(results.size(), 1);
+    assertEquals(results.get(0), new Entity(DataAccessor.userEntityName, userId));
   }
 
   @Test
-  public void registerUser_invalidUserId_throwIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(null));
+  public void registerUser_emptydUserId_throwIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(""));
+  }
+
+  @Test
+  public void registerUser_nullUserId_throwIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(null));
+  }
+
+  @Test
+  public void registerUser_alreadyRegistered_dontRegisterAgain() {
+    String userId = "12345";
+    dataAccessor.registerUser(userId);
+    List<Entity> firstTime = createPreparedQueryByUserId(userId)
+        .asList(FetchOptions.Builder.withDefaults());
+
+    dataAccessor.registerUser(userId); // Trying to register a user we already registered
+    List<Entity> secondTime = createPreparedQueryByUserId(userId)
+        .asList(FetchOptions.Builder.withDefaults());
+
+    assertEquals(firstTime.size(), 1);
+    assertEquals(firstTime.get(0), new Entity(DataAccessor.userEntityName, userId));
+    assertEquals(secondTime.size(), 1);
+    assertEquals(firstTime.get(0), new Entity(DataAccessor.userEntityName, userId));
   }
 
   private PreparedQuery createPreparedQueryByUserId(String userId) {
     Key userIdKey = KeyFactory.createKey(DataAccessor.userEntityName, userId);
-    Filter userIdFilter =
-        new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
+    Filter userIdFilter = new Query.FilterPredicate(
+        Entity.KEY_RESERVED_PROPERTY,
+        FilterOperator.EQUAL,
+        userIdKey);
     Query query = new Query(DataAccessor.userEntityName).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query);
   }

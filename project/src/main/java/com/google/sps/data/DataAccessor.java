@@ -65,6 +65,9 @@ public class DataAccessor {
   * @param userId the id of the user that we want to register to our system
   */
   public void registerUser(String userId) {
+    if (isRegistered(userId)) {
+      return;
+    }
     checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
     Entity userEntity = new Entity(userEntityName, userId);
     datastoreService.put(userEntity);
