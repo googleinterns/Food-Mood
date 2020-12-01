@@ -15,11 +15,16 @@
 package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
 
@@ -27,8 +32,25 @@ import com.google.maps.model.LatLng;
 
 public class UserVerifierTest {
 
+  private UserVerifier verifier;
+
+  @Before
+  public void setUp() {
+    GoogleIdTokenVerifier googleVerifier = mock(GoogleIdTokenVerifier.class)
+    verifier = new UserVerifier(googleVerifier);
+  }
+
   @Test
-  public void randomSort_keepsAllItems() {
-    
+  public void getUserIdByToken_emptyIdToken_emptyOptional() {
+    Optional<String> result = verifier.getUserIdByToken("");
+
+    assertFalse(result.isPresent());
+  }
+
+  @Test
+  public void getUserIdByToken_nullIdToken_emptyOptional() {
+    Optional<String> result = verifier.getUserIdByToken(null);
+
+    assertFalse(result.isPresent());
   }
 }
