@@ -31,7 +31,7 @@ import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
-import com.google.sps.data.ScorerFactory;
+import com.google.sps.data.PlacesScorerImpl;
 
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
@@ -48,7 +48,7 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void init() {
     fetcher = new PlacesFetcher();
-    scorer = ScorerFactory.createScorer();
+    scorer = new PlacesScorerImpl();
   }
 
   void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {

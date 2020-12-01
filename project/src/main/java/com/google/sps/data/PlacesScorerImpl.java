@@ -1,12 +1,10 @@
 package com.google.sps.data;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import com.google.maps.model.LatLng;
 
-public class UnregisteredScorer implements PlacesScorer {
+public class PlacesScorerImpl implements PlacesScorer {
 
     // The coefficients for the scoring algorithm, sum up to 1.
     private static final double RATING_WEIGHT = 0.7;

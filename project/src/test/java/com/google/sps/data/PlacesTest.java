@@ -45,7 +45,7 @@ public final class PlacesTest {
     Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
     ImmutableList<Place> placesList = ImmutableList.of(placeLowRating, placeHighRating);
     LatLng userLoaction = new LatLng(32.09, 34.78);
-    PlacesScorer scorerMock = mock(UnregisteredScorer.class);
+    PlacesScorer scorerMock = mock(PlacesScorerImpl.class);
     when(scorerMock.getScores(placesList, userLoaction))
         .thenReturn(ImmutableMap.of(placeLowRating, 0.5d, placeHighRating, 1d));
 

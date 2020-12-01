@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
-public class UnregisteredScorerTest {
+public class PlacesScorerImplTest {
 
     // Used for double comparasions to avoid differences resulting from double representations.
     private static final double DELTA = 0.0001;
@@ -53,7 +53,7 @@ public class UnregisteredScorerTest {
         // rating = place's rating / Max Rating
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
         ImmutableMap<Place, Double> result =
-            new UnregisteredScorer().getScores(PLACES_TO_SCORE, USER_LOCATION);
+            new PlacesScorerImpl().getScores(PLACES_TO_SCORE, USER_LOCATION);
 
         Double expectedScorePlace1 = 0.495;
         Double expectedScorePlace2 = 0.775;
@@ -65,7 +65,7 @@ public class UnregisteredScorerTest {
     public void getScores_emptyPlaceList_returnsEmptyMap() {
         assertEquals(
             ImmutableMap.of(),
-            new UnregisteredScorer().getScores(ImmutableList.of(), USER_LOCATION));
+            new PlacesScorerImpl().getScores(ImmutableList.of(), USER_LOCATION));
     }
 
 }
