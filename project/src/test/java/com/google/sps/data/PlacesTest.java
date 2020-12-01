@@ -45,11 +45,11 @@ public final class PlacesTest {
     Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
     ImmutableList<Place> placesList = ImmutableList.of(placeLowRating, placeHighRating);
     LatLng userLoaction = new LatLng(32.09, 34.78);
-    PlacesScorer scorerMock = mock(PlacesScorerImpl.class);
-    when(scorerMock.getScores(placesList, userLoaction))
+    PlacesScorer mockScorer = mock(PlacesScorerImpl.class);
+    when(mockScorer.getScores(placesList, userLoaction))
         .thenReturn(ImmutableMap.of(placeLowRating, 0.5d, placeHighRating, 1d));
 
-    ImmutableList<Place> result = Places.scoreSort(placesList, userLoaction, scorerMock);
+    ImmutableList<Place> result = Places.scoreSort(placesList, userLoaction, mockScorer);
 
     assertEquals(ImmutableList.of(placeHighRating, placeLowRating), result);
   }

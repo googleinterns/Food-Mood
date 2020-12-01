@@ -18,31 +18,28 @@ public class PlacesScorerImpl implements PlacesScorer {
     // score.
     private static final double MAX_DURATION_SECONDS = 40 * 60;
 
-   /**
-   * Returns a map of a place and the score the place gets based on a scoring algorithm.
-   * @return A map between a place to a double representing the place’s score
-   */
     @Override
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
         ImmutableMap<Place, Double> durations = getDurations(places, userLocation);
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
-            scores.put(place, calcScoreOfPlace(durations, place));
+            scores.put(place, calculatePlaceScore(durations, place));
         }
         return scores.build();
     }
 
     // Calculates a score for place,
     // score calculated by the place's rating and driving duration from the user's location.
-    private double calcScoreOfPlace(ImmutableMap<Place, Double> durations, Place place) {
+    private double calculatePlaceScore(ImmutableMap<Place, Double> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
             + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
     // Returns the duration in seconds from each place on places list to the destination
-    private ImmutableMap<Place, Double> getDurations(ImmutableList<Place> places, LatLng destination) {
+    private ImmutableMap<Place, Double> getDurations(
+            ImmutableList<Place> places, LatLng destination) {
         // TODO (M2): This function will call the Distance matrix API to calculate the durations.
         // Duration are hardcoded to 30 minutes temporarly.
         Double duration = 1800D;

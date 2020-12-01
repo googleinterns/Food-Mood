@@ -48,7 +48,6 @@ public final class QueryServletTest {
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
   private static final PlacesScorer SCORER = mock(PlacesScorer.class);
-  private static final LatLng USER_LOCATION = new LatLng(00, 00);
   private StringWriter responseStringWriter;
   private PrintWriter responsePrintWriter;
   private QueryServlet servlet;
@@ -157,7 +156,7 @@ public final class QueryServletTest {
         .setMinRating(4)
         .setMaxPriceLevel(3)
         .setOpenNow(true)
-        .setLocation(USER_LOCATION)
+        .setLocation(new LatLng(00, 00))
         .setCuisines(ImmutableList.of("sushi", "hamburger"))
         .build();
 
@@ -168,6 +167,19 @@ public final class QueryServletTest {
 
     verify(FETCHER).fetch(expectedUserPrefs);
   }
+
+  @Test
+  // This test checks that the PlacesScorer is called with the expected parameters
+  public void getRequest_getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
+    ImmutableList<Place> places = createPlacesListBySize(1);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    verify(SCORER).getScores(places, new LatLng(00, 00));
+  }
+
 
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.

@@ -18,8 +18,19 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.LatLng;
 
+/**
+ * Responsible for calculating a place’s score
+ * based on driving duration to the user’s location and rating.
+ */
 public interface PlacesScorer {
 
+    /**
+     * Returns a map of a place and the score the place gets based on a scoring algorithm.
+     *
+     * @param places A list of places we want to calculate their score
+     * @param userLocation The user’s location used for score calculation
+     * @return A map between a place to a double representing the place’s score
+     */
     ImmutableMap<Place, Double> getScores(ImmutableList<Place> places, LatLng userLocation);
 
 }
