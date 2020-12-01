@@ -44,7 +44,7 @@ public final class PlacesTest {
     );
 
     ImmutableList<Place> result = Places.filter(
-      twoPlaces /* places */,
+      twoPlaces,
         1 /* min rating */,
         true /* filter if no website */,
         true /* filter branches of same place */
@@ -63,7 +63,7 @@ public final class PlacesTest {
         .setLocation(new LatLng(35.35, 35.35)).build();
 
     ImmutableList<Place> result = Places.filter(
-        ImmutableList.of(branch1, branch2, branch3) /* places */,
+        ImmutableList.of(branch1, branch2, branch3),
         1 /* min rating */,
         false /* filter if no website */,
         true /* filter branches of same place */
@@ -80,7 +80,7 @@ public final class PlacesTest {
     Place lowRatingPlace = createValidPlaceBuilderByName("name2").setRating(lowerRating).build();
 
     ImmutableList<Place> result = Places.filter(
-        ImmutableList.of(highRatingPlace, lowRatingPlace) /* places */,
+        ImmutableList.of(highRatingPlace, lowRatingPlace),
         highRating /* min rating */,
         false /* filter if no website */,
         false /* filter branches of same place */
@@ -90,20 +90,34 @@ public final class PlacesTest {
   }
 
   @Test
-  public void filter_filterNotRequired_notFiltering() {
-    Place websiteEmpty = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
+  public void filter_branchesFilterNotRequired_notFiltering() {
     Place samePlace1 = createValidPlaceBuilderByName("name1").build();
     Place samePlace2 = createValidPlaceBuilderByName("name1").build();
-    ImmutableList<Place> allPlaces = ImmutableList.of(websiteEmpty, samePlace1, samePlace2);
+    ImmutableList<Place> allPlaces = ImmutableList.of(samePlace1, samePlace2);
 
     ImmutableList<Place> result = Places.filter(
-        allPlaces /* places */,
+        allPlaces,
         1 /* min rating */,
         false /* filter if no website */,
         false /* filter branches of same place */
     );
 
     assertEquals(result, allPlaces);
+  }
+
+  @Test
+  public void filter_webditeFilterNotRequired_notFiltering() {
+    Place emptyWebsitePlace = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
+    ImmutableList<Place> emptyWebsitePlaceList = ImmutableList.of(emptyWebsitePlace);
+
+    ImmutableList<Place> result = Places.filter(
+        emptyWebsitePlaceList,
+        1 /* min rating */,
+        false /* filter if no website */,
+        false /* filter branches of same place */
+    );
+
+    assertEquals(result, emptyWebsitePlaceList);
   }
 
   @Test
@@ -123,7 +137,7 @@ public final class PlacesTest {
         ImmutableList.<Place>builder().addAll(placesToKeep).add(placeToFilter).build();
 
     ImmutableList<Place> result = Places.filter(
-        allPlaces /* places */,
+        allPlaces,
         1 /* min rating */,
         true /* filter if no website */,
         false /* filter branches of same place */
@@ -147,7 +161,7 @@ public final class PlacesTest {
         ImmutableList.<Place>builder().addAll(placesToFilter).add(placeToKeep).build();
 
     ImmutableList<Place> result = Places.filter(
-        allPlaces /* places */,
+        allPlaces,
         1 /* min rating */,
         false /* filter if no website */,
         false /* filter branches of same place */
