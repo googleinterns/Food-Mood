@@ -318,6 +318,12 @@ function createMap(userLocation) {
         zoom: ZOOM_OUT,
     }
   );
+  new window.google.maps.Marker({
+    title: "Me!",
+    position: userLocation,
+    map: map,
+    icon: "https://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png"
+  });
   return map;
 }
 
