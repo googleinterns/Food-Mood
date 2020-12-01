@@ -20,8 +20,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.sps.data.FetcherException;
+import com.google.sps.data.GeoContext;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
@@ -47,8 +47,8 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher();
-    scorer = new PlacesScorerImpl();
+    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+    scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
   }
 
   void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
@@ -95,6 +95,6 @@ public final class QueryServlet extends HttpServlet {
 
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
-    return new LatLng(Float.parseFloat(latLng[0]), Float.parseFloat(latLng[1]));
+    return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
  }

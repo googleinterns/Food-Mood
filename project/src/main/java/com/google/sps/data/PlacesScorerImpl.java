@@ -1,8 +1,19 @@
 package com.google.sps.data;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.maps.DistanceMatrixApi;
+import com.google.maps.DistanceMatrixApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.errors.ApiException;
+import com.google.maps.model.DistanceMatrix;
 import com.google.maps.model.LatLng;
+import com.google.maps.model.TravelMode;
 
 public class PlacesScorerImpl implements PlacesScorer {
 
@@ -18,6 +29,18 @@ public class PlacesScorerImpl implements PlacesScorer {
     // score.
     private static final double MAX_DURATION_SECONDS = 40 * 60;
 
+    // The entry point for a Google GEO API request.
+    private GeoApiContext context;
+
+    /**
+     * PlacesScorerImpl constructor.
+     *
+     * @param geoApiContext the GeoApiContext used for all Google GEO API requests
+     */
+    public PlacesScorerImpl(GeoApiContext geoApiContext) {
+        this.context = geoApiContext;
+    }
+
    /**
    * Returns a map of a place and the score the place gets based on a scoring algorithm.
    * @return A map between a place to a double representing the place’s score
@@ -25,7 +48,7 @@ public class PlacesScorerImpl implements PlacesScorer {
     @Override
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
-        ImmutableMap<Place, Double> durations = getDurations(places, userLocation);
+        ImmutableMap<Place, Long> durations = getDurations(places, userLocation);
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
             scores.put(place, calcScoreOfPlace(durations, place));
@@ -35,14 +58,15 @@ public class PlacesScorerImpl implements PlacesScorer {
 
     // Calculates a score for place,
     // score calculated by the place's rating and driving duration from the user's location.
-    private double calcScoreOfPlace(ImmutableMap<Place, Double> durations, Place place) {
+    private double calcScoreOfPlace(ImmutableMap<Place, Long> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
             + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
     // Returns the duration in seconds from each place on places list to the destination
-    private ImmutableMap<Place, Long> getDurations(LatLng destination) throws ApiException, InterruptedException, IOException {
+    private ImmutableMap<Place, Long> getDurations(ImmutableList<Place> places, LatLng destination)
+            throws ApiException, InterruptedException, IOException {
         Map<Place, Long> durations = new HashMap<>();
         LatLng[] origins = places.stream()
             .map(place -> place.location()).toArray(LatLng[]::new);
