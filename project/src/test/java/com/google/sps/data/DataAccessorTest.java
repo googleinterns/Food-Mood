@@ -50,7 +50,7 @@ public final class DataAccessorTest {
   // A datastore service instance, that shall be created locally
   private final DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
 
-  // The tested dataaccessor, which will be initialized with a datastore service instance.
+  // The tested dataAccessor, which will be initialized with a datastore service instance.
   private DataAccessor dataAccessor;
 
   @Before
@@ -67,7 +67,7 @@ public final class DataAccessorTest {
   @Test
   public void isRegistered_registered_true() {
     String userId = "12345";
-    Entity userEntity = new Entity(DataAccessor.userEntityName, userId);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, userId);
     datastoreService.put(userEntity);
 
     assertTrue(dataAccessor.isRegistered(userId));
@@ -77,7 +77,7 @@ public final class DataAccessorTest {
   public void isRegistered_notRegistered_false() {
     String registeredUserId = "12345";
     String unRegisteredUserId = "54321";
-    Entity userEntity = new Entity(DataAccessor.userEntityName, registeredUserId);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, registeredUserId);
     datastoreService.put(userEntity);
 
     assertFalse(dataAccessor.isRegistered(unRegisteredUserId));
@@ -102,7 +102,7 @@ public final class DataAccessorTest {
         .asList(FetchOptions.Builder.withDefaults());
 
     assertEquals(results.size(), 1);
-    assertEquals(results.get(0), new Entity(DataAccessor.userEntityName, userId));
+    assertEquals(results.get(0), new Entity(DataAccessor.USER_ENTITY_NAME, userId));
   }
 
   @Test
@@ -117,28 +117,26 @@ public final class DataAccessorTest {
 
   @Test
   public void registerUser_alreadyRegistered_dontRegisterAgain() {
+    // This test assumes that "registerUser" adds the user to the system, and makes sure that
+    // the same user can't be added to the system more than once.
     String userId = "12345";
     dataAccessor.registerUser(userId);
-    List<Entity> firstTime = createPreparedQueryByUserId(userId)
+
+    dataAccessor.registerUser(userId); // Trying to register a user that was already registered
+    List<Entity> results = createPreparedQueryByUserId(userId)
         .asList(FetchOptions.Builder.withDefaults());
 
-    dataAccessor.registerUser(userId); // Trying to register a user we already registered
-    List<Entity> secondTime = createPreparedQueryByUserId(userId)
-        .asList(FetchOptions.Builder.withDefaults());
-
-    assertEquals(firstTime.size(), 1);
-    assertEquals(firstTime.get(0), new Entity(DataAccessor.userEntityName, userId));
-    assertEquals(secondTime.size(), 1);
-    assertEquals(firstTime.get(0), new Entity(DataAccessor.userEntityName, userId));
+    assertEquals(results.size(), 1);
+    assertEquals(results.get(0), new Entity(DataAccessor.USER_ENTITY_NAME, userId));
   }
 
   private PreparedQuery createPreparedQueryByUserId(String userId) {
-    Key userIdKey = KeyFactory.createKey(DataAccessor.userEntityName, userId);
+    Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_NAME, userId);
     Filter userIdFilter = new Query.FilterPredicate(
         Entity.KEY_RESERVED_PROPERTY,
         FilterOperator.EQUAL,
         userIdKey);
-    Query query = new Query(DataAccessor.userEntityName).setFilter(userIdFilter).setKeysOnly();
+    Query query = new Query(DataAccessor.USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query);
   }
 }
