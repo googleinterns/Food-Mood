@@ -32,7 +32,7 @@ public class DataAccessor {
 
   private final DatastoreService datastoreService;
   @VisibleForTesting
-  final static String USER_ENTITY_NAME = "User";
+  static final String USER_ENTITY_NAME = "User";
 
   DataAccessor() {
     this.datastoreService = DatastoreServiceFactory.getDatastoreService();
