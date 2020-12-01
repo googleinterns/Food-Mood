@@ -56,7 +56,7 @@ public final class Places {
    */
   public static ImmutableList<Place> scoreSort(ImmutableList<Place> places, LatLng userLocation, PlacesScorer scorer) {
     List<Place> mutablePlaces = new ArrayList<>(places);
-    Map<Place, Double> placesScores = scorer.getScores();
+    Map<Place, Double> placesScores = scorer.getScores(places, userLocation);
     Collections.sort(mutablePlaces, (p1, p2) -> {
       return placesScores.get(p2).compareTo(placesScores.get(p1));
     });

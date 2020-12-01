@@ -14,10 +14,12 @@
 
 package com.google.sps.data;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.maps.model.LatLng;
 
 public interface PlacesScorer {
 
-    ImmutableMap<Place, Double> getScores();
+    ImmutableMap<Place, Double> getScores(ImmutableList<Place> places, LatLng userLocation);
 
 }

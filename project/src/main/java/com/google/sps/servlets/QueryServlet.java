@@ -29,7 +29,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
+import com.google.sps.data.ScorerFactory;
 
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
@@ -41,15 +43,17 @@ public final class QueryServlet extends HttpServlet {
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
-
+  private PlacesScorer scorer;
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher();
+    scorer = ScorerFactory.createScorer();
   }
 
-  void init(PlacesFetcher inputFetcher) {
+  void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
     fetcher = inputFetcher;
+    scorer = inputScorer;
   }
 
   @Override
@@ -82,7 +86,7 @@ public final class QueryServlet extends HttpServlet {
     }
     response.setContentType("application/json");
     response.getWriter().write(new Gson().toJson(
-      Places.scoreSort(filteredPlaces, userPrefs.location(), new PlacesScorer(places, userLocation))
+      Places.scoreSort(filteredPlaces, userPrefs.location(), scorer)
           .stream()
           .limit(MAX_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())

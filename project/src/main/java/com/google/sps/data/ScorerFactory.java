@@ -14,15 +14,12 @@
 
 package com.google.sps.data;
 
-import com.google.common.collect.ImmutableList;
-import com.google.maps.model.LatLng;
-
 public class ScorerFactory {
 
     // When a scorer for registered users will be added then a criteria will be passed here
-    // so the relevant scorer is created
-    public static PlacesScorer getScorer(ImmutableList<Place> places, LatLng userLocation) {
-        return UnregisteredScorer.createScorer(places, userLocation);
+    // so the relevant scorer is created.
+    public static PlacesScorer createScorer() {
+        return new UnregisteredScorer ();
     }
 
 }

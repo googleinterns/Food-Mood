@@ -47,44 +47,25 @@ public class UnregisteredScorerTest {
     private static final ImmutableList<Place> PLACES_TO_SCORE = ImmutableList.of(PLACE_1, PLACE_2);
 
     @Test
-    public void createScorer_returnsValidUnregisteredScorer() {
-        ImmutableMap<Place, Double> expectedDurations =
-            ImmutableMap.of(
-                PLACE_1, 1800d,
-                PLACE_2, 1800d
-            );
-
-        UnregisteredScorer result =
-            UnregisteredScorer.createScorer(PLACES_TO_SCORE, USER_LOCATION);
-
-        assertEquals(expectedDurations, result.getDurations());
-    }
-
-    @Test
     public void getScores_validPlaceList_returnsMapOfCorrectScores() {
         // Expected scores are calculated by the following algorithm:
         // Score(place) = rating*0.7 + drivingETA*0.3, such that:
         // rating = place's rating / Max Rating
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
-
-        Place place1 = PLACE_BUILDER.setName("name1").setRating(3).build();
-        Place place2 = PLACE_BUILDER.setName("name2").setRating(5).build();
-
         ImmutableMap<Place, Double> result =
-            PlacesScorer(ImmutableList.of(place1, place2), USER_LOCATION)
-            .getScores();
+            new UnregisteredScorer().getScores(PLACES_TO_SCORE, USER_LOCATION);
 
         Double expectedScorePlace1 = 0.495;
         Double expectedScorePlace2 = 0.775;
-        assertEquals(expectedScorePlace1, result.get(place1), DELTA);
-        assertEquals(expectedScorePlace2, result.get(place2), DELTA);
+        assertEquals(expectedScorePlace1, result.get(PLACE_1), DELTA);
+        assertEquals(expectedScorePlace2, result.get(PLACE_2), DELTA);
     }
 
     @Test
     public void getScores_emptyPlaceList_returnsEmptyMap() {
         assertEquals(
             ImmutableMap.of(),
-            new PlacesScorer(ImmutableList.of(), USER_LOCATION).getScores());
+            new UnregisteredScorer().getScores(ImmutableList.of(), USER_LOCATION));
     }
 
 }

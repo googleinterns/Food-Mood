@@ -43,14 +43,13 @@ public final class PlacesTest {
   public void scoreSort_sortedByScoringAlgorithm() {
     Place placeLowRating = createValidPlaceBuilderByName("name1").setRating(1).build();
     Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
+    ImmutableList<Place> placesList = ImmutableList.of(placeLowRating, placeHighRating);
+    LatLng userLoaction = new LatLng(32.09, 34.78);
     PlacesScorer scorerMock = mock(UnregisteredScorer.class);
-    when(scorerMock.getScores())
+    when(scorerMock.getScores(placesList, userLoaction))
         .thenReturn(ImmutableMap.of(placeLowRating, 0.5d, placeHighRating, 1d));
 
-    ImmutableList<Place> result = Places.scoreSort(
-        ImmutableList.of(placeLowRating, placeHighRating),
-        new LatLng(32.09, 34.78),
-        scorerMock);
+    ImmutableList<Place> result = Places.scoreSort(placesList, userLoaction, scorerMock);
 
     assertEquals(ImmutableList.of(placeHighRating, placeLowRating), result);
   }

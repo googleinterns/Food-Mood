@@ -32,6 +32,8 @@ import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.BusinessStatus;
 import com.google.sps.data.FetcherException;
+import com.google.sps.data.PlacesScorer;
+import com.google.sps.data.ScorerFactory;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -44,6 +46,7 @@ public final class QueryServletTest {
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
+  private static final PlacesScorer SCORER = ScorerFactory.createScorer();
   private StringWriter responseStringWriter;
   private PrintWriter responsePrintWriter;
   private QueryServlet servlet;
@@ -53,7 +56,7 @@ public final class QueryServletTest {
     responseStringWriter = new StringWriter();
     responsePrintWriter = new PrintWriter(responseStringWriter);
     servlet = new QueryServlet();
-    servlet.init(FETCHER);
+    servlet.init(FETCHER, SCORER);
     when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
     initializeRequestParameters();
   }
