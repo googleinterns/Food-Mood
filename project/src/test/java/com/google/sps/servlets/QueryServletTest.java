@@ -170,7 +170,7 @@ public final class QueryServletTest {
 
   @Test
   // This test checks that the PlacesScorer is called with the expected parameters
-  public void getRequest_getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
+  public void getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
     ImmutableList<Place> places = createPlacesListBySize(1);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
     when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
