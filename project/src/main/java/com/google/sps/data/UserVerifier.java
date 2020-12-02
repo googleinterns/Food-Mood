@@ -17,11 +17,11 @@ package com.google.sps.data;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.Optional;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.api.client.http.javanet.NetHttpTransport;
 
 public class UserVerifier {
@@ -52,10 +52,8 @@ public class UserVerifier {
     try {
       idToken = verifier.verify(id_token);
     } catch (GeneralSecurityException | IOException e) {
-      return null;
-      // return Optional.empty(); TODO: figure out why it doesn't work
+      return Optional.empty();
     }
-    // return idToken != null ? Optional.of(idToken.getPayload().getSubject()) : Optional.empty();
-    return idToken != null ? Optional.of(idToken.getPayload().getSubject()) : null;
+    return idToken != null ? Optional.of(idToken.getPayload().getSubject()) : Optional.empty();
   }
 }

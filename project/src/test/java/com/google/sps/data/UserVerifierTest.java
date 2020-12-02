@@ -16,37 +16,48 @@ package com.google.sps.data;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.common.base.Optional;
 
 @RunWith(JUnit4.class)
 
 public class UserVerifierTest {
 
-  private UserVerifier verifier;
+  private GoogleIdTokenVerifier googleVerifier = mock(GoogleIdTokenVerifier.class);
+  private UserVerifier userVerifier;
 
   @Before
   public void setUp() {
-    GoogleIdTokenVerifier googleVerifier = mock(GoogleIdTokenVerifier.class);
-    verifier = new UserVerifier(googleVerifier);
+    userVerifier = new UserVerifier(googleVerifier);
   }
 
   @Test
   public void getUserIdByToken_emptyIdToken_emptyOptional() {
-    Optional<String> result = verifier.getUserIdByToken("");
+    Optional<String> result = userVerifier.getUserIdByToken("");
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_nullIdToken_emptyOptional() {
-    Optional<String> result = verifier.getUserIdByToken(null);
+    Optional<String> result = userVerifier.getUserIdByToken(null);
 
     assertFalse(result.isPresent());
+  }
+
+  @Test
+  public void getUserIdByToken_validIdToken_getUserId() throws Exception {
+    GoogleIdToken mockedToken = new GoogleIdToken(null, null, null, null);
+    String validToken = "abcde";
+    Optional<String> result = userVerifier.getUserIdByToken(validToken);
+    when(googleVerifier.verify(validToken)).thenReturn(mockedToken);
   }
 }
