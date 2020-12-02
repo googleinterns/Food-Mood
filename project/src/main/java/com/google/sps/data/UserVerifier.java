@@ -50,7 +50,7 @@ public class UserVerifier {
    * Autheticates the given token using Google's verifier, and returns an Optional that holds
    * the user's id, if the process was successful.
    *
-   * @param id_token the token of the user
+   * @param idToken the token of the user
    * @return an optional that holds the verified user ID, or null if the process wasn't successful
    */
   public Optional<String> getUserIdByToken(String idToken) {
