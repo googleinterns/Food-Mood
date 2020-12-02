@@ -14,18 +14,18 @@
 
 package com.google.sps.data;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
 @RunWith(JUnit4.class)
 
@@ -56,8 +56,13 @@ public class UserVerifierTest {
   @Test
   public void getUserIdByToken_validIdToken_getUserId() throws Exception {
     GoogleIdToken mockedToken = new GoogleIdToken(null, null, null, null);
+    GoogleIdToken.Payload mockedPayload = new GoogleIdToken.Payload();
     String validToken = "abcde";
-    Optional<String> result = userVerifier.getUserIdByToken(validToken);
+    String validUserId = "12345";
     when(googleVerifier.verify(validToken)).thenReturn(mockedToken);
+    when(mockedToken.getPayload()).thenReturn(mockedPayload);
+    when(mockedPayload.getSubject()).thenReturn(validUserId);
+
+    assertEquals(userVerifier.getUserIdByToken(validToken), validUserId);
   }
 }

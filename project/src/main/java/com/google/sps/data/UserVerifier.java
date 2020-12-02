@@ -28,16 +28,22 @@ public class UserVerifier {
 
   private GoogleIdTokenVerifier verifier;
 
-  public UserVerifier(String clientId) {
-    this.verifier = new GoogleIdTokenVerifier
-    .Builder(new NetHttpTransport(), new JacksonFactory())
-    .setAudience(Collections.singletonList(clientId))
-    .build();
-  }
-
   @VisibleForTesting
   UserVerifier(GoogleIdTokenVerifier googleVerifier) {
     this.verifier = googleVerifier;
+  }
+
+  /**
+   * @param clientId A Google API client ID for the Google Sign-In services
+   * @return A UserVerifier instance
+   */
+  public static UserVerifier create(String clientId) {
+    return new UserVerifier(
+        new GoogleIdTokenVerifier
+            .Builder(new NetHttpTransport(), new JacksonFactory())
+            .setAudience(Collections.singletonList(clientId))
+            .build()
+    );
   }
 
   /**
