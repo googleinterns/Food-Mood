@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * The package that currently holds all the java files of the food-mood project.
- */
 package com.google.sps.data;
 
 import static java.util.Comparator.comparing;
@@ -78,6 +75,6 @@ public final class Places {
   private static boolean placeHasNoWebsiteLink(Place place) {
     return Strings.isNullOrEmpty(place.websiteUrl()) && Strings.isNullOrEmpty(place.googleUrl());
   }
-
+  
   private Places() { }
 }
