@@ -34,7 +34,10 @@ public class DataAccessor {
   @VisibleForTesting
   static final String USER_ENTITY_NAME = "User";
 
-  DataAccessor() {
+  /**
+   * A constructor that creates a DatastoreService instance for the class.
+   */
+  public DataAccessor() {
     this.datastoreService = DatastoreServiceFactory.getDatastoreService();
   }
 
