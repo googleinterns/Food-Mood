@@ -53,13 +53,15 @@ public class UserVerifier {
    * @param id_token the token of the user
    * @return an optional that holds the verified user ID, or null if the process wasn't successful
    */
-  public Optional<String> getUserIdByToken(String id_token) {
-    GoogleIdToken idToken;
+  public Optional<String> getUserIdByToken(String idToken) {
+    GoogleIdToken googleIdToken;
     try {
-      idToken = verifier.verify(id_token);
+      googleIdToken = verifier.verify(idToken);
     } catch (GeneralSecurityException | IOException e) {
       return Optional.empty();
     }
-    return idToken != null ? Optional.of(idToken.getPayload().getSubject()) : Optional.empty();
+    return googleIdToken != null
+        ? Optional.of(googleIdToken.getPayload().getSubject())
+        : Optional.empty();
   }
 }

@@ -38,6 +38,8 @@ import com.google.sps.data.UserPreferences;
 @WebServlet("/query")
 public final class QueryServlet extends HttpServlet {
 
+  private static final long serialVersionUID = 1L;
+  
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
