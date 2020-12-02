@@ -106,7 +106,7 @@ public final class PlacesTest {
   }
 
   @Test
-  public void filter_webditeFilterNotRequired_notFiltering() {
+  public void filter_websiteFilterNotRequired_notFiltering() {
     Place emptyWebsitePlace = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
     ImmutableList<Place> emptyWebsitePlaceList = ImmutableList.of(emptyWebsitePlace);
 
