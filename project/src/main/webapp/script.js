@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The user location map. the map has to be accessed from different functions.
+// The user location map. Has to be accessed from different functions.
 let globalUserMap;
+// The current Google user.
+let googleUser = null;
 
 /**
  * Fetches recommended places from the 'query' servlet, and switches from the query form to the
@@ -39,6 +41,9 @@ function fetchFromQuery() {
   const placesDiv = document.getElementById('place');
   displayResultsPage();
   const map = createMap();
+  if (globalUserMap) {
+    registerUserByToken();
+  }
   fetch('/query?' + params)
       .then(response => response.json())
       .then((places) => {
@@ -336,3 +341,33 @@ function addPlaceMarker(map, place) {
     map.setCenter(marker.position);
   });
 }
+
+/**
+ * Called when a user signs in with a Google account.
+ * Updates the global google user, and displays a welcoming messege.
+ */
+function onSignIn(user) {
+  document.getElementById('user-container').innerText =
+      "Hello, " + user.getBasicProfile().getName() + "!";
+  googleUser = user;
+ }
+
+ /** Called when a user signs out of a Google account, updates the screen and the global user. */
+ function signOut() {
+  gapi.auth2.getAuthInstance().signOut();
+  document.getElementById('user-container').innerText =
+      'You are currently not logged in with a Google account.';
+  googleUser = null;
+ }
+
+ function registerUserByToken() {
+  if (!googleUser) {
+    return;
+  }
+  fetch('/register?idToken=' + googleUser.getAuthResponse().id_token, {method: 'POST'})
+  .then(response => response.json())
+  .then((response) => {
+  })
+  .catch((error) => {
+  });
+ }
