@@ -78,6 +78,6 @@ public final class Places {
   private static boolean placeHasNoWebsiteLink(Place place) {
     return Strings.isNullOrEmpty(place.websiteUrl()) && Strings.isNullOrEmpty(place.googleUrl());
   }
-
+  
   private Places() { }
 }
