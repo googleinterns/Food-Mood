@@ -85,7 +85,11 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
     Place lowRating = createValidPlaceBuilder().setRating(3).setName("lowRatingPlace").build();
-    Place noWebsite = createValidPlaceBuilder().setWebsiteUrl("").setName("noWebsitePlace").build();
+    Place noWebsite = createValidPlaceBuilder()
+        .setWebsiteUrl("")
+        .setGoogleUrl("")
+        .setName("noWebsitePlace")
+        .build();
     // The following place purposely has the same name as the valid place, so that we make sure that
     // we end up with only one of them.
     Place validPlace2 = createValidPlaceBuilder().setName("validPlace").build();

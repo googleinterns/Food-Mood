@@ -97,6 +97,31 @@
       <artifactId>google-cloud</artifactId>
       <version>0.10.0-alpha</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.appengine/appengine-testing -->
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-testing</artifactId>
+      <version>1.9.64</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-api-stubs</artifactId>
+      <version>1.9.64</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-tools-sdk</artifactId>
+      <version>1.9.64</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.api-client</groupId>
+      <artifactId>google-api-client-appengine</artifactId>
+      <version>1.23.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
