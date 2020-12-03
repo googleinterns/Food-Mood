@@ -30,35 +30,35 @@ import com.google.common.annotations.VisibleForTesting;
 @WebServlet("/register")
 public final class RegistrationServlet extends HttpServlet {
 
- private static final long serialVersionUID = 1L;
- private UserVerifier userVerifier;
- private DataAccessor dataAccessor;
+  private static final long serialVersionUID = 1L;
+  private UserVerifier userVerifier;
+  private DataAccessor dataAccessor;
 
- @Override
- public void init() {
-  this.userVerifier = UserVerifier.create("CLIENT_ID");
-  this.dataAccessor = new DataAccessor();
- }
+  @Override
+  public void init() {
+    this.userVerifier = UserVerifier.create("CLIENT_ID");
+    this.dataAccessor = new DataAccessor();
+  }
 
- @VisibleForTesting
- void init(UserVerifier userVerifier, DataAccessor dataAccessor) {
-   this.userVerifier = userVerifier;
-   this.dataAccessor = dataAccessor;
- }
+  @VisibleForTesting
+  void init(UserVerifier userVerifier, DataAccessor dataAccessor) {
+    this.userVerifier = userVerifier;
+    this.dataAccessor = dataAccessor;
+  }
 
- @Override
- public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-   String userIdToken = request.getParameter("idToken");
-   if (userIdToken == null) {
-     return;
-   }
-   Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
-   if (!optionalUserId.isPresent()) {
-     return;
-   }
-   String finalUserId = optionalUserId.get();
-   if (!dataAccessor.isRegistered(finalUserId)){
-     dataAccessor.registerUser(finalUserId);
-   }
- }
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String userIdToken = request.getParameter("idToken");
+    if (userIdToken == null) {
+      return;
+    }
+    Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
+    if (!optionalUserId.isPresent()) {
+      return;
+    }
+    String finalUserId = optionalUserId.get();
+    if (!dataAccessor.isRegistered(finalUserId)){
+      dataAccessor.registerUser(finalUserId);
+    }
+  }
 }

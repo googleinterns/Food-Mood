@@ -14,15 +14,11 @@
 
 package com.google.sps.servlets;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,44 +31,36 @@ import com.google.sps.data.UserVerifier;
 @RunWith(JUnit4.class)
 public class RegistrationServletTest {
 
- private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
- private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
- private RegistrationServlet servlet;
- private UserVerifier userVerifier;
- private DataAccessor dataAccessor;
+  private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
+  private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
+  private RegistrationServlet servlet;
+  private UserVerifier userVerifier;
+  private DataAccessor dataAccessor;
 
- @Before
- public void setUp() throws Exception {
-   servlet = new RegistrationServlet();
-   userVerifier = mock(UserVerifier.class);
-   dataAccessor = new DataAccessor();
-   servlet.init(userVerifier, dataAccessor);
- }
+  @Before
+  public void setUp() throws Exception {
+    servlet = new RegistrationServlet();
+    userVerifier = mock(UserVerifier.class);
+    dataAccessor = new DataAccessor();
+    servlet.init(userVerifier, dataAccessor);
+  }
 
- @Test
- public void doPost_validToken_registerUser() throws Exception {
-  //  String userId = mockValidTokenAndReturnVerifiedUserId();
+  @Test
+  public void doPost_validToken_registerUser() throws Exception {
+    String idToken = "abcde";
+    String userId = "12345";
+    when(REQUEST.getParameter("idToken")).thenReturn(idToken);
+    when(userVerifier.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
+    when(dataAccessor.isRegistered(userId)).thenReturn(false);
 
-  //  servlet.doPost(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
-  //  verify(dataAccessor).registerUser(userId);
- }
+    verify(dataAccessor).registerUser(userId);
+  }
 
- public void doPost_invalidToken_notRegistering() throws Exception {
-  //  // This is the behaviour when a token ID isn't valid
-  //  when(userVerifier.verify(any(String.class))).thenReturn(null);
+  public void doPost_invalidToken_notRegistering() throws Exception {
+  }
 
-  //  servlet.doPost(REQUEST, RESPONSE);
-
-  //  verify(dataAccessor, never()).registerUser(any(String.class));
- }
-
- public void doPost_validTokenAlreadyRegisteredUser_notRegistering() throws Exception {
-  //  String userId = mockValidTokenAndReturnVerifiedUserId();
-  //  when(dataAccessor.isRegistered(userId)).thenReturn(true);
-
-  //  servlet.doPost(REQUEST, RESPONSE);
-
-  //  verify(dataAccessor, never()).registerUser(any(String.class));
- }
+  public void doPost_validTokenAlreadyRegisteredUser_notRegistering() throws Exception {
+  }
 }
