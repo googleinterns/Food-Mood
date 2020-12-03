@@ -116,18 +116,13 @@ public final class DataAccessorTest {
   }
 
   @Test
-  public void registerUser_alreadyRegistered_dontRegisterAgain() {
+  public void registerUser_alreadyRegistered_throwIllegalArgumentException() {
     // This test assumes that "registerUser" adds the user to the system, and makes sure that
     // the same user can't be added to the system more than once.
     String userId = "12345";
     dataAccessor.registerUser(userId);
 
-    dataAccessor.registerUser(userId); // Trying to register a user that was already registered
-    List<Entity> results = createPreparedQueryByUserId(userId)
-        .asList(FetchOptions.Builder.withDefaults());
-
-    assertEquals(results.size(), 1);
-    assertEquals(results.get(0), new Entity(DataAccessor.USER_ENTITY_NAME, userId));
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(userId));
   }
 
   private PreparedQuery createPreparedQueryByUserId(String userId) {
