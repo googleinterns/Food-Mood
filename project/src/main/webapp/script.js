@@ -107,14 +107,14 @@ function getUserLocationFromUi() {
 /** Displays a message to the user for a low number of results. */
 function displayNumResultsMessage(numResults) {
   let messageElement = document.getElementById('problem-message-container');
-  const tryAgainMessage =
+  const tryAgainMessage = '<br>' +
       'You are welcome to try again, and maybe try to change some of the entered parameters.';
   if (numResults === 0) {
-    messageElement.innerHTML = 'Your search had no results. ' + '<br>' + tryAgainMessage
+    messageElement.innerHTML = 'Your search had no results. ' + tryAgainMessage
   } else if (numResults === 1) {
-    messageElement.innerHTML = 'Your search had only 1 result. ' + '<br>' + tryAgainMessage
+    messageElement.innerHTML = 'Your search had only 1 result. ' + tryAgainMessage
   } else if (numResults === 2) {
-    messageElement.innerHTML = 'Your search had only 2 results. ' + '<br>' + tryAgainMessage
+    messageElement.innerHTML = 'Your search had only 2 results. ' + tryAgainMessage
   }
 }
 
