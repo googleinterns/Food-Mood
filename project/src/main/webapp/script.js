@@ -20,9 +20,7 @@ let globalUserMap;
  * results elements in order to display them to the user.
  */
 function fetchFromQuery() {
-  document.getElementById('map-error-container').innerText = '';
-  const inputErrorElement = document.getElementById('input-error-container');
-  inputErrorElement.innerText = '';
+  clearAllMessages();
   let params;
   try {
     params = [
@@ -33,12 +31,13 @@ function fetchFromQuery() {
       `location=${getUserLocationFromUi()}`
     ].join('&');
   } catch (error) {
-    inputErrorElement.innerText = 'ERROR: ' + error.message;
+    document.getElementById('input-error-container').innerText = 'ERROR: ' + error.message;
     return;
   }
   const placesDiv = document.getElementById('place');
   displayResultsPage();
-  const map = createMap();
+  const userCoords = JSON.parse(localStorage.getItem('userLocation'));
+  const map = createMap({lat: userCoords.lat, lng: userCoords.lng});
   fetch('/query?' + params)
       .then(response => response.json())
       .then((places) => {
@@ -47,18 +46,12 @@ function fetchFromQuery() {
           addPlaceMarker(map, singlePlace)
         });
         displayAfterResults();
-        if (places.length === 0) {
-          document.getElementById('message-container').innerHTML =
-              'Your search didn\'t have any results. You are welcome to try again, \
-              and maybe try to change some of the entered parameters.'
-        } else if (places.length < 3) {
-          document.getElementById('message-container').innerHTML =
-              'Your search had only ' + places.length + ' results. You are welcome to try again, \
-              and maybe try to change some of the entered parameters.'
+        if (places.length < 3) {
+          displayNumResultsMessage(places.length);
         }
       })
       .catch((error) => {
-        document.getElementById('message-container').innerHTML = "Oops, we encountered a problem! \
+        document.getElementById('problem-message-container').innerText = "Oops, we encountered a problem! \
             Could you please try again?";
       });
 }
@@ -111,18 +104,32 @@ function getUserLocationFromUi() {
   return coords.lat + "," + coords.lng;
 }
 
+/** Displays a message to the user for a low number of results. */
+function displayNumResultsMessage(numResults) {
+  let messageElement = document.getElementById('problem-message-container');
+  const tryAgainMessage = '<br>' +
+      'You are welcome to try again, and maybe try to change some of the entered parameters.';
+  if (numResults === 0) {
+    messageElement.innerHTML = 'Your search had no results. ' + tryAgainMessage
+  } else if (numResults === 1) {
+    messageElement.innerHTML = 'Your search had only 1 result. ' + tryAgainMessage
+  } else if (numResults === 2) {
+    messageElement.innerHTML = 'Your search had only 2 results. ' + tryAgainMessage
+  }
+}
+
 /** Displays the results page. */
 function displayResultsPage() {
-  document.getElementById('query-form').style.display = 'none';
+  document.getElementById('user-input').style.display = 'none';
   document.getElementById('results').style.display = 'block';
-  document.getElementById('map-container').style.display = 'none';
+  document.getElementById('results-map-container').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
 }
 
 /** Displays the map and the feedback box in the results page after the results are ready. */
 function displayAfterResults() {
   document.getElementById('waiting-message').style.display = 'none';
-  document.getElementById('map-container').style.display = 'block';
+  document.getElementById('results-map-container').style.display = 'block';
   document.getElementById('feedback-box').style.display = 'block';
 }
 
@@ -172,10 +179,20 @@ function addLinkToPlaceElement(placeElement, url, linkText) {
  * results.
  */
 function tryAgain() {
-  document.getElementById('query-form').style.display = 'block';
+  document.getElementById('user-input').style.display = 'block';
   document.getElementById('results').style.display = 'none';
   document.getElementById('waiting-message').style.display = 'block'
   document.getElementById('place').innerText = '';
+  document.getElementById('map-error-container').innerText = '';
+  document.getElementById('input-error-container').innerText = '';
+}
+
+/** Clears all the messages that are displayed to the user during the user session. */
+function clearAllMessages() {
+  document.getElementById('place').innerText = '';
+  document.getElementById('map-error-container').innerText = '';
+  document.getElementById('input-error-container').innerText = '';
+  document.getElementById('problem-message-container').innerText = '';
 }
 
 /**
@@ -298,19 +315,26 @@ function getDeviceLocationAndShowOnMap() {
 function displayGeolocationError(errorText) {
   document.getElementById('map-error-container').innerHTML =
       errorText + ', so we can\'t use your location.' + '<br>' +
-      'Use the map to find your location.' + '<br>';
+      'Use the map to find your location.' + '<br> <br>';
 }
 
-/** Creates a map and adds it to the page. */
-function createMap() {
+/**
+ *  Creates a map and adds it to the page.
+ */
+function createMap(userLocation) {
   const ZOOM_OUT = 12;
-  const USER_LOCATION = {lat: 32.080576, lng: 34.780641}; //TODO(M1): change to user's location
   const map = new window.google.maps.Map(
-    document.getElementById('map-container'), {
-      center: USER_LOCATION,
-      zoom: ZOOM_OUT,
+    document.getElementById('results-map-container'), {
+        center: userLocation,
+        zoom: ZOOM_OUT,
     }
   );
+  new window.google.maps.Marker({
+    title: "Me!",
+    position: userLocation,
+    map: map,
+    icon: "https://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png"
+  });
   return map;
 }
 

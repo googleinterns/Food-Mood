@@ -5,6 +5,8 @@
   font-size: 20px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   white-space: nowrap;
+  background-color: #f8c4a9;
+  background-image: linear-gradient(62deg, #f8c4a9 0%, #fae1a4 91%);
 }
 
 li {
@@ -20,20 +22,20 @@ li {
   margin-top: 20px;
 }
 
-#map-container {
-  border: thin solid black;
-  height: 400px;
-  width: 350px;
+.submit {
+  background-color: rgb(197, 235, 197);
+  width: 200px;
+  height: 50px;
+  padding: 10px;
+  font-size: 20px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-#feedback-box {
-  border: 1px solid grey;
-  width: 270px;
-  background-color: rgb(199, 232, 245);
-  padding: 2%;
-  margin-top: 20px;
-  display: inline-block;
-  margin-left: 15px;
+.button {
+  width: 150px;
+  padding: 5px;
+  background-color: rgb(228 231 232);
+  margin-top: 10px;
 }
 
 .form-element-toolbar {
@@ -49,12 +51,12 @@ li {
 .form-element-toolbar label {
   display: inline-block;
   background-color: #ddd;
-  padding: 8px 15px;
+  padding: 8px 8px;
   font-family: sans-serif, Arial;
   font-size: 16px;
-  border: 2px solid #444;
-  border-radius: 4px;
   margin: 2px;
+  margin-bottom: 15px;
+  border-radius: 30px;
 }
 
 .form-element-toolbar label:hover {
@@ -71,15 +73,72 @@ li {
   border-color: #287ec7;
 }
 
+.error-text {
+  font-size: 18px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: red;
+  margin: 0 auto;
+}
+
+#location-form,
+#map-error-container {
+  margin-left: 50px;
+}
+
 .form-button {
-  background-color: rgb(144, 178, 243);
-  width: 200px;
-  padding: 10px;
-  font-size: 15px;
+  display: block;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background-color: rgb(144, 214, 226);
+  width: 400px;
+  height: 70px;
+  border-radius: 30px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background-size: 100% 100%;
+  margin-bottom: 15px;
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .form-button:hover {
   background-color: rgb(78, 136, 243);
+}
+
+#results-content {
+  float: left;
+  width: 80%;
+}
+
+#results-map-container {
+  border: thin solid black;
+  height: 300px;
+  width: 100%;
+  margin-top: auto;
+}
+
+#feedback-box {
+  border: 1px solid grey;
+  width: 270px;
+  background-color: rgb(199, 232, 245);
+  padding: 2%;
+  margin-top: 20px;
+  display: inline-block;
+  margin-left: 15px;
+}
+
+#query-form {
+  width: 80%;
+  float: left;
+  margin-left: -200px;
+}
+
+#user-map-container {
+  width: 100%;
+  margin-left: 350px;
+  margin-top: auto;
 }
 
 #location-input {
@@ -97,20 +156,4 @@ li {
   width: 600px;
   margin-left: auto;
   display: 'none';
-}
-
-.submit {
-  background-color: rgb(197, 235, 197);
-  width: 200px;
-  height: 50px;
-  padding: 10px;
-  font-size: 20px;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
-.button {
-  width: 150px;
-  padding: 5px;
-  background-color: rgb(228 231 232);
-  margin-top: 10px;
 }
