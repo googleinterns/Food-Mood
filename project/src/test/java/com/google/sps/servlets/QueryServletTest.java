@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
+import com.google.sps.data.BusinessStatus;
 
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
@@ -84,7 +85,11 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
     Place lowRating = createValidPlaceBuilder().setRating(3).setName("lowRatingPlace").build();
-    Place noWebsite = createValidPlaceBuilder().setWebsiteUrl("").setName("noWebsitePlace").build();
+    Place noWebsite = createValidPlaceBuilder()
+        .setWebsiteUrl("")
+        .setGoogleUrl("")
+        .setName("noWebsitePlace")
+        .build();
     // The following place purposely has the same name as the valid place, so that we make sure that
     // we end up with only one of them.
     Place validPlace2 = createValidPlaceBuilder().setName("validPlace").build();
@@ -134,20 +139,17 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
-    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+    when(REQUEST.getParameter("location")).thenReturn("35.35000000,30.00000000");
     when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
     UserPreferences expectedUserPrefs = UserPreferences.builder()
         .setMinRating(4)
         .setMaxPriceLevel(3)
         .setOpenNow(true)
-        .setLocation(new LatLng(00, 00))
+        .setLocation(new LatLng(35.35000000, 30.00000000))
         .setCuisines(ImmutableList.of("sushi", "hamburger"))
         .build();
 
     servlet.doGet(REQUEST, RESPONSE);
-
-    // TODO(M1): this test fails with semi-real ccordinates, because float is unstable.
-    // When we refactor the float to be a double, we'll need to add real values (instead of 0).
 
     verify(FETCHER).fetch(expectedUserPrefs);
   }
@@ -172,7 +174,10 @@ public final class QueryServletTest {
           .setPhone("+97250-0000-000")
           .setRating(4)
           .setPriceLevel(3)
-          .setLocation(new LatLng(35.35, 30.30));
+          .setLocation(new LatLng(35.35, 30.30))
+          .setBusinessStatus(BusinessStatus.OPERATIONAL)
+          .setGoogleUrl("google.com")
+          .setPlaceId("placeId");
   }
 
   // Returns the number of json elements in the servlet's response

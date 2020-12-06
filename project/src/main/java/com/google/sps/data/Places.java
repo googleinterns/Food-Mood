@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * The package that currently holds all the java files of the food-mood project.
- */
 package com.google.sps.data;
 
 import static java.util.Comparator.comparing;
@@ -57,13 +54,12 @@ public final class Places {
    */
   public static ImmutableList<Place> filter(ImmutableList<Place> places, int minRating, Boolean
       filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
-    //TODO(M1): also filter by place's status when the attribute is added
     ImmutableList<Place> result =
         places.stream()
             .sorted(Comparator.comparing(Place::rating).reversed())
+            .filter(place -> place.businessStatus() == BusinessStatus.OPERATIONAL)
             .filter(place -> place.rating() >= minRating)
-            //TODO(M1): also chack about having a google maps link, when attribute added
-            .filter(place -> !(filterIfNoWebsite && Strings.isNullOrEmpty(place.websiteUrl())))
+            .filter(place -> !(filterIfNoWebsite && placeHasNoWebsiteLink(place)))
             .collect(ImmutableList.toImmutableList());
     if (filterBranchesOfSamePlace) {
       result = result.stream().collect(
@@ -75,5 +71,10 @@ public final class Places {
     }
     return result;
   }
+
+  private static boolean placeHasNoWebsiteLink(Place place) {
+    return Strings.isNullOrEmpty(place.websiteUrl()) && Strings.isNullOrEmpty(place.googleUrl());
+  }
+
   private Places() { }
 }
