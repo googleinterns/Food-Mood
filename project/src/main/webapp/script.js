@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This was added in order to let the linter know that we treat 'gapi' (Google API) as a global var.
+/* global gapi */
+
 // The user location map. Has to be accessed from different functions.
 let globalUserMap;
+
 // The current Google user.
 let googleUser = null;
 
