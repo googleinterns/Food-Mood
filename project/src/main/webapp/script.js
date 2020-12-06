@@ -41,7 +41,7 @@ function fetchFromQuery() {
   const placesDiv = document.getElementById('place');
   displayResultsPage();
   const map = createMap();
-  if (globalUserMap) {
+  if (googleUser) {
     registerUserByToken();
   }
   fetch('/query?' + params)
@@ -350,24 +350,20 @@ function onSignIn(user) {
   document.getElementById('user-welcome-messeage-container').innerText =
       "Hello, " + user.getBasicProfile().getName() + "!";
   googleUser = user;
- }
+}
 
- /** Called when a user signs out of a Google account, updates the screen and the global user. */
- function signOut() {
+/** Called when a user signs out of a Google account, updates the screen and the global user. */
+function signOut() {
   gapi.auth2.getAuthInstance().signOut();
   document.getElementById('user-welcome-messeage-container').innerText =
       'You are currently not logged in with a Google account.';
   googleUser = null;
- }
+}
 
- function registerUserByToken() {
+/** Registers the logged in user, using the registration servlet. */
+function registerUserByToken() {
   if (!googleUser) {
     return;
   }
-  fetch('/register?idToken=' + googleUser.getAuthResponse().id_token, {method: 'POST'})
-  .then(response => response.json())
-  .then((response) => {
-  })
-  .catch((error) => {
-  });
- }
+  fetch('/register?idToken=' + googleUser.getAuthResponse().id_token, {method: 'POST'});
+}
