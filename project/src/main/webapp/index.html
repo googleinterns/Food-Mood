@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
-  <script src="script.js"></script>
-  <head>
-    <meta charset="UTF-8">
-    <title>food-mood</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body class="text-content">
-    <h1> FoodMood - your food order helper!</h1>
+ <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+ <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
+ <script src="script.js"></script>
+ <head>
+   <meta charset="UTF-8">
+   <title>food-mood</title>
+   <link rel="stylesheet" href="style.css">
+   <base target="_blank" rel="noopener noreferrer">
+ </head>
+ <body class="text-content">
+  <h1> FoodMood - your food order helper!</h1>
+  <div class="user-input" id="user-input">
     <div id="query-form" class="query-form">
       <form id="cuisines-form" class="form-element-toolbar">
         <p>Select cuisines:</p>
@@ -21,13 +23,14 @@
         <label for="cuisine-sushi">Sushi</label>
         <input type="checkbox" id="cuisine-hamburger" name="cuisine" value="hamburger" checked>
         <label for="cuisine-hamburger">Hamburger</label>
+        <br>
         <input type="checkbox" id="cuisine-salad" name="cuisine" value="salad" checked>
         <label for="cuisine-salad">Salad</label>
         <input type="checkbox" id="cuisine-homemade" name="cuisine" value="homemade" checked>
         <label for="cuisine-homemade">Homemade</label>
       </form>
       <form id="rating-form" class="form-element-toolbar">
-        Min rating (out of 5):
+        <p>Mininal rating (out of 5):</p>
         <input type="radio" id="rating-0" name="rating" value="1" checked="checked">
         <label for="rating-0">I don't mind</label>
         <input type="radio" id="rating-1" name="rating" value="1">
@@ -42,7 +45,7 @@
         <label for="rating-5">5 star</label>
       </form>
       <form id="price-form" class="form-element-toolbar">
-        Max price level:
+        <p>Maximal price level:</p>
         <input type="radio" id="price-all" name="price" value="4" checked="checked">
         <label for="price-all">I don't mind</label>
         <input type="radio" id="price-1" name="price" value="1">
@@ -55,36 +58,46 @@
         <label for="price-4">Very Expensive</label>
       </form>
       <form id="open-now-form" class="form-element-toolbar">
-        Should it be open now?
+        <p>Should it be open now?</p>
         <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
         <label for="open-now-yes">Yes</label>
         <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
         <label for="open-now-dont-mind">I don't mind</label>
       </form>
-      <div id="input-error-container"></div>
+      <div id="input-error-container" class="error-text"></div>
+    </div>
+    <div id="user-map-container">
+      <br> <br>
       <form id="location-form" class="form-element-toolbar">
-        <input type="radio" id="device-location" name="location" value="device-location"
-            onclick="getDeviceLocationAndShowOnMap()">
+        <input type="radio" id="device-location" class="device-location" name="location"
+        value="device-location" onclick="getDeviceLocationAndShowOnMap()">
         <label for="device-location">Press here to use your device's location!</label>
       </form>
       <input id="location-input" class="controls" type="text" placeholder="Search Box"/>
-      <div id="map-error-container"></div>
+      <div id="map-error-container" class="error-text"></div>
       <div id="map"></div>
       <script> addMapWithSearchBox() </script>
-      <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
+     </div>
+     <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">
-      <h2>Food Mood's recommendation:</h2>
-      <p id="waiting-message">Please wait as we are finding the best results for you</p>
-      <p id="message-container"></p>
-      <ol id="place"> </ol>
-      <div id="map-container"> </div>
+      <div id="results-content-and-map">
+        <div id="results-content" class="results-content">
+          <h2>Food Mood's recommendation:</h2>
+          <div id="waiting-message">Please wait while we are finding the best results for you</div>
+          <div id="problem-message-container" class="error-text"></div>
+          <ol id="place"> </ol>
+        </div>
+        <div id="results-map-container"> </div>
+      </div>
       <div id="feedback-box">
         <label for="liking-feedback">Like these options?<br> Let us know what you chose: <br></label>
         <select class="button" name="feedback" id="feedback">
-        <option value="1">First option</option>
-        <option value="2">Second option</option>
-        <option value="3">Third option</option>
+          <option value="1">First option</option>
+          <option value="2">Second option</option>
+          <option value="3">Third option</option>
+          <br>
+          <input type="submit" value="Submit" style="font-weight: bold">
         </select>
         <br><br>
         <label for="disliking-feedback">Don't like these options? <br></label>
@@ -92,4 +105,4 @@
       </div>
     </div>
   </body>
-</html>
+ </html>
