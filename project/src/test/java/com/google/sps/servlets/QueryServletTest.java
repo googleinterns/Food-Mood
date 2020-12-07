@@ -31,7 +31,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
-import com.google.sps.data.BusinessStatus;
 import com.google.sps.data.FetcherException;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.Place;
@@ -40,6 +39,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
+import com.google.sps.data.BusinessStatus;
+
 
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
@@ -154,20 +155,17 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
-    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+    when(REQUEST.getParameter("location")).thenReturn("35.35000000,30.00000000");
     when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
     UserPreferences expectedUserPrefs = UserPreferences.builder()
         .setMinRating(4)
         .setMaxPriceLevel(3)
         .setOpenNow(true)
-        .setLocation(new LatLng(00, 00))
+        .setLocation(new LatLng(35.35000000, 30.00000000))
         .setCuisines(ImmutableList.of("sushi", "hamburger"))
         .build();
 
     servlet.doGet(REQUEST, RESPONSE);
-
-    // TODO(M1): this test fails with semi-real ccordinates, because float is unstable.
-    // When we refactor the float to be a double, we'll need to add real values (instead of 0).
 
     verify(FETCHER).fetch(expectedUserPrefs);
   }
