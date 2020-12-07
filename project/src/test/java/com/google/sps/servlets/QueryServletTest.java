@@ -31,7 +31,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
-import com.google.sps.data.BusinessStatus;
 import com.google.sps.data.FetcherException;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.Place;
