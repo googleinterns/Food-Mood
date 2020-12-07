@@ -375,7 +375,7 @@ function addPlaceMarker(map, place) {
  * Updates the global google user, and displays a welcoming messege.
  */
 function onSignIn(user) {
-  document.getElementById('user-welcome-messeage-container').innerText =
+  document.getElementById('user-welcome-message-container').innerText =
       "Hello, " + user.getBasicProfile().getName() + "!";
   googleUser = user;
 }
@@ -383,7 +383,7 @@ function onSignIn(user) {
 /** Called when a user signs out of a Google account, updates the screen and the global user. */
 function signOut() {
   gapi.auth2.getAuthInstance().signOut();
-  document.getElementById('user-welcome-messeage-container').innerText =
+  document.getElementById('user-welcome-message-container').innerText =
       'You are currently not logged in with a Google account.';
   googleUser = null;
 }
