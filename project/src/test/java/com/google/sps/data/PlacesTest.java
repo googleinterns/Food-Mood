@@ -90,6 +90,29 @@ public final class PlacesTest {
   }
 
   @Test
+  public void filter_floatingPointRating_filterOutByRoundingToNearestInt() {
+    // This test checks that the rating is filtered after rounding it to the nearest int.
+    // For example, when places with 5 starts are desired, places that have at least 4.5 stars will
+    // be supplied.
+    int threshRating = 4;
+    Place higherRatingPlace =
+        createValidPlaceBuilderByName("higherRating").setRating(threshRating + 0.5f).build();
+    Place slightlyLowerRatingPlace =
+        createValidPlaceBuilderByName("slightlyLowerRating").setRating(threshRating - 0.1f).build();
+    Place muchLowerRatingPlace =
+        createValidPlaceBuilderByName("muchLowerRating").setRating(threshRating - 0.8f).build();
+
+    ImmutableList<Place> result = Places.filter(
+        ImmutableList.of(higherRatingPlace, slightlyLowerRatingPlace, muchLowerRatingPlace),
+        threshRating /* min rating */,
+        false /* filter if no website */,
+        false /* filter branches of same place */
+    );
+
+    assertEquals(result, ImmutableList.of(higherRatingPlace, slightlyLowerRatingPlace));
+  }
+
+  @Test
   public void filter_branchesFilterNotRequired_notFiltering() {
     Place samePlace1 = createValidPlaceBuilderByName("name1").build();
     Place samePlace2 = createValidPlaceBuilderByName("name1").build();

@@ -58,7 +58,7 @@ public final class Places {
         places.stream()
             .sorted(Comparator.comparing(Place::rating).reversed())
             .filter(place -> place.businessStatus() == BusinessStatus.OPERATIONAL)
-            .filter(place -> place.rating() >= minRating)
+            .filter(place -> Math.rint(place.rating()) >= minRating)
             .filter(place -> !(filterIfNoWebsite && placeHasNoWebsiteLink(place)))
             .collect(ImmutableList.toImmutableList());
     if (filterBranchesOfSamePlace) {
