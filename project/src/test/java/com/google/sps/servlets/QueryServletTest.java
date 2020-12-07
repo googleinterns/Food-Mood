@@ -95,7 +95,11 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
     Place lowRating = createValidPlaceBuilder().setRating(3).setName("lowRatingPlace").build();
-    Place noWebsite = createValidPlaceBuilder().setWebsiteUrl("").setName("noWebsitePlace").build();
+    Place noWebsite = createValidPlaceBuilder()
+        .setWebsiteUrl("")
+        .setGoogleUrl("")
+        .setName("noWebsitePlace")
+        .build();
     // The following place purposely has the same name as the valid place, so that we make sure that
     // we end up with only one of them.
     Place validPlace2 = createValidPlaceBuilder().setName("validPlace").build();
@@ -170,15 +174,15 @@ public final class QueryServletTest {
 
   @Test
   // This test checks that the PlacesScorer is called with the expected parameters
-  public void getRequest_getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
-    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+  public void getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
     ImmutableList<Place> places = createPlacesListBySize(1);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
 
     servlet.doGet(REQUEST, RESPONSE);
+
     verify(SCORER).getScores(places, new LatLng(00, 00));
   }
-
 
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.

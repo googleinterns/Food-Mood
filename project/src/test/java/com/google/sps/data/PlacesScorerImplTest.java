@@ -131,7 +131,6 @@ public class PlacesScorerImplTest {
         Double expectedScorePlace2 = 1.0;
         assertEquals(expectedScorePlace1, result.get(PLACE_1), DELTA);
         assertEquals(expectedScorePlace2, result.get(PLACE_2), DELTA);
-
     }
 
 }

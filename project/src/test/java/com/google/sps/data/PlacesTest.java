@@ -45,11 +45,11 @@ public final class PlacesTest {
     Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
     ImmutableList<Place> placesList = ImmutableList.of(placeLowRating, placeHighRating);
     LatLng userLoaction = new LatLng(32.09, 34.78);
-    PlacesScorer scorerMock = mock(PlacesScorerImpl.class);
-    when(scorerMock.getScores(placesList, userLoaction))
+    PlacesScorer mockScorer = mock(PlacesScorerImpl.class);
+    when(mockScorer.getScores(placesList, userLoaction))
         .thenReturn(ImmutableMap.of(placeLowRating, 0.5d, placeHighRating, 1d));
 
-    ImmutableList<Place> result = Places.scoreSort(placesList, userLoaction, scorerMock);
+    ImmutableList<Place> result = Places.scoreSort(placesList, userLoaction, mockScorer);
 
     assertEquals(ImmutableList.of(placeHighRating, placeLowRating), result);
   }
@@ -62,7 +62,7 @@ public final class PlacesTest {
     );
 
     ImmutableList<Place> result = Places.filter(
-      twoPlaces /* places */,
+      twoPlaces,
         1 /* min rating */,
         true /* filter if no website */,
         true /* filter branches of same place */
@@ -81,30 +81,13 @@ public final class PlacesTest {
         .setLocation(new LatLng(35.35, 35.35)).build();
 
     ImmutableList<Place> result = Places.filter(
-        ImmutableList.of(branch1, branch2, branch3) /* places */,
+        ImmutableList.of(branch1, branch2, branch3),
         1 /* min rating */,
         false /* filter if no website */,
         true /* filter branches of same place */
       );
 
     assertEquals(result, ImmutableList.of(branch1));
-  }
-
-
-  @Test
-  public void filter_noWebsite_filterOut() {
-    Place websiteEmpty = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
-    Place place1 = createValidPlaceBuilderByName("name1").build();
-    Place place2 = createValidPlaceBuilderByName("name2").build();
-
-    ImmutableList<Place> result = Places.filter(
-        ImmutableList.of(websiteEmpty, place1, place2) /* places */,
-        1 /* min rating */,
-        true /* filter if no website */,
-        false /* filter branches of same place */
-    );
-
-    assertEquals(result, ImmutableList.of(place1, place2));
   }
 
   @Test
@@ -115,7 +98,7 @@ public final class PlacesTest {
     Place lowRatingPlace = createValidPlaceBuilderByName("name2").setRating(lowerRating).build();
 
     ImmutableList<Place> result = Places.filter(
-        ImmutableList.of(highRatingPlace, lowRatingPlace) /* places */,
+        ImmutableList.of(highRatingPlace, lowRatingPlace),
         highRating /* min rating */,
         false /* filter if no website */,
         false /* filter branches of same place */
@@ -125,20 +108,84 @@ public final class PlacesTest {
   }
 
   @Test
-  public void filter_filterNotRequired_notFiltering() {
-    Place websiteEmpty = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
+  public void filter_branchesFilterNotRequired_notFiltering() {
     Place samePlace1 = createValidPlaceBuilderByName("name1").build();
     Place samePlace2 = createValidPlaceBuilderByName("name1").build();
-    ImmutableList<Place> allPlaces = ImmutableList.of(websiteEmpty, samePlace1, samePlace2);
+    ImmutableList<Place> allPlaces = ImmutableList.of(samePlace1, samePlace2);
 
     ImmutableList<Place> result = Places.filter(
-      allPlaces /* places */,
+        allPlaces,
         1 /* min rating */,
         false /* filter if no website */,
         false /* filter branches of same place */
     );
 
     assertEquals(result, allPlaces);
+  }
+
+  @Test
+  public void filter_websiteFilterNotRequired_notFiltering() {
+    Place emptyWebsitePlace = createValidPlaceBuilderByName("name").setWebsiteUrl("").build();
+    ImmutableList<Place> emptyWebsitePlaceList = ImmutableList.of(emptyWebsitePlace);
+
+    ImmutableList<Place> result = Places.filter(
+        emptyWebsitePlaceList,
+        1 /* min rating */,
+        false /* filter if no website */,
+        false /* filter branches of same place */
+    );
+
+    assertEquals(result, emptyWebsitePlaceList);
+  }
+
+  @Test
+  public void filter_filterByWebsitePresence() {
+    ImmutableList<Place> placesToKeep = ImmutableList.of(
+        // Place has both a website URL and a google URL
+        createValidPlaceBuilderByName("name1").build(),
+        // Place has a website URL and doesn't have a google URL
+        createValidPlaceBuilderByName("name2").setGoogleUrl("").build(),
+        // Place doesn't have a website URL and has a google URL
+        createValidPlaceBuilderByName("name3").setWebsiteUrl("").build()
+    );
+    // Place doesn't have a website URL or a google URL
+    Place placeToFilter =
+        createValidPlaceBuilderByName("name4").setWebsiteUrl("").setGoogleUrl("").build();
+    ImmutableList<Place> allPlaces =
+        ImmutableList.<Place>builder().addAll(placesToKeep).add(placeToFilter).build();
+
+    ImmutableList<Place> result = Places.filter(
+        allPlaces,
+        1 /* min rating */,
+        true /* filter if no website */,
+        false /* filter branches of same place */
+    );
+
+    assertEquals(result, placesToKeep);
+  }
+
+  @Test
+  public void filter_filterByStatus() {
+    Place placeToKeep = createValidPlaceBuilderByName("name1")
+        .setBusinessStatus(BusinessStatus.OPERATIONAL).build();
+    ImmutableList<Place> placesToFilter = ImmutableList.of(
+        createValidPlaceBuilderByName("name2")
+            .setBusinessStatus(BusinessStatus.CLOSED_TEMPORARILY).build(),
+        createValidPlaceBuilderByName("name3")
+            .setBusinessStatus(BusinessStatus.CLOSED_PERMANENTLY).build(),
+        createValidPlaceBuilderByName("name4").setBusinessStatus(BusinessStatus.UNKNOWN).build()
+    );
+    ImmutableList<Place> allPlaces =
+        ImmutableList.<Place>builder().addAll(placesToFilter).add(placeToKeep).build();
+
+    ImmutableList<Place> result = Places.filter(
+        allPlaces,
+        1 /* min rating */,
+        false /* filter if no website */,
+        false /* filter branches of same place */
+    );
+
+    assertEquals(result, ImmutableList.of(placeToKeep));
   }
 
   // Returns a Place builder that has valid values of all attributes.

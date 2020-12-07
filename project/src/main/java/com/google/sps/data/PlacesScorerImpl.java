@@ -20,12 +20,11 @@ public class PlacesScorerImpl implements PlacesScorer {
     private static final double RATING_WEIGHT = 0.7;
     private static final double DURATION_WEIGHT = 0.3;
 
-    // The maximum possible rating as defined by the Google Places API
+    // The maximum possible rating as defined by the Google Places API.
     private static final double MAX_RATING = 5;
 
-    // The maximum durations in seconds,
-    // so that any duration higher than that will not contribute to the place's
-    // score.
+    // The maximum durations in seconds, so that any duration higher than that
+    // will not contribute to the place's score.
     private static final double MAX_DURATION_SECONDS = 40 * 60;
 
     // The entry point for a Google GEO API request.
@@ -40,12 +39,6 @@ public class PlacesScorerImpl implements PlacesScorer {
         this.context = geoApiContext;
     }
 
-    /**
-     * Returns a map of a place and the score the place gets based on a scoring
-     * algorithm.
-     *
-     * @return A map between a place to a double representing the place’s score
-     */
     @Override
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
@@ -57,14 +50,14 @@ public class PlacesScorerImpl implements PlacesScorer {
 		}
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
-            scores.put(place, calcScoreOfPlace(durations, place));
+            scores.put(place, calculatePlaceScore(durations, place));
         }
         return scores.build();
     }
 
     // Calculates a score for place,
     // score calculated by the place's rating and driving duration from the user's location.
-    private double calcScoreOfPlace(ImmutableMap<Place, Long> durations, Place place) {
+    private double calculatePlaceScore(ImmutableMap<Place, Long> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
             + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
