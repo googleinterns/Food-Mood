@@ -158,13 +158,6 @@ li {
   display: 'none';
 }
 
-.button {
-  width: 150px;
-  padding: 5px;
-  background-color: rgb(228 231 232);
-  margin-top: 10px;
-}
-
 #sign-in-segment {
   width: 100%;
   text-align: center;
