@@ -16,11 +16,14 @@ package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
@@ -34,6 +37,21 @@ public final class PlacesTest {
 
     assertTrue(result.contains(place1));
     assertTrue(result.contains(place2));
+  }
+
+  @Test
+  public void scoreSort_sortedByScoringAlgorithm() {
+    Place placeLowRating = createValidPlaceBuilderByName("name1").setRating(1).build();
+    Place placeHighRating = createValidPlaceBuilderByName("name2").setRating(2).build();
+    ImmutableList<Place> placesList = ImmutableList.of(placeLowRating, placeHighRating);
+    LatLng userLoaction = new LatLng(32.09, 34.78);
+    PlacesScorer mockScorer = mock(PlacesScorerImpl.class);
+    when(mockScorer.getScores(placesList, userLoaction))
+        .thenReturn(ImmutableMap.of(placeLowRating, 0.5d, placeHighRating, 1d));
+
+    ImmutableList<Place> result = Places.scoreSort(placesList, userLoaction, mockScorer);
+
+    assertEquals(ImmutableList.of(placeHighRating, placeLowRating), result);
   }
 
   @Test
