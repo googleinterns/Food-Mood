@@ -64,7 +64,8 @@ public class PlacesScorerImplTest {
     // each row will include one DistanceMatrixElement that holds the duration between a place
     // to the user location.
     // This method creates uniform durations between each origin to the destinations.
-    private static DistanceMatrixRow[] createDistanceMatrixRows(int numOfRows, Long durationInSeconds) {
+    private static DistanceMatrixRow[] createDistanceMatrixRows(
+            int numOfRows, Long durationInSeconds) {
         DistanceMatrixElement element = new DistanceMatrixElement();
         Duration duration = new Duration();
         duration.inSeconds = durationInSeconds;
@@ -105,7 +106,7 @@ public class PlacesScorerImplTest {
     @Test
     public void getScores_emptyPlaceList_returnsEmptyMap() throws Exception {
         PlacesScorerImpl spiedScorer = spy(placesScorer);
-        doReturn(new DistanceMatrix(new String[0], new String[0],new DistanceMatrixRow[0]))
+        doReturn(new DistanceMatrix(new String[0], new String[0], new DistanceMatrixRow[0]))
             .when(spiedScorer)
             .getDistanceResults(any(DistanceMatrixApiRequest.class));
 

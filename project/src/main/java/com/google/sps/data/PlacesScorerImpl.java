@@ -3,7 +3,6 @@ package com.google.sps.data;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -41,14 +40,15 @@ public class PlacesScorerImpl implements PlacesScorer {
     }
 
     @Override
-    public ImmutableMap<Place, Double> getScores(ImmutableList<Place> places, LatLng userLocation) {
+    public ImmutableMap<Place, Double> getScores(
+            ImmutableList<Place> places, LatLng userLocation) {
         ImmutableMap<Place, Long> durations;
         try {
             durations = getDurations(places, userLocation);
         } catch (ApiException | InterruptedException | IOException e) {
             // TODO(Tal): log error
 			return scoreByRating(places);
-		}
+        }
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
             scores.put(place, calculatePlaceScore(durations, place));

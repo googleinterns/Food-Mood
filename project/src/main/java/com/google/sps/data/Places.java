@@ -18,7 +18,6 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.maps.errors.ApiException;
 import com.google.maps.model.LatLng;
 
 /**
