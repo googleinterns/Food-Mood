@@ -97,4 +97,4 @@ public final class QueryServlet extends HttpServlet {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
- }
+}

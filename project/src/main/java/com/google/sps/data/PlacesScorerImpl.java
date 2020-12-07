@@ -3,6 +3,7 @@ package com.google.sps.data;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -40,12 +41,12 @@ public class PlacesScorerImpl implements PlacesScorer {
     }
 
     @Override
-    public ImmutableMap<Place, Double> getScores(
-            ImmutableList<Place> places, LatLng userLocation) {
+    public ImmutableMap<Place, Double> getScores(ImmutableList<Place> places, LatLng userLocation) {
         ImmutableMap<Place, Long> durations;
-		try {
-			durations = getDurations(places, userLocation);
-		} catch (ApiException | InterruptedException | IOException e) {
+        try {
+            durations = getDurations(places, userLocation);
+        } catch (ApiException | InterruptedException | IOException e) {
+            // TODO(Tal): log error
 			return scoreByRating(places);
 		}
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
@@ -56,7 +57,7 @@ public class PlacesScorerImpl implements PlacesScorer {
     }
 
     // Calculates a score for place,
-    // score calculated by the place's rating and driving duration from the user's location.
+    // score calculated by the place's rating and driving duration to the user's location.
     private double calculatePlaceScore(ImmutableMap<Place, Long> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
