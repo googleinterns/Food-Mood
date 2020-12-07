@@ -21,6 +21,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.maps.errors.ApiException;
 import com.google.maps.model.LatLng;
 
 /**
@@ -38,6 +40,7 @@ public final class Places {
 
   /**
    * Sorts the given list of Places randomly.
+   *
    * @param places the list we want to sort.
    * @return a new list containing the original list's elements in random order.
    */
@@ -49,10 +52,11 @@ public final class Places {
 
   /**
    * Sorts the given list of Places by score.
-   * @param places the list we want to sort.
+   *
+   * @param places       the list we want to sort.
    * @param userLocation the user's loaction, used for scores calculations
-   * @return a new list containing the original list's elements
-   *     arranged by descending order of their scores.
+   * @return a new list containing the original list's elements arranged by
+   *         descending order of their scores.
    */
   public static ImmutableList<Place> scoreSort(ImmutableList<Place> places, LatLng userLocation, PlacesScorer scorer) {
     List<Place> mutablePlaces = new ArrayList<>(places);

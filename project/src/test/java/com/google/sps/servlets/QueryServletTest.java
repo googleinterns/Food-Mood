@@ -40,7 +40,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
-import com.google.sps.data.BusinessStatus;
 
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
@@ -151,20 +150,35 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
-    when(REQUEST.getParameter("location")).thenReturn("35.35000000,30.00000000");
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
     when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
     UserPreferences expectedUserPrefs = UserPreferences.builder()
         .setMinRating(4)
         .setMaxPriceLevel(3)
         .setOpenNow(true)
-        .setLocation(new LatLng(35.35000000, 30.00000000))
+        .setLocation(new LatLng(00, 00))
         .setCuisines(ImmutableList.of("sushi", "hamburger"))
         .build();
 
     servlet.doGet(REQUEST, RESPONSE);
 
+    // TODO(M1): this test fails with semi-real ccordinates, because float is unstable.
+    // When we refactor the float to be a double, we'll need to add real values (instead of 0).
+
     verify(FETCHER).fetch(expectedUserPrefs);
   }
+
+  @Test
+  // This test checks that the PlacesScorer is called with the expected parameters
+  public void getRequest_getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+    ImmutableList<Place> places = createPlacesListBySize(1);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+
+    servlet.doGet(REQUEST, RESPONSE);
+    verify(SCORER).getScores(places, new LatLng(00, 00));
+  }
+
 
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.

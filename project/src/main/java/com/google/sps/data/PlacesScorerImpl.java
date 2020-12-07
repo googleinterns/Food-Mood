@@ -41,16 +41,20 @@ public class PlacesScorerImpl implements PlacesScorer {
     }
 
     /**
-    * Returns a map of a place and the score the place gets based on a scoring algorithm.
-    * @return A map between a place to a double representing the place’s score
-    * @throws IOException
-    * @throws InterruptedException
-    * @throws ApiException
-    */
+     * Returns a map of a place and the score the place gets based on a scoring
+     * algorithm.
+     *
+     * @return A map between a place to a double representing the place’s score
+     */
     @Override
     public ImmutableMap<Place, Double> getScores(
-            ImmutableList<Place> places, LatLng userLocation) throws ApiException, InterruptedException, IOException {
-        ImmutableMap<Place, Long> durations = getDurations(places, userLocation);
+            ImmutableList<Place> places, LatLng userLocation) {
+        ImmutableMap<Place, Long> durations;
+		try {
+			durations = getDurations(places, userLocation);
+		} catch (ApiException | InterruptedException | IOException e) {
+			return scoreByRating(places);
+		}
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
             scores.put(place, calcScoreOfPlace(durations, place));
@@ -66,6 +70,12 @@ public class PlacesScorerImpl implements PlacesScorer {
             + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
+    // Scores places by their rating only, used in case of errors in durations calculation.
+    private ImmutableMap<Place, Double> scoreByRating(ImmutableList<Place> places) {
+        return places.stream().collect(
+            ImmutableMap.toImmutableMap(place -> place, place -> place.rating() / MAX_RATING));
+    }
+
     // Returns the duration in seconds from each place on places list to the destination
     private ImmutableMap<Place, Long> getDurations(ImmutableList<Place> places, LatLng destination)
             throws ApiException, InterruptedException, IOException {
@@ -76,13 +86,11 @@ public class PlacesScorerImpl implements PlacesScorer {
             DistanceMatrixApi.newRequest(context)
                 .origins(origins)
                 .destinations(destination)
-                .mode(TravelMode.DRIVING); // This is the default, just wrote it to bring to attention there are other options
+                .mode(TravelMode.DRIVING);
         DistanceMatrix distanceMatrix = getDistanceResults(distanceRequest);
         for (int i = 0; i < places.size(); i++) {
             durations.put(places.get(i), distanceMatrix.rows[i].elements[0].duration.inSeconds);
-            System.out.println(places.get(i).name() + ":" + distanceMatrix.rows[i].elements[0].duration.humanReadable);
         }
-        durations.forEach((place, value) -> System.out.println(place.name() + ":" + value));
         return ImmutableMap.copyOf(durations);
         }
 
