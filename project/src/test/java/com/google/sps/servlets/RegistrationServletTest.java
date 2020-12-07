@@ -36,7 +36,7 @@ public class RegistrationServletTest {
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private UserVerifier userVerifier = mock(UserVerifier.class);
-  private DataAccessor dataAccessor = new DataAccessor();
+  private DataAccessor dataAccessor = mock(DataAccessor.class);
   private RegistrationServlet servlet;
 
   @Before
@@ -52,14 +52,13 @@ public class RegistrationServletTest {
     when(REQUEST.getParameter("idToken")).thenReturn(idToken);
     when(userVerifier.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
     when(dataAccessor.isRegistered(userId)).thenReturn(false);
-    when(dataAccessor.isRegistered(any(String.class))).thenReturn(false);
 
     servlet.doPost(REQUEST, RESPONSE);
-    verify(dataAccessor).isRegistered(userId);
 
     verify(dataAccessor).registerUser(userId);
   }
 
+  @Test
   public void doPost_invalidToken_dontRegister() throws Exception {
     when(REQUEST.getParameter("idToken")).thenReturn(null);
 
@@ -68,6 +67,7 @@ public class RegistrationServletTest {
     verify(dataAccessor, never()).registerUser(any(String.class));
   }
 
+  @Test
   public void doPost_validTokenAlreadyRegisteredUser_dontRegister() throws Exception {
     String idToken = "abcde";
     String userId = "12345";
