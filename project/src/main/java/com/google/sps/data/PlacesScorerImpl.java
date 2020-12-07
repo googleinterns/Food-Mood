@@ -14,7 +14,7 @@ import com.google.maps.model.DistanceMatrix;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.TravelMode;
 
-public class PlacesScorerImpl implements PlacesScorer {
+public final class PlacesScorerImpl implements PlacesScorer {
 
     // The coefficients for the scoring algorithm, sum up to 1.
     private static final double RATING_WEIGHT = 0.7;
