@@ -37,12 +37,12 @@ public class PlacesScorerImpl implements PlacesScorer {
         this.context = geoApiContext;
     }
 
-    @Override
     /**
      * {@inheritDoc}
      *
      * Calculates scores based on driving duration to the user’s location and rating
      */
+    @Override
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
         ImmutableMap<Place, Long> durations;
