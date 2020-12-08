@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.FetcherException;
+import com.google.sps.data.GeoContext;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
@@ -46,7 +47,7 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher();
+    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
     scorer = new PlacesScorerImpl();
   }
 
