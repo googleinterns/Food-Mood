@@ -16,9 +16,7 @@ package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -36,38 +34,37 @@ import org.junit.runners.JUnit4;
 public class UserVerifierTest {
 
   private static final GoogleIdTokenVerifier GOOGLE_VERIFIER = mock(GoogleIdTokenVerifier.class);
-  private static final UserVerifier USER_VERIFIER = new UserVerifier();
+  private UserVerifier userVerifier;
 
   @Before
   public void setUp() {
-    USER_VERIFIER.updateGoogleVerifier(GOOGLE_VERIFIER);
+    userVerifier = new UserVerifier(GOOGLE_VERIFIER);
   }
 
   @Test
   public void getUserIdByToken_emptyIdToken_returnEmptyOptional() {
-    Optional<String> result = USER_VERIFIER.getUserIdByToken("");
+    Optional<String> result = userVerifier.getUserIdByToken("");
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_nullIdToken_returnEmptyOptional() {
-    Optional<String> result = USER_VERIFIER.getUserIdByToken(null);
+    Optional<String> result = userVerifier.getUserIdByToken(null);
 
     assertFalse(result.isPresent());
   }
 
   @Test
-  public void getUserIdByToken_validIdToken_getUserId() throws Exception {
-    UserVerifier spiedUserVerifier = spy(USER_VERIFIER);
+  public void getUserIdByToken_validIdToken_getUserId_s() throws Exception {
     GoogleIdToken mockedToken = mock(GoogleIdToken.class);
-    Payload mockedPayload = mock(Payload.class);
     String validToken = "abcde";
     String validUserId = "12345";
+    Payload payload = new Payload();
+    payload.setSubject(validUserId);
     when(GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
-    when(mockedToken.getPayload()).thenReturn(mockedPayload);
-    doReturn(validUserId).when(spiedUserVerifier).getSubjectFromPayload(mockedPayload);
+    when(mockedToken.getPayload()).thenReturn(payload);
 
-    assertEquals(spiedUserVerifier.getUserIdByToken(validToken), Optional.of(validUserId));
+    assertEquals(userVerifier.getUserIdByToken(validToken), Optional.of(validUserId));
   }
 }

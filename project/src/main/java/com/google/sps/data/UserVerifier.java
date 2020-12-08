@@ -32,7 +32,8 @@ public class UserVerifier {
    * A private constructor that takes in a GoogleIdTokenVerifier object.
    * @param googleVerifier a Google tool for verifying the validity of Google users' tokens
    */
-  private UserVerifier(GoogleIdTokenVerifier googleVerifier) {
+  @VisibleForTesting
+  UserVerifier(GoogleIdTokenVerifier googleVerifier) {
     this.verifier = googleVerifier;
   }
 
@@ -47,16 +48,6 @@ public class UserVerifier {
             .setAudience(Collections.singletonList(clientId))
             .build()
     );
-  }
-
-  /** A constructor meant for enabling mockito to spy this class, so must have no parameters. */
-  @VisibleForTesting
-  UserVerifier() { }
-
-  /** Allows to inject the googleVerifier, meant for enabling mockito to spy and test this class. */
-  @VisibleForTesting
-  void updateGoogleVerifier(GoogleIdTokenVerifier googleVerifier) {
-    this.verifier = googleVerifier;
   }
 
   /**
