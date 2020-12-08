@@ -17,10 +17,12 @@ package com.google.sps.data;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,12 +33,12 @@ import org.junit.runners.JUnit4;
 
 public class UserVerifierTest {
 
-  private GoogleIdTokenVerifier googleVerifier = mock(GoogleIdTokenVerifier.class);
+  private static final GoogleIdTokenVerifier GOOGLE_VERIFIER = mock(GoogleIdTokenVerifier.class);
   private UserVerifier userVerifier;
 
   @Before
   public void setUp() {
-    userVerifier = new UserVerifier(googleVerifier);
+    userVerifier = new UserVerifier(GOOGLE_VERIFIER);
   }
 
   @Test
@@ -55,11 +57,11 @@ public class UserVerifierTest {
 
   @Test
   public void getUserIdByToken_validIdToken_getUserId() throws Exception {
-    GoogleIdToken mockedToken = new GoogleIdToken(null, null, null, null);
-    GoogleIdToken.Payload mockedPayload = new GoogleIdToken.Payload();
+    GoogleIdToken mockedToken = mock(GoogleIdToken.class);
+    Payload mockedPayload = mock(Payload.class);
     String validToken = "abcde";
     String validUserId = "12345";
-    when(googleVerifier.verify(validToken)).thenReturn(mockedToken);
+    when(GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
     when(mockedToken.getPayload()).thenReturn(mockedPayload);
     when(mockedPayload.getSubject()).thenReturn(validUserId);
 

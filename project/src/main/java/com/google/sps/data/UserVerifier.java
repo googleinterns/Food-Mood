@@ -28,6 +28,10 @@ public class UserVerifier {
 
   private GoogleIdTokenVerifier verifier;
 
+  /**
+   * A constructor that takes in a GoogleIdTokenVerifier object.
+   * @param googleVerifier a Google tool for verifying the validity of Google users' tokens
+   */
   @VisibleForTesting
   UserVerifier(GoogleIdTokenVerifier googleVerifier) {
     this.verifier = googleVerifier;
