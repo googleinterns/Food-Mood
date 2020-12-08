@@ -16,13 +16,8 @@ package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -78,37 +73,5 @@ public class DataAccessor {
     checkArgument(!isRegistered(userId), "User already registered.");
     Entity userEntity = new Entity(USER_ENTITY_NAME, userId);
     datastoreService.put(userEntity);
-  }
-
-  /**
-   * Updates the database with information from the user feedback.
-   * @param userId the user who sent the feedback
-   * @param recommendedPlaces a map of places that the user sends feedback about, and a boolean
-   *    that states whether the user chose the place or not
-   * @param requestedToTryAgain whether the user decided to try again (and get a new list of places)
-   */
-  public void updateUserFeedback(String userId, ImmutableList<String> recommendedPlaces) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
-    for (String place : recommendedPlaces) {
-      Entity recommendationEntity = new Entity(RECOMMENDATION_ENTITY_NAME);
-      recommendationEntity.setProperty("UserId", userId);
-      recommendationEntity.setProperty("PlaceId", place);
-      datastoreService.put(recommendationEntity);
-    }
-  }
-
-  /**
-   * Approches the database and gets the places that were recommended to the user in the past.
-   * @param userId the user we want the information about.
-   * @return the IDs of the places that the user received recommendations about in the past.
-   */
-  public ImmutableList<String> getPlacesThatWereRecommendedToUser(String userId) {
-    Filter userIdFilter = new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId);
-    Query query = new Query(RECOMMENDATION_ENTITY_NAME).setFilter(userIdFilter);
-    return datastoreService.prepare(query)
-        .asList(FetchOptions.Builder.withDefaults())
-        .stream()
-        .map(entity -> (String)entity.getProperty("PlaceId"))
-        .collect(ImmutableList.toImmutableList());
   }
 }
