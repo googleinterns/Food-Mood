@@ -41,7 +41,6 @@ import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.BusinessStatus;
 
-
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
 

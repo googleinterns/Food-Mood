@@ -48,7 +48,7 @@ public final class Places {
   /**
    * Sorts the given list of Places by score.
    *
-   * @param places       the list we want to sort.
+   * @param places the list we want to sort
    * @param userLocation the user's loaction, used for scores calculations
    * @param scorer the PlacesScorer which calculates a score for each place
    * @return a new list containing the original list's elements

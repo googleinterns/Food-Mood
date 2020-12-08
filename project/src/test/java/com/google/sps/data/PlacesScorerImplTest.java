@@ -47,24 +47,26 @@ public class PlacesScorerImplTest {
         .setPriceLevel(4)
         .setLocation(new LatLng(32.08, 34.78))
         .setGoogleUrl("google.com")
-        .setPlaceId("placeid1")
+        .setPlaceId("placeid")
+        .setName("name")
         .setBusinessStatus(BusinessStatus.OPERATIONAL);
 
     private static final LatLng USER_LOCATION = new LatLng(33.12, 34.56);
-    private static final Place PLACE_1 = PLACE_BUILDER.setName("name1").setRating(3).build();
-    private static final Place PLACE_2 = PLACE_BUILDER.setName("name2").setRating(5).build();
+    private static final Place PLACE_RATING_3 = PLACE_BUILDER.setRating(3).build();
+    private static final Place PLACE_RATING_5 = PLACE_BUILDER.setRating(5).build();
     private static final String[] PLACES_ADDRESSES = {"Place1 Address", "Place2 Address"};
     private static final String[] USERS_ADDRESS = {"User's Address"};
-    private static final ImmutableList<Place> PLACES_TO_SCORE = ImmutableList.of(PLACE_1, PLACE_2);
+    private static final ImmutableList<Place> PLACES_TO_SCORE =
+        ImmutableList.of(PLACE_RATING_3, PLACE_RATING_5);
     private static final DistanceMatrixRow[] DISTANCE_MATRIX_ROW =
-        createDistanceMatrixRows(2, 1800L); // 30 minutes durations
+        createUniformDistanceMatrixRows(PLACES_ADDRESSES.length, 1800L); // 30 minutes durations
 
     // Each DistanceMatrixRow represents the results for a single origin.
     // Since there is only one destination (the user's location) for all origins (the places),
     // each row will include one DistanceMatrixElement that holds the duration between a place
     // to the user location.
     // This method creates uniform durations between each origin to the destinations.
-    private static DistanceMatrixRow[] createDistanceMatrixRows(
+    private static DistanceMatrixRow[] createUniformDistanceMatrixRows(
             int numOfRows, Long durationInSeconds) {
         DistanceMatrixElement element = new DistanceMatrixElement();
         Duration duration = new Duration();
@@ -97,10 +99,10 @@ public class PlacesScorerImplTest {
         ImmutableMap<Place, Double> result =
             spiedScorer.getScores(PLACES_TO_SCORE, USER_LOCATION);
 
-        Double expectedScorePlace1 = 0.495;
-        Double expectedScorePlace2 = 0.775;
-        assertEquals(expectedScorePlace1, result.get(PLACE_1), DELTA);
-        assertEquals(expectedScorePlace2, result.get(PLACE_2), DELTA);
+        Double expectedScorePlaceRating3 = 0.495;
+        Double expectedScorePlaceRating5 = 0.775;
+        assertEquals(expectedScorePlaceRating3, result.get(PLACE_RATING_3), DELTA);
+        assertEquals(expectedScorePlaceRating5, result.get(PLACE_RATING_5), DELTA);
     }
 
     @Test
@@ -128,10 +130,10 @@ public class PlacesScorerImplTest {
         ImmutableMap<Place, Double> result =
             spiedScorer.getScores(PLACES_TO_SCORE, USER_LOCATION);
 
-        Double expectedScorePlace1 = 0.6;
-        Double expectedScorePlace2 = 1.0;
-        assertEquals(expectedScorePlace1, result.get(PLACE_1), DELTA);
-        assertEquals(expectedScorePlace2, result.get(PLACE_2), DELTA);
+        Double expectedScorePlaceRating3 = 0.6;
+        Double expectedScorePlaceRating5 = 1.0;
+        assertEquals(expectedScorePlaceRating3, result.get(PLACE_RATING_3), DELTA);
+        assertEquals(expectedScorePlaceRating5, result.get(PLACE_RATING_5), DELTA);
     }
 
 }

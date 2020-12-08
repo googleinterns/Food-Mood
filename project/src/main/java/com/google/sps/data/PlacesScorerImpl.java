@@ -47,7 +47,7 @@ public class PlacesScorerImpl implements PlacesScorer {
             durations = getDurations(places, userLocation);
         } catch (ApiException | InterruptedException | IOException e) {
             // TODO(Tal): log error
-			return scoreByRating(places);
+		    return scoreByRating(places);
         }
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
@@ -73,7 +73,7 @@ public class PlacesScorerImpl implements PlacesScorer {
     // Returns the duration in seconds from each place on places list to the destination
     private ImmutableMap<Place, Long> getDurations(ImmutableList<Place> places, LatLng destination)
             throws ApiException, InterruptedException, IOException {
-        Map<Place, Long> durations = new HashMap<>();
+        ImmutableMap.Builder<Place, Long> durations = new ImmutableMap.Builder<>();
         LatLng[] origins = places.stream()
             .map(place -> place.location()).toArray(LatLng[]::new);
         DistanceMatrixApiRequest distanceRequest =
@@ -85,9 +85,8 @@ public class PlacesScorerImpl implements PlacesScorer {
         for (int i = 0; i < places.size(); i++) {
             durations.put(places.get(i), distanceMatrix.rows[i].elements[0].duration.inSeconds);
         }
-        return ImmutableMap.copyOf(durations);
-        }
-
+        return durations.build();
+    }
 
     /**
     * Queries Google Places API according to given query.
@@ -96,9 +95,9 @@ public class PlacesScorerImpl implements PlacesScorer {
     *     and the user's location as the destination
     * @return A DistanceMatrix containig the distance and duration from each origin
     *     to the destination, each row in the matrix corresponds to an origin
-    * @throws IOException
-    * @throws InterruptedException
-    * @throws ApiException
+    * @throws IOException Thrown when an I/O exception of some sort has occurred
+    * @throws InterruptedException Thrown when a thread is occupied and interrupted
+    * @throws ApiException Thrown if the API returned result is an error
     */
     @VisibleForTesting
     DistanceMatrix getDistanceResults(DistanceMatrixApiRequest distanceMatRequest)
