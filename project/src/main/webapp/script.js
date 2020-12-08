@@ -376,6 +376,7 @@ function onSignIn(user) {
       "Hello, " + user.getBasicProfile().getName() + "!";
   googleUser = user;
   registerUserByToken();
+  document.getElementById('sign-out-button').style.display = 'inline-block';
 }
 
 /** Called when a user signs out of a Google account, updates the screen and the global user. */
@@ -384,6 +385,7 @@ function signOut() {
   document.getElementById('user-welcome-message-container').innerText =
       'You are currently not logged in with a Google account.';
   googleUser = null;
+  document.getElementById('sign-out-button').style.display = 'none';
 }
 
 /** Registers the logged in user, using the registration servlet. */
