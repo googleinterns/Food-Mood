@@ -24,9 +24,7 @@ import com.google.sps.data.DataAccessor;
 import com.google.sps.data.UserVerifier;
 import com.google.common.annotations.VisibleForTesting;
 
- /**
- * A servlet that registering a user, according to a given token.
-*/
+/** A servlet that registers a user, according to a given token. */
 @WebServlet("/register")
 public final class RegistrationServlet extends HttpServlet {
 
@@ -36,7 +34,7 @@ public final class RegistrationServlet extends HttpServlet {
 
   @Override
   public void init() {
-    this.userVerifier = UserVerifier.create("CLIENT_ID");
+    this.userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
     this.dataAccessor = new DataAccessor();
   }
 

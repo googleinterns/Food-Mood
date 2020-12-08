@@ -35,14 +35,14 @@ public class RegistrationServletTest {
 
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
-  private UserVerifier userVerifier = mock(UserVerifier.class);
-  private DataAccessor dataAccessor = mock(DataAccessor.class);
+  private static final UserVerifier USER_VERIFIER = mock(UserVerifier.class);
+  private static final DataAccessor DATA_ACCESSOR = mock(DataAccessor.class);
   private RegistrationServlet servlet;
 
   @Before
   public void setUp() throws Exception {
     servlet = new RegistrationServlet();
-    servlet.init(userVerifier, dataAccessor);
+    servlet.init(USER_VERIFIER, DATA_ACCESSOR);
   }
 
   @Test
@@ -50,12 +50,12 @@ public class RegistrationServletTest {
     String idToken = "abcde";
     String userId = "12345";
     when(REQUEST.getParameter("idToken")).thenReturn(idToken);
-    when(userVerifier.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
-    when(dataAccessor.isRegistered(userId)).thenReturn(false);
+    when(USER_VERIFIER.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
+    when(DATA_ACCESSOR.isRegistered(userId)).thenReturn(false);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(dataAccessor).registerUser(userId);
+    verify(DATA_ACCESSOR).registerUser(userId);
   }
 
   @Test
@@ -64,7 +64,7 @@ public class RegistrationServletTest {
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(dataAccessor, never()).registerUser(any(String.class));
+    verify(DATA_ACCESSOR, never()).registerUser(any(String.class));
   }
 
   @Test
@@ -72,11 +72,11 @@ public class RegistrationServletTest {
     String idToken = "abcde";
     String userId = "12345";
     when(REQUEST.getParameter("idToken")).thenReturn(idToken);
-    when(userVerifier.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
-    when(dataAccessor.isRegistered(userId)).thenReturn(true);
+    when(USER_VERIFIER.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
+    when(DATA_ACCESSOR.isRegistered(userId)).thenReturn(true);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(dataAccessor, never()).registerUser(userId);
+    verify(DATA_ACCESSOR, never()).registerUser(userId);
   }
 }
