@@ -44,9 +44,6 @@ function fetchFromQuery() {
   displayResultsPage();
   const userCoords = JSON.parse(localStorage.getItem('userLocation'));
   const map = createMap({lat: userCoords.lat, lng: userCoords.lng});
-  if (googleUser) {
-    registerUserByToken();
-  }
   fetch('/query?' + params)
       .then(response => response.json())
       .then((places) => {
@@ -378,6 +375,7 @@ function onSignIn(user) {
   document.getElementById('user-welcome-message-container').innerText =
       "Hello, " + user.getBasicProfile().getName() + "!";
   googleUser = user;
+  registerUserByToken();
 }
 
 /** Called when a user signs out of a Google account, updates the screen and the global user. */
