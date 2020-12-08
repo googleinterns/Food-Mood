@@ -92,7 +92,7 @@ public final class PlacesTest {
   @Test
   public void filter_floatingPointRating_filterOutByRoundingToNearestInt() {
     // This test checks that the rating is filtered after rounding it to the nearest int.
-    // For example, when places with 5 starts are desired, places that have at least 4.5 stars will
+    // For example, when places with 5 starts are desired, places that have more than 4.5 stars will
     // be supplied.
     int threshRating = 4;
     Place higherRatingPlace =
