@@ -19,8 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.LatLng;
 
 /**
- * Responsible for calculating a place’s score
- * based on driving duration to the user’s location and rating.
+ * Responsible for calculating a place’s score.
  */
 public interface PlacesScorer {
 

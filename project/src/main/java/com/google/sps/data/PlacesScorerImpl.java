@@ -1,8 +1,6 @@
 package com.google.sps.data;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -40,14 +38,18 @@ public class PlacesScorerImpl implements PlacesScorer {
     }
 
     @Override
+    /**
+     * {@inheritDoc}
+     *
+     * Calculates scores based on driving duration to the user’s location and rating
+     */
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
         ImmutableMap<Place, Long> durations;
         try {
             durations = getDurations(places, userLocation);
         } catch (ApiException | InterruptedException | IOException e) {
-            // TODO(Tal): log error
-		    return scoreByRating(places);
+            return scoreByRating(places); // TODO(Tal): log error
         }
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
