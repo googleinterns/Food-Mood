@@ -29,11 +29,10 @@ public class UserVerifier {
   private GoogleIdTokenVerifier verifier;
 
   /**
-   * A constructor that takes in a GoogleIdTokenVerifier object.
+   * A private constructor that takes in a GoogleIdTokenVerifier object.
    * @param googleVerifier a Google tool for verifying the validity of Google users' tokens
    */
-  @VisibleForTesting
-  UserVerifier(GoogleIdTokenVerifier googleVerifier) {
+  private UserVerifier(GoogleIdTokenVerifier googleVerifier) {
     this.verifier = googleVerifier;
   }
 
@@ -48,6 +47,16 @@ public class UserVerifier {
             .setAudience(Collections.singletonList(clientId))
             .build()
     );
+  }
+
+  /** A constructor meant for enabling mockito to spy this class, so must have no parameters. */
+  @VisibleForTesting
+  UserVerifier() { }
+
+  /** Allows to inject the googleVerifier, meant for enabling mockito to spy and test this class. */
+  @VisibleForTesting
+  void updateGoogleVerifier(GoogleIdTokenVerifier googleVerifier) {
+    this.verifier = googleVerifier;
   }
 
   /**
@@ -65,7 +74,14 @@ public class UserVerifier {
       return Optional.empty();
     }
     return googleIdToken != null
-        ? Optional.of(googleIdToken.getPayload().getSubject())
+        ? getSubjectFromPayload(googleIdToken.getPayload())
         : Optional.empty();
+  }
+
+  @VisibleForTesting
+  // This function wraps the call to GoogleIdToken.Payload.getSubject(). That's done in order to
+  // enable testing, because the function is final and cannot be mocked.
+  Optional<String> getSubjectFromPayload(GoogleIdToken.Payload payload) {
+    return Optional.of(payload.getSubject());
   }
 }
