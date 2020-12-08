@@ -44,14 +44,14 @@ public class UserVerifierTest {
   }
 
   @Test
-  public void getUserIdByToken_emptyIdToken_emptyOptional() {
+  public void getUserIdByToken_emptyIdToken_returnEmptyOptional() {
     Optional<String> result = USER_VERIFIER.getUserIdByToken("");
 
     assertFalse(result.isPresent());
   }
 
   @Test
-  public void getUserIdByToken_nullIdToken_emptyOptional() {
+  public void getUserIdByToken_nullIdToken_returnEmptyOptional() {
     Optional<String> result = USER_VERIFIER.getUserIdByToken(null);
 
     assertFalse(result.isPresent());
@@ -66,7 +66,7 @@ public class UserVerifierTest {
     String validUserId = "12345";
     when(GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
     when(mockedToken.getPayload()).thenReturn(mockedPayload);
-    doReturn(Optional.of(validUserId)).when(spiedUserVerifier).getSubjectFromPayload(mockedPayload);
+    doReturn(validUserId).when(spiedUserVerifier).getSubjectFromPayload(mockedPayload);
 
     assertEquals(spiedUserVerifier.getUserIdByToken(validToken), Optional.of(validUserId));
   }

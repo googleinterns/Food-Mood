@@ -64,7 +64,7 @@ public class UserVerifier {
    * the user's id, if the process was successful.
    *
    * @param idToken the token of the user
-   * @return an optional that holds the verified user ID, or null if the process wasn't successful
+   * @return an Optional with the verified user ID in case of success (and an empty optional else)
    */
   public Optional<String> getUserIdByToken(String idToken) {
     GoogleIdToken googleIdToken;
@@ -74,14 +74,14 @@ public class UserVerifier {
       return Optional.empty();
     }
     return googleIdToken != null
-        ? getSubjectFromPayload(googleIdToken.getPayload())
+        ? Optional.of(getSubjectFromPayload(googleIdToken.getPayload()))
         : Optional.empty();
   }
 
   @VisibleForTesting
   // This function wraps the call to GoogleIdToken.Payload.getSubject(). That's done in order to
   // enable testing, because the function is final and cannot be mocked.
-  Optional<String> getSubjectFromPayload(GoogleIdToken.Payload payload) {
-    return Optional.of(payload.getSubject());
+  String getSubjectFromPayload(GoogleIdToken.Payload payload) {
+    return payload.getSubject();
   }
 }
