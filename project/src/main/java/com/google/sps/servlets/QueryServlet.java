@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.FetcherException;
-import com.google.sps.data.GeoContext;
 import com.google.sps.data.Place;
 import com.google.sps.data.Places;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,7 +28,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
+import com.google.sps.data.PlacesScorerImpl;
 
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
@@ -41,22 +42,25 @@ public final class QueryServlet extends HttpServlet {
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
-
+  private PlacesScorer scorer;
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+    fetcher = new PlacesFetcher();
+    scorer = new PlacesScorerImpl();
   }
 
-  void init(PlacesFetcher inputFetcher) {
+  void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
     fetcher = inputFetcher;
+    scorer = inputScorer;
   }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     ImmutableList<Place> filteredPlaces;
+    UserPreferences userPrefs;
     try {
-      UserPreferences userPrefs =
+      userPrefs =
           UserPreferences.builder()
               .setMinRating(Float.parseFloat(request.getParameter("rating")))
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
@@ -81,10 +85,10 @@ public final class QueryServlet extends HttpServlet {
     }
     response.setContentType("application/json");
     response.getWriter().write(new Gson().toJson(
-        Places.randomSort(filteredPlaces)
-            .stream()
-            .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-            .collect(Collectors.toList())
+      Places.scoreSort(filteredPlaces, userPrefs.location(), scorer)
+          .stream()
+          .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+          .collect(Collectors.toList())
     ));
   }
 
