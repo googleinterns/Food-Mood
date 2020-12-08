@@ -36,37 +36,38 @@ import org.junit.runners.JUnit4;
 public class UserVerifierTest {
 
   private static final GoogleIdTokenVerifier GOOGLE_VERIFIER = mock(GoogleIdTokenVerifier.class);
-  private static final UserVerifier SPIED_USER_VERIFIER = spy(UserVerifier.class);
+  private static final UserVerifier USER_VERIFIER = new UserVerifier();
 
   @Before
   public void setUp() {
-    SPIED_USER_VERIFIER.updateGoogleVerifier(GOOGLE_VERIFIER);
+    USER_VERIFIER.updateGoogleVerifier(GOOGLE_VERIFIER);
   }
 
   @Test
   public void getUserIdByToken_emptyIdToken_emptyOptional() {
-    Optional<String> result = SPIED_USER_VERIFIER.getUserIdByToken("");
+    Optional<String> result = USER_VERIFIER.getUserIdByToken("");
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_nullIdToken_emptyOptional() {
-    Optional<String> result = SPIED_USER_VERIFIER.getUserIdByToken(null);
+    Optional<String> result = USER_VERIFIER.getUserIdByToken(null);
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_validIdToken_getUserId() throws Exception {
+    UserVerifier spiedUserVerifier = spy(USER_VERIFIER);
     GoogleIdToken mockedToken = mock(GoogleIdToken.class);
     Payload mockedPayload = mock(Payload.class);
     String validToken = "abcde";
     String validUserId = "12345";
     when(GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
     when(mockedToken.getPayload()).thenReturn(mockedPayload);
-    doReturn(Optional.of(validUserId)).when(SPIED_USER_VERIFIER).getSubjectFromPayload(mockedPayload);
+    doReturn(Optional.of(validUserId)).when(spiedUserVerifier).getSubjectFromPayload(mockedPayload);
 
-    assertEquals(SPIED_USER_VERIFIER.getUserIdByToken(validToken), Optional.of(validUserId));
+    assertEquals(spiedUserVerifier.getUserIdByToken(validToken), Optional.of(validUserId));
   }
 }
