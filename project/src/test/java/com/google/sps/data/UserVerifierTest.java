@@ -25,6 +25,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import java.util.Optional;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -34,41 +36,37 @@ import org.junit.runners.JUnit4;
 public class UserVerifierTest {
 
   private static final GoogleIdTokenVerifier GOOGLE_VERIFIER = mock(GoogleIdTokenVerifier.class);
+  private static final UserVerifier SPIED_USER_VERIFIER = spy(UserVerifier.class);
+
+  @Before
+  public void setUp() {
+    SPIED_USER_VERIFIER.updateGoogleVerifier(GOOGLE_VERIFIER);
+  }
 
   @Test
   public void getUserIdByToken_emptyIdToken_emptyOptional() {
-    UserVerifier userVerifier = createUserVerifierWithGoogleVerfier();
-    Optional<String> result = userVerifier.getUserIdByToken("");
+    Optional<String> result = SPIED_USER_VERIFIER.getUserIdByToken("");
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_nullIdToken_emptyOptional() {
-    UserVerifier userVerifier = createUserVerifierWithGoogleVerfier();
-    Optional<String> result = userVerifier.getUserIdByToken(null);
+    Optional<String> result = SPIED_USER_VERIFIER.getUserIdByToken(null);
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_validIdToken_getUserId() throws Exception {
-    UserVerifier spiedUserVerifier = spy(UserVerifier.class);
     GoogleIdToken mockedToken = mock(GoogleIdToken.class);
     Payload mockedPayload = mock(Payload.class);
     String validToken = "abcde";
     String validUserId = "12345";
-    spiedUserVerifier.updateGoogleVerifier(GOOGLE_VERIFIER);
     when(GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
     when(mockedToken.getPayload()).thenReturn(mockedPayload);
-    doReturn(Optional.of(validUserId)).when(spiedUserVerifier).getSubjectFromPayload(mockedPayload);
+    doReturn(Optional.of(validUserId)).when(SPIED_USER_VERIFIER).getSubjectFromPayload(mockedPayload);
 
-    assertEquals(spiedUserVerifier.getUserIdByToken(validToken), Optional.of(validUserId));
-  }
-
-  private UserVerifier createUserVerifierWithGoogleVerfier() {
-    UserVerifier userVerifier = new UserVerifier();
-    userVerifier.updateGoogleVerifier(GOOGLE_VERIFIER);
-    return userVerifier;
+    assertEquals(SPIED_USER_VERIFIER.getUserIdByToken(validToken), Optional.of(validUserId));
   }
 }
