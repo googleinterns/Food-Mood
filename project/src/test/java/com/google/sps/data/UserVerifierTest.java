@@ -23,8 +23,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import java.util.Optional;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -33,24 +31,20 @@ import org.junit.runners.JUnit4;
 
 public class UserVerifierTest {
 
-  private static final GoogleIdTokenVerifier GOOGLE_VERIFIER = mock(GoogleIdTokenVerifier.class);
-  private UserVerifier userVerifier;
-
-  @Before
-  public void setUp() {
-    userVerifier = new UserVerifier(GOOGLE_VERIFIER);
-  }
+  private static final GoogleIdTokenVerifier MOCKED_GOOGLE_VERIFIER
+      = mock(GoogleIdTokenVerifier.class);
+  private static final UserVerifier USER_VERIFIER = new UserVerifier(MOCKED_GOOGLE_VERIFIER);
 
   @Test
   public void getUserIdByToken_emptyIdToken_returnEmptyOptional() {
-    Optional<String> result = userVerifier.getUserIdByToken("");
+    Optional<String> result = USER_VERIFIER.getUserIdByToken("");
 
     assertFalse(result.isPresent());
   }
 
   @Test
   public void getUserIdByToken_nullIdToken_returnEmptyOptional() {
-    Optional<String> result = userVerifier.getUserIdByToken(null);
+    Optional<String> result = USER_VERIFIER.getUserIdByToken(null);
 
     assertFalse(result.isPresent());
   }
@@ -62,9 +56,9 @@ public class UserVerifierTest {
     String validUserId = "12345";
     Payload payload = new Payload();
     payload.setSubject(validUserId);
-    when(GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
+    when(MOCKED_GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
     when(mockedToken.getPayload()).thenReturn(payload);
 
-    assertEquals(userVerifier.getUserIdByToken(validToken), Optional.of(validUserId));
+    assertEquals(USER_VERIFIER.getUserIdByToken(validToken), Optional.of(validUserId));
   }
 }
