@@ -15,6 +15,7 @@
 package com.google.sps.servlets;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +33,8 @@ import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.PlacesScorerImpl;
+import com.google.sps.data.DataAccessor;
+import com.google.sps.data.UserVerifier;
 
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
@@ -44,16 +47,26 @@ public final class QueryServlet extends HttpServlet {
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
   private PlacesScorer scorer;
+  private UserVerifier userVerifier;
+  private DataAccessor dataAccessor;
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
     scorer = new PlacesScorerImpl();
+    userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
+    dataAccessor = new DataAccessor();
   }
 
-  void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
+  void init(
+      PlacesFetcher inputFetcher,
+      PlacesScorer inputScorer,
+      UserVerifier inputUserVerifier,
+      DataAccessor inputDataAccessor) {
     fetcher = inputFetcher;
     scorer = inputScorer;
+    userVerifier = inputUserVerifier;
+    dataAccessor = inputDataAccessor;
   }
 
   @Override
@@ -69,6 +82,8 @@ public final class QueryServlet extends HttpServlet {
               .setLocation(getLatLngFromString(request.getParameter("location")))
               .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
               .build();
+      String userIdToken = request.getParameter("idToken");
+      storePreferences(userIdToken, userPrefs);
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* min rating */,
@@ -93,8 +108,23 @@ public final class QueryServlet extends HttpServlet {
     ));
   }
 
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+  }
+
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
- }
+
+  // Store the user's preferences in the database only if this is a signed in user.
+  private void storePreferences(String userIdToken, UserPreferences userPrefs) {
+    Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
+    if (!optionalUserId.isPresent()) {
+        return;
+    }
+    String userId = optionalUserId.get();
+    dataAccessor.storeUserPreferences(userId, userPrefs);
+  }
+}

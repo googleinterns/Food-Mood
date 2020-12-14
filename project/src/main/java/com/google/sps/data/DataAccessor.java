@@ -35,7 +35,7 @@ public class DataAccessor {
   private final DatastoreService datastoreService;
   @VisibleForTesting
   static final String USER_ENTITY_KIND = "User";
-  static final String PREFERNCE_ENTITY_KIND = "UserPreferences";
+  static final String PREFERNCES_ENTITY_KIND = "UserPreferences";
 
   /**
    * A constructor that creates a DatastoreService instance for the class.
@@ -83,8 +83,9 @@ public class DataAccessor {
    * @param userId The ID of the user to store the preferred cuisines for.
    * @param userPref The user choices on the query form to store in the user’s database.
    */
-  public void storeUserPreferences(int userId, UserPreferences userPref) {
-    Entity userEntity = new Entity(PREFERNCE_ENTITY_KIND);
+  public void storeUserPreferences(String userId, UserPreferences userPref) {
+    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
+    Entity userEntity = new Entity(PREFERNCES_ENTITY_KIND);
     userEntity.setProperty("userId", userId);
     userEntity.setProperty("date", new Date());
     userEntity.setProperty("preferedCuisines", userPref.cuisines());

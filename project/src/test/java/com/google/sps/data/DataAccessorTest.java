@@ -125,6 +125,37 @@ public final class DataAccessorTest {
     assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(userId));
   }
 
+  @Test
+  public void storeUserPreferences_validUserIdAndPreferences_userPreferencesStored() {
+    String userId = "12345";
+
+    dataAccessor.storeUserPreferences(userId, );
+    List<Entity> results = createPreparedQueryByUserId(userId)
+        .asList(FetchOptions.Builder.withDefaults());
+
+    assertEquals(results.size(), 1);
+    assertEquals(results.get(0), new Entity(DataAccessor.PREFERNCES_ENTITY_KIND));
+  }
+
+  @Test
+  public void storeUserPreferences_validUserIdNoPreferedCuisines_emptyListStored() {
+    String userId = "12345";
+
+    dataAccessor.storeUserPreferences(userId, );
+    List<Entity> results = createPreparedQueryByUserId(userId)
+        .asList(FetchOptions.Builder.withDefaults());
+
+    assertEquals(results.size(), 1);
+    assertEquals(results.get(0), new Entity(DataAccessor.PREFERNCES_ENTITY_KIND));
+  }
+
+
+  @Test
+  public void storeUserPreferences_emptydUserId_throwIllegalArgumentException() {
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(""));
+  }
+
+
   private PreparedQuery createPreparedQueryByUserId(String userId) {
     Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_KIND, userId);
     Filter userIdFilter = new Query.FilterPredicate(
