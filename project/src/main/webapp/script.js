@@ -15,6 +15,9 @@
 // The user location map. the map has to be accessed from different functions.
 let globalUserMap;
 
+// The current Google user.
+let googleUser = null;
+
 /**
  * Fetches recommended places from the 'query' servlet, and switches from the query form to the
  * results elements in order to display them to the user.
@@ -29,6 +32,7 @@ function fetchFromQuery() {
       `price=${getUserPriceFromUi()}`,
       `open=${getUserOpenNowFromUi()}`,
       `location=${getUserLocationFromUi()}`
+      `idToken=${getUserIdToken()}`
     ].join('&');
   } catch (error) {
     document.getElementById('input-error-container').innerText = 'ERROR: ' + error.message;
@@ -75,6 +79,13 @@ function getUsercuisinesFromUi() {
 
 function getUserRatingFromUi() {
   return getCheckedValueByElementId('rating-form', 'Choose exactly one rating.');
+}
+
+function getUserIdToken() {
+  if (!googleUser) {
+    return "";
+  }
+  return googleUser.getAuthResponse().id_token;
 }
 
 function getUserPriceFromUi() {
