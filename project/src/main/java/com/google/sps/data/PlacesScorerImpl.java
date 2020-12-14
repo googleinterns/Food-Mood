@@ -9,6 +9,8 @@ import com.google.maps.DistanceMatrixApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.DistanceMatrix;
+import com.google.maps.model.DistanceMatrixElement;
+import com.google.maps.model.DistanceMatrixElementStatus;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.TravelMode;
 
@@ -23,7 +25,7 @@ public class PlacesScorerImpl implements PlacesScorer {
 
     // The maximum durations in seconds, so that any duration higher than that
     // will not contribute to the place's score.
-    private static final double MAX_DURATION_SECONDS = 40 * 60;
+    private static final long MAX_DURATION_SECONDS = 40 * 60;
 
     // The entry point for a Google GEO API request.
     private GeoApiContext context;
@@ -63,7 +65,7 @@ public class PlacesScorerImpl implements PlacesScorer {
     private double calculatePlaceScore(ImmutableMap<Place, Long> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
-            + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
+            + DURATION_WEIGHT * Math.max(1 - ((double)durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
     // Scores places by their rating only, used in case of errors in durations calculation.
@@ -85,7 +87,12 @@ public class PlacesScorerImpl implements PlacesScorer {
                 .mode(TravelMode.DRIVING);
         DistanceMatrix distanceMatrix = getDistanceResults(distanceRequest);
         for (int i = 0; i < places.size(); i++) {
-            durations.put(places.get(i), distanceMatrix.rows[i].elements[0].duration.inSeconds);
+            DistanceMatrixElement element = distanceMatrix.rows[i].elements[0];
+            if (element.status == DistanceMatrixElementStatus.OK) {
+                durations.put(places.get(i), element.duration.inSeconds);
+            } else { //TODO: decide if this place should be filtered out
+                durations.put(places.get(i), MAX_DURATION_SECONDS);
+            }
         }
         return durations.build();
     }

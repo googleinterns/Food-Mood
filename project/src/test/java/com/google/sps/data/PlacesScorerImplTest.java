@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.maps.DistanceMatrixApiRequest;
 import com.google.maps.model.DistanceMatrix;
 import com.google.maps.model.DistanceMatrixElement;
+import com.google.maps.model.DistanceMatrixElementStatus;
 import com.google.maps.model.DistanceMatrixRow;
 import com.google.maps.model.Duration;
 import com.google.maps.model.LatLng;
@@ -52,12 +53,8 @@ public class PlacesScorerImplTest {
         .setBusinessStatus(BusinessStatus.OPERATIONAL);
 
     private static final LatLng USER_LOCATION = new LatLng(33.12, 34.56);
-    private static final Place PLACE_RATING_3 = PLACE_BUILDER.setRating(3).build();
-    private static final Place PLACE_RATING_5 = PLACE_BUILDER.setRating(5).build();
     private static final String[] PLACES_ADDRESSES = {"Place1 Address", "Place2 Address"};
     private static final String[] USERS_ADDRESS = {"User's Address"};
-    private static final ImmutableList<Place> PLACES_TO_SCORE =
-        ImmutableList.of(PLACE_RATING_3, PLACE_RATING_5);
     private static final DistanceMatrixRow[] DISTANCE_MATRIX_ROW =
         createUniformDistanceMatrixRows(PLACES_ADDRESSES.length, 1800L); // 30 minutes durations
 
@@ -72,6 +69,7 @@ public class PlacesScorerImplTest {
         Duration duration = new Duration();
         duration.inSeconds = durationInSeconds;
         element.duration = duration;
+        element.status = DistanceMatrixElementStatus.OK;
         DistanceMatrixRow[] distanceMatrixRows = new DistanceMatrixRow[numOfRows];
         for (int i = 0; i < numOfRows; i++) {
             DistanceMatrixRow distanceMatrixSingleRow = new DistanceMatrixRow();
@@ -89,20 +87,23 @@ public class PlacesScorerImplTest {
     public void getScores_validPlaceList_returnsMapOfCorrectScores() throws Exception {
         // Expected scores are calculated by the following algorithm:
         // Score(place) = rating*0.7 + drivingETA*0.3, such that:
-        // rating = place's rating / Max Rating
+        // rating = place's rating / Max Rating(=5)
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
+        Place PlaceWithRating3 = PLACE_BUILDER.setRating(3).build();
+        Place PlaceWithRating5 = PLACE_BUILDER.setRating(5).build();
         PlacesScorerImpl spiedScorer = spy(placesScorer);
         doReturn(new DistanceMatrix(PLACES_ADDRESSES, USERS_ADDRESS, DISTANCE_MATRIX_ROW))
             .when(spiedScorer)
             .getDistanceResults(any(DistanceMatrixApiRequest.class));
 
         ImmutableMap<Place, Double> result =
-            spiedScorer.getScores(PLACES_TO_SCORE, USER_LOCATION);
+            spiedScorer.getScores(
+                ImmutableList.of(PlaceWithRating3, PlaceWithRating5), USER_LOCATION);
 
         Double expectedScorePlaceRating3 = 0.495;
         Double expectedScorePlaceRating5 = 0.775;
-        assertEquals(expectedScorePlaceRating3, result.get(PLACE_RATING_3), DELTA);
-        assertEquals(expectedScorePlaceRating5, result.get(PLACE_RATING_5), DELTA);
+        assertEquals(expectedScorePlaceRating3, result.get(PlaceWithRating3), DELTA);
+        assertEquals(expectedScorePlaceRating5, result.get(PlaceWithRating5), DELTA);
     }
 
     @Test
@@ -121,19 +122,49 @@ public class PlacesScorerImplTest {
     public void getScores_durationCalculationFails_returnScoresByRating() throws Exception {
         // When duration calculations fail the expected scores are calculated by ratings only:
         // Score(place) = rating, such that:
-        // rating = place's rating / Max Rating (= 5)
+        // rating = place's rating / Max Rating(=5)
+        Place PlaceWithRating3 = PLACE_BUILDER.setRating(3).build();
+        Place PlaceWithRating5 = PLACE_BUILDER.setRating(5).build();
         PlacesScorerImpl spiedScorer = spy(placesScorer);
         doThrow(new IOException())
             .when(spiedScorer)
             .getDistanceResults(any(DistanceMatrixApiRequest.class));
 
         ImmutableMap<Place, Double> result =
-            spiedScorer.getScores(PLACES_TO_SCORE, USER_LOCATION);
+            spiedScorer.getScores(
+                ImmutableList.of(PlaceWithRating3, PlaceWithRating5), USER_LOCATION);
 
         Double expectedScorePlaceRating3 = 0.6;
         Double expectedScorePlaceRating5 = 1.0;
-        assertEquals(expectedScorePlaceRating3, result.get(PLACE_RATING_3), DELTA);
-        assertEquals(expectedScorePlaceRating5, result.get(PLACE_RATING_5), DELTA);
+        assertEquals(expectedScorePlaceRating3, result.get(PlaceWithRating3), DELTA);
+        assertEquals(expectedScorePlaceRating5, result.get(PlaceWithRating5), DELTA);
     }
+
+
+    @Test
+    public void getScores_invalidDurationStatus_scoresByMaxDuration() throws Exception {
+        // Expected scores are calculated by the following algorithm:
+        // Score(place) = rating*0.7 + drivingETA*0.3, such that:
+        // rating = place's rating / Max Rating(=5)
+        // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
+        Place placeWithMaxRating1 = PLACE_BUILDER.setName("place1").setRating(5).build();
+        Place placeWithMaxRating2 = PLACE_BUILDER.setName("place2").setRating(5).build();
+        DISTANCE_MATRIX_ROW[0].elements[0].status = DistanceMatrixElementStatus.ZERO_RESULTS;
+        DISTANCE_MATRIX_ROW[1].elements[0].status = DistanceMatrixElementStatus.NOT_FOUND;
+        PlacesScorerImpl spiedScorer = spy(placesScorer);
+        doReturn(new DistanceMatrix(PLACES_ADDRESSES, USERS_ADDRESS, DISTANCE_MATRIX_ROW))
+            .when(spiedScorer)
+            .getDistanceResults(any(DistanceMatrixApiRequest.class));
+
+        ImmutableMap<Place, Double> result =
+            spiedScorer.getScores(
+                ImmutableList.of(placeWithMaxRating1, placeWithMaxRating2), USER_LOCATION);
+
+        Double expectedScore = 0.7;
+        assertEquals(expectedScore, result.get(placeWithMaxRating1), DELTA);
+        assertEquals(expectedScore, result.get(placeWithMaxRating2), DELTA);
+    }
+
+
 
 }
