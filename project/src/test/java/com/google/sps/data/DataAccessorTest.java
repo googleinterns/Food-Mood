@@ -67,7 +67,7 @@ public final class DataAccessorTest {
   @Test
   public void isRegistered_registered_true() {
     String userId = "12345";
-    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, userId);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_KIND, userId);
     datastoreService.put(userEntity);
 
     assertTrue(dataAccessor.isRegistered(userId));
@@ -77,7 +77,7 @@ public final class DataAccessorTest {
   public void isRegistered_notRegistered_false() {
     String registeredUserId = "12345";
     String unRegisteredUserId = "54321";
-    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, registeredUserId);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_KIND, registeredUserId);
     datastoreService.put(userEntity);
 
     assertFalse(dataAccessor.isRegistered(unRegisteredUserId));
@@ -102,7 +102,7 @@ public final class DataAccessorTest {
         .asList(FetchOptions.Builder.withDefaults());
 
     assertEquals(results.size(), 1);
-    assertEquals(results.get(0), new Entity(DataAccessor.USER_ENTITY_NAME, userId));
+    assertEquals(results.get(0), new Entity(DataAccessor.USER_ENTITY_KIND, userId));
   }
 
   @Test
@@ -126,12 +126,12 @@ public final class DataAccessorTest {
   }
 
   private PreparedQuery createPreparedQueryByUserId(String userId) {
-    Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_NAME, userId);
+    Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_KIND, userId);
     Filter userIdFilter = new Query.FilterPredicate(
         Entity.KEY_RESERVED_PROPERTY,
         FilterOperator.EQUAL,
         userIdKey);
-    Query query = new Query(DataAccessor.USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
+    Query query = new Query(DataAccessor.USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query);
   }
 }

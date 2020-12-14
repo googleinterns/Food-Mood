@@ -16,6 +16,8 @@ package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.Date;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -32,7 +34,8 @@ public class DataAccessor {
 
   private final DatastoreService datastoreService;
   @VisibleForTesting
-  static final String USER_ENTITY_NAME = "User";
+  static final String USER_ENTITY_KIND = "User";
+  static final String PREFERNCE_ENTITY_KIND = "UserPreferences";
 
   /**
    * A constructor that creates a DatastoreService instance for the class.
@@ -53,10 +56,10 @@ public class DataAccessor {
   */
   public boolean isRegistered(String userId) {
     checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
-    Key userIdKey = KeyFactory.createKey(USER_ENTITY_NAME, userId);
+    Key userIdKey = KeyFactory.createKey(USER_ENTITY_KIND, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
-    Query query = new Query(USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
+    Query query = new Query(USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query)
         .asList(FetchOptions.Builder.withDefaults())
         .size() > 0;
@@ -70,7 +73,22 @@ public class DataAccessor {
   public void registerUser(String userId) {
     checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
     checkArgument(!isRegistered(userId), "User already registered.");
-    Entity userEntity = new Entity(USER_ENTITY_NAME, userId);
+    Entity userEntity = new Entity(USER_ENTITY_KIND, userId);
     datastoreService.put(userEntity);
   }
+
+  /**
+   * Stores the UserPreferences in the personalized user database.
+   *
+   * @param userId The ID of the user to store the preferred cuisines for.
+   * @param userPref The user choices on the query form to store in the user’s database.
+   */
+  public void storeUserPreferences(int userId, UserPreferences userPref) {
+    Entity userEntity = new Entity(PREFERNCE_ENTITY_KIND);
+    userEntity.setProperty("userId", userId);
+    userEntity.setProperty("date", new Date());
+    userEntity.setProperty("preferedCuisines", userPref.cuisines());
+    datastoreService.put(userEntity);
+  }
+
 }
