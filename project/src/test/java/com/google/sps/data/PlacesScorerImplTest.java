@@ -89,8 +89,8 @@ public class PlacesScorerImplTest {
         // Score(place) = rating*0.7 + drivingETA*0.3, such that:
         // rating = place's rating / Max Rating(=5)
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
-        Place PlaceWithRating3 = PLACE_BUILDER.setRating(3).build();
-        Place PlaceWithRating5 = PLACE_BUILDER.setRating(5).build();
+        Place placeWithRating3 = PLACE_BUILDER.setRating(3).build();
+        Place placeWithRating5 = PLACE_BUILDER.setRating(5).build();
         PlacesScorerImpl spiedScorer = spy(placesScorer);
         doReturn(new DistanceMatrix(PLACES_ADDRESSES, USERS_ADDRESS, DISTANCE_MATRIX_ROW))
             .when(spiedScorer)
@@ -98,12 +98,12 @@ public class PlacesScorerImplTest {
 
         ImmutableMap<Place, Double> result =
             spiedScorer.getScores(
-                ImmutableList.of(PlaceWithRating3, PlaceWithRating5), USER_LOCATION);
+                ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION);
 
         Double expectedScorePlaceRating3 = 0.495;
         Double expectedScorePlaceRating5 = 0.775;
-        assertEquals(expectedScorePlaceRating3, result.get(PlaceWithRating3), DELTA);
-        assertEquals(expectedScorePlaceRating5, result.get(PlaceWithRating5), DELTA);
+        assertEquals(expectedScorePlaceRating3, result.get(placeWithRating3), DELTA);
+        assertEquals(expectedScorePlaceRating5, result.get(placeWithRating5), DELTA);
     }
 
     @Test
@@ -123,8 +123,8 @@ public class PlacesScorerImplTest {
         // When duration calculations fail the expected scores are calculated by ratings only:
         // Score(place) = rating, such that:
         // rating = place's rating / Max Rating(=5)
-        Place PlaceWithRating3 = PLACE_BUILDER.setRating(3).build();
-        Place PlaceWithRating5 = PLACE_BUILDER.setRating(5).build();
+        Place placeWithRating3 = PLACE_BUILDER.setRating(3).build();
+        Place placeWithRating5 = PLACE_BUILDER.setRating(5).build();
         PlacesScorerImpl spiedScorer = spy(placesScorer);
         doThrow(new IOException())
             .when(spiedScorer)
@@ -132,12 +132,12 @@ public class PlacesScorerImplTest {
 
         ImmutableMap<Place, Double> result =
             spiedScorer.getScores(
-                ImmutableList.of(PlaceWithRating3, PlaceWithRating5), USER_LOCATION);
+                ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION);
 
         Double expectedScorePlaceRating3 = 0.6;
         Double expectedScorePlaceRating5 = 1.0;
-        assertEquals(expectedScorePlaceRating3, result.get(PlaceWithRating3), DELTA);
-        assertEquals(expectedScorePlaceRating5, result.get(PlaceWithRating5), DELTA);
+        assertEquals(expectedScorePlaceRating3, result.get(placeWithRating3), DELTA);
+        assertEquals(expectedScorePlaceRating5, result.get(placeWithRating5), DELTA);
     }
 
 
