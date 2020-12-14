@@ -65,8 +65,8 @@ public class PlacesScorerImpl implements PlacesScorer {
     private double calculatePlaceScore(ImmutableMap<Place, Long> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
-            + DURATION_WEIGHT *
-                Math.max(1 - ((double) durations.get(place) / MAX_DURATION_SECONDS), 0);
+            + DURATION_WEIGHT
+                * Math.max(1 - ((double) durations.get(place) / MAX_DURATION_SECONDS), 0);
     }
 
     // Scores places by their rating only, used in case of errors in durations calculation.
