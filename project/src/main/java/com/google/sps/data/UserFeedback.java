@@ -25,16 +25,16 @@ import com.google.common.collect.ImmutableList;
 public abstract class UserFeedback {
 
   /** @return a list of IDs of the places that were recommended to the user. */
-  public abstract ImmutableList<String> recommendedPlacesIds();
+  public abstract ImmutableList<String> placesRecommendedToUser();
 
   /** @return the ID of the place the user chose, if any. */
-  public abstract Optional<String> chosenPlaceId();
+  public abstract Optional<String> placeUserChose();
 
   /**
   * @return true if the user requested to try again and get more recommendations (implying they
   * weren't satisfied with the recommenrations he recieved).
   */
-  public abstract boolean triedAgain();
+  public abstract boolean userTriedAgain();
 
 
   /** @return a builder that enables to build a new UserFeedback object. */
@@ -46,22 +46,23 @@ public abstract class UserFeedback {
   @AutoValue.Builder
   public abstract static class Builder {
     /**
-     * @param recommendedPlacesIds a list of IDs of the places that were recommended to the user.
+     * @param placesRecommendedToUser a list of IDs of the places that were recommended to the user.
      * @return a UserFeedback builder that enables to continue building.
      */
-    public abstract Builder setRecommendedPlacesIds(ImmutableList<String> recommendedPlacesIds);
+    public abstract Builder setPlacesRecommendedToUser(ImmutableList<String>
+        placesRecommendedToUser);
 
     /**
      * @param chosenPlaceId the ID of the place the user chose, if any.
      * @return a UserFeedback builder that enables to continue building.
      */
-    public abstract Builder setChosenPlaceId(Optional<String> chosenPlaceId);
+    public abstract Builder setPlaceUserChose(String placeUserChose);
 
     /**
      * @param triedAgain true if the user requested to try again and get more recommendations
      * @return a UserFeedback builder that enables to continue building
      */
-    public abstract Builder setTriedAgain(boolean triedAgain);
+    public abstract Builder setUserTriedAgain(boolean userTriedAgain);
 
     /**
      * Builds the UserFeedback object according to the data that was set so far.
@@ -74,12 +75,14 @@ public abstract class UserFeedback {
      * Concludes the building of a new UserFeedback instance.
      *
      * @return the new instance.
-     * @throws IllegalArgumentException if an input isn't valid
+     * @throws IllegalArgumentException if the user feedback isn't consistent.
      */
     public UserFeedback build() throws IllegalArgumentException {
       UserFeedback feedback = autoBuild();
-      ValidationUtils.validateChosenPlaceInReccomendedPlaces(feedback.chosenPlaceId(),
-          feedback.recommendedPlacesIds());
+      ValidationUtils.validateChosenPlaceInReccomendedPlaces(feedback.placeUserChose(),
+          feedback.placesRecommendedToUser());
+      ValidationUtils.validateUserTriedAgainOnlyIfdidntchoose(feedback.placeUserChose(),
+          feedback.userTriedAgain());
       return feedback;
     }
   }

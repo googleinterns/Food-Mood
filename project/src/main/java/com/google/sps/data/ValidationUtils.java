@@ -51,17 +51,30 @@ public final class ValidationUtils {
         "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
   }
 
+
   /**
-   * @param priceLevel the price level of a place, should be represented by a number between 0-4.
-   * @throws IllegalArgumentException
+   * @param placeUserChose the place the user chose to order from
+   * @param placesRecommendedToUser the places that the system recommended to the user
+   * @throws IllegalArgumentException if chosen place wasn't one of the recommended places
    */
-  public static void validateChosenPlaceInReccomendedPlaces(Optional<String> chosenPlaceId,
-      ImmutableList<String> recommendedPlacesIds) throws IllegalArgumentException {
+  public static void validateChosenPlaceInReccomendedPlaces(Optional<String> placeUserChose,
+      ImmutableList<String> placesRecommendedToUser) throws IllegalArgumentException {
     checkArgument(
-        chosenPlaceId.isPresent()
-            ? recommendedPlacesIds.contains(chosenPlaceId.get())
-            : true,
+        !placeUserChose.isPresent() || placesRecommendedToUser.contains(placeUserChose.get()),
         "Chosen place must be one of places that were recommended to the user."
+    );
+  }
+
+  /**
+   * @param placeUserChose the place the user chose to order from
+   * @param userTriedAgain whether the user requested the system for new recommendations
+   * @throws IllegalArgumentException if the user chose a place and yet requested new
+   *                                  recommendations
+   */
+  public static void validateUserTriedAgainOnlyIfdidntchoose(Optional<String> placeUserChose,
+      boolean userTriedAgain) throws IllegalArgumentException {
+    checkArgument(
+        !(placeUserChose.isPresent() && userTriedAgain), "User can't both try again and choose a place."
     );
   }
 
