@@ -181,7 +181,6 @@ public final class QueryServletTest {
     verify(SCORER).getScores(places, new LatLng(00, 00));
   }
 
-
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.
   private static ImmutableList<Place> createPlacesListBySize(int numOfPlaces) {
