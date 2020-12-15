@@ -31,9 +31,9 @@ import org.junit.runners.JUnit4;
 
 public class UserVerifierTest {
 
-  private static final GoogleIdTokenVerifier MOCKED_GOOGLE_VERIFIER
+  private static final GoogleIdTokenVerifier mockedGoogleVerifier
       = mock(GoogleIdTokenVerifier.class);
-  private static final UserVerifier USER_VERIFIER = new UserVerifier(MOCKED_GOOGLE_VERIFIER);
+  private static final UserVerifier USER_VERIFIER = new UserVerifier(mockedGoogleVerifier);
 
   @Test
   public void getUserIdByToken_emptyIdToken_returnEmptyOptional() {
@@ -56,7 +56,7 @@ public class UserVerifierTest {
     String validUserId = "12345";
     Payload payload = new Payload();
     payload.setSubject(validUserId);
-    when(MOCKED_GOOGLE_VERIFIER.verify(validToken)).thenReturn(mockedToken);
+    when(mockedGoogleVerifier.verify(validToken)).thenReturn(mockedToken);
     when(mockedToken.getPayload()).thenReturn(payload);
 
     assertEquals(USER_VERIFIER.getUserIdByToken(validToken), Optional.of(validUserId));
