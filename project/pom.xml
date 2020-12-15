@@ -97,17 +97,6 @@
       <artifactId>google-cloud</artifactId>
       <version>0.10.0-alpha</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty -->
-    <dependency>
-      <groupId>com.google.oauth-client</groupId>
-      <artifactId>google-oauth-client-jetty</artifactId>
-      <version>1.23.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.cloud</groupId>
-      <artifactId>google-cloud</artifactId>
-      <version>0.10.0-alpha</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/com.google.appengine/appengine-testing -->
     <dependency>
       <groupId>com.google.appengine</groupId>
