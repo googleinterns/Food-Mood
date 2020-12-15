@@ -73,6 +73,7 @@ public class PlacesFetcher {
     public PlacesFetcher(GeoApiContext geoApiContext) {
         this.context = geoApiContext;
     }
+
     /**
      * Builds a query and requests it from Google Places API.
      *
