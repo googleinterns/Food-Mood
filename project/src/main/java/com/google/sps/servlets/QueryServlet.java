@@ -29,7 +29,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
+import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
+import com.google.sps.data.PlacesScorerImpl;
 
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
@@ -38,25 +40,30 @@ import com.google.sps.data.UserPreferences;
 @WebServlet("/query")
 public final class QueryServlet extends HttpServlet {
 
+  private static final long serialVersionUID = 1L;
+
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
-
+  private PlacesScorer scorer;
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+    scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
   }
 
-  void init(PlacesFetcher inputFetcher) {
+  void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
     fetcher = inputFetcher;
+    scorer = inputScorer;
   }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     ImmutableList<Place> filteredPlaces;
+    UserPreferences userPrefs;
     try {
-      UserPreferences userPrefs =
+      userPrefs =
           UserPreferences.builder()
               .setMinRating(Float.parseFloat(request.getParameter("rating")))
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
@@ -81,10 +88,10 @@ public final class QueryServlet extends HttpServlet {
     }
     response.setContentType("application/json");
     response.getWriter().write(new Gson().toJson(
-        Places.randomSort(filteredPlaces)
-            .stream()
-            .limit(MAX_NUM_PLACES_TO_RECOMMEND)
-            .collect(Collectors.toList())
+      Places.scoreSort(filteredPlaces, userPrefs.location(), scorer)
+          .stream()
+          .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+          .collect(Collectors.toList())
     ));
   }
 
@@ -92,4 +99,4 @@ public final class QueryServlet extends HttpServlet {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
- }
+}

@@ -16,6 +16,7 @@ package com.google.sps.servlets;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,8 +32,10 @@ import java.io.StringWriter;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.FetcherException;
+import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
@@ -44,6 +47,7 @@ public final class QueryServletTest {
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
+  private static final PlacesScorer SCORER = mock(PlacesScorer.class);
   private StringWriter responseStringWriter;
   private PrintWriter responsePrintWriter;
   private QueryServlet servlet;
@@ -53,7 +57,7 @@ public final class QueryServletTest {
     responseStringWriter = new StringWriter();
     responsePrintWriter = new PrintWriter(responseStringWriter);
     servlet = new QueryServlet();
-    servlet.init(FETCHER);
+    servlet.init(FETCHER, SCORER);
     when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
     initializeRequestParameters();
   }
@@ -62,7 +66,10 @@ public final class QueryServletTest {
   public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
     ImmutableList<Place> placesListWithMoreThanMaxNum =
         createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithMoreThanMaxNum);
+    when(FETCHER.fetch(any(UserPreferences.class)))
+        .thenReturn(placesListWithMoreThanMaxNum);
+    when(SCORER.getScores(eq(placesListWithMoreThanMaxNum), any(LatLng.class)))
+        .thenReturn(createScoreMap(placesListWithMoreThanMaxNum));
 
     servlet.doGet(REQUEST, RESPONSE);
 
@@ -73,7 +80,10 @@ public final class QueryServletTest {
   public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(placesListWithLessThanMaxNum);
+    when(FETCHER.fetch(any(UserPreferences.class)))
+        .thenReturn(placesListWithLessThanMaxNum);
+    when(SCORER.getScores(eq(placesListWithLessThanMaxNum), any(LatLng.class)))
+        .thenReturn(createScoreMap(placesListWithLessThanMaxNum));
 
     servlet.doGet(REQUEST, RESPONSE);
 
@@ -95,7 +105,12 @@ public final class QueryServletTest {
     Place validPlace2 = createValidPlaceBuilder().setName("validPlace").build();
     ImmutableList<Place> places =
         ImmutableList.of(validPlace, lowRating, noWebsite, validPlace2);
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+    ImmutableList<Place> filteredPlaces =
+        ImmutableList.of(validPlace, lowRating, noWebsite);
+    when(FETCHER.fetch(any(UserPreferences.class)))
+        .thenReturn(places);
+    when(SCORER.getScores(eq(filteredPlaces), any(LatLng.class)))
+        .thenReturn(createScoreMap(filteredPlaces));
 
     servlet.doGet(REQUEST, RESPONSE);
 
@@ -154,6 +169,18 @@ public final class QueryServletTest {
     verify(FETCHER).fetch(expectedUserPrefs);
   }
 
+  @Test
+  // This test checks that the PlacesScorer is called with the expected parameters
+  public void getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
+    ImmutableList<Place> places = createPlacesListBySize(1);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    verify(SCORER).getScores(places, new LatLng(00, 00));
+  }
+
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.
   private static ImmutableList<Place> createPlacesListBySize(int numOfPlaces) {
@@ -165,6 +192,12 @@ public final class QueryServletTest {
       );
     }
     return places.build();
+  }
+
+  // Returns an immutable map of all places on the places list scored by 1
+  private static ImmutableMap<Place, Double> createScoreMap(ImmutableList<Place> places) {
+    return places.stream()
+        .collect(ImmutableMap.toImmutableMap(place -> place, place -> 1d));
   }
 
   private static Place.Builder createValidPlaceBuilder() {

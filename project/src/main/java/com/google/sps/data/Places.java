@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.maps.model.LatLng;
 
 /**
  * A utility class for Place objects.
@@ -33,6 +35,7 @@ public final class Places {
 
   /**
    * Sorts the given list of Places randomly.
+   *
    * @param places the list we want to sort.
    * @return a new list containing the original list's elements in random order.
    */
@@ -41,6 +44,26 @@ public final class Places {
     Collections.shuffle(mutablePlaces);
     return ImmutableList.copyOf(mutablePlaces);
   }
+
+  /**
+   * Sorts the given list of Places by score.
+   *
+   * @param places the list we want to sort
+   * @param userLocation the user's loaction, used for scores calculations
+   * @param scorer the PlacesScorer which calculates a score for each place
+   * @return a new list containing the original list's elements
+   *     arranged by descending order of their scores.
+   */
+  public static ImmutableList<Place> scoreSort(
+        ImmutableList<Place> places, LatLng userLocation, PlacesScorer scorer) {
+    List<Place> mutablePlaces = new ArrayList<>(places);
+    Map<Place, Double> placesScores = scorer.getScores(places, userLocation);
+    Collections.sort(mutablePlaces, (p1, p2) -> {
+      return placesScores.get(p2).compareTo(placesScores.get(p1));
+    });
+    return ImmutableList.copyOf(mutablePlaces);
+  }
+
 
   /**
    * Filters the given list of places according to the given parameters.
