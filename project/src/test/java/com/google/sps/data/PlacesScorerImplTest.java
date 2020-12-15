@@ -69,7 +69,6 @@ public class PlacesScorerImplTest {
         Duration duration = new Duration();
         duration.inSeconds = durationInSeconds;
         element.duration = duration;
-        element.status = DistanceMatrixElementStatus.OK;
         DistanceMatrixRow[] distanceMatrixRows = new DistanceMatrixRow[numOfRows];
         for (int i = 0; i < numOfRows; i++) {
             DistanceMatrixRow distanceMatrixSingleRow = new DistanceMatrixRow();
@@ -91,6 +90,8 @@ public class PlacesScorerImplTest {
         // drivingETA = max{1 - durationInMinutes(=30) / 40, 0}
         Place placeWithRating3 = PLACE_BUILDER.setRating(3).build();
         Place placeWithRating5 = PLACE_BUILDER.setRating(5).build();
+        DISTANCE_MATRIX_ROW[0].elements[0].status = DistanceMatrixElementStatus.OK;
+        DISTANCE_MATRIX_ROW[1].elements[0].status = DistanceMatrixElementStatus.OK;
         PlacesScorerImpl spiedScorer = spy(placesScorer);
         doReturn(new DistanceMatrix(PLACES_ADDRESSES, USERS_ADDRESS, DISTANCE_MATRIX_ROW))
             .when(spiedScorer)
