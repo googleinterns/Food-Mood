@@ -48,7 +48,7 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void init() {
     fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
-    scorer = new PlacesScorerImpl();
+    scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
   }
 
   void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
@@ -97,4 +97,4 @@ public final class QueryServlet extends HttpServlet {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
- }
+}
