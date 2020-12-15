@@ -35,48 +35,50 @@ public class RegistrationServletTest {
 
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
-  private static final UserVerifier USER_VERIFIER = mock(UserVerifier.class);
-  private static final DataAccessor DATA_ACCESSOR = mock(DataAccessor.class);
+  private static final String ID_TOKEN = "abcde";
+  private static final String USER_ID = "12345";
+  private static UserVerifier mockUserVerifier;
+  private static DataAccessor mockDataAccessor;
   private RegistrationServlet servlet;
 
   @Before
   public void setUp() throws Exception {
+    mockUserVerifier = mock(UserVerifier.class);
+    mockDataAccessor = mock(DataAccessor.class);
     servlet = new RegistrationServlet();
-    servlet.init(USER_VERIFIER, DATA_ACCESSOR);
+    servlet.init(mockUserVerifier, mockDataAccessor);
   }
 
   @Test
-  public void doPost_validToken_registerUser() throws Exception {
+  public void doPost_validToken_registersUser() throws Exception {
     String idToken = "abcde";
     String userId = "12345";
     when(REQUEST.getParameter("idToken")).thenReturn(idToken);
-    when(USER_VERIFIER.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
-    when(DATA_ACCESSOR.isRegistered(userId)).thenReturn(false);
+    when(mockUserVerifier.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
+    when(mockDataAccessor.isRegistered(userId)).thenReturn(false);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(DATA_ACCESSOR).registerUser(userId);
+    verify(mockDataAccessor).registerUser(userId);
   }
 
   @Test
-  public void doPost_invalidToken_dontRegister() throws Exception {
+  public void doPost_invalidToken_doesntRegister() throws Exception {
     when(REQUEST.getParameter("idToken")).thenReturn(null);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(DATA_ACCESSOR, never()).registerUser(any(String.class));
+    verify(mockDataAccessor, never()).registerUser(any(String.class));
   }
 
   @Test
-  public void doPost_validTokenAlreadyRegisteredUser_dontRegister() throws Exception {
-    String idToken = "abcde";
-    String userId = "12345";
-    when(REQUEST.getParameter("idToken")).thenReturn(idToken);
-    when(USER_VERIFIER.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
-    when(DATA_ACCESSOR.isRegistered(userId)).thenReturn(true);
+  public void doPost_validTokenAlreadyRegisteredUser_doesntRegister() throws Exception {
+    when(REQUEST.getParameter("idToken")).thenReturn(ID_TOKEN);
+    when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
+    when(mockDataAccessor.isRegistered(USER_ID)).thenReturn(true);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(DATA_ACCESSOR, never()).registerUser(userId);
+    verify(mockDataAccessor, never()).registerUser(USER_ID);
   }
 }

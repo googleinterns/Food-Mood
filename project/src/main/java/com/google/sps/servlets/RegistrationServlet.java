@@ -26,9 +26,9 @@ import com.google.common.annotations.VisibleForTesting;
 
 /** A servlet that registers a user, according to a given token. */
 @WebServlet("/register")
+@SuppressWarnings("serial")
 public final class RegistrationServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
   private UserVerifier userVerifier;
   private DataAccessor dataAccessor;
 
@@ -48,10 +48,14 @@ public final class RegistrationServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String userIdToken = request.getParameter("idToken");
     if (userIdToken == null) {
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+          "No user ID token was received, so can't register user.");
       return;
     }
     Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
     if (!optionalUserId.isPresent()) {
+      response.sendError(HttpServletResponse.SC_NOT_FOUND,
+          "Didn't manage to get data for given user ID token.");
       return;
     }
     String finalUserId = optionalUserId.get();
