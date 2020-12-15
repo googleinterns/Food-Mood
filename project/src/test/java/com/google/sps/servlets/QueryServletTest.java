@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -191,15 +192,14 @@ public final class QueryServletTest {
   // This test checks that storeUserPreferences is called with the expected parameters
   // when the servlet gets a valid ID token
   public void getRequest_validIdToken_userIdAndPreferencesForwardedForStoring() throws Exception {
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
+    initializeRequestParameters();
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
     when(REQUEST.getParameter("idToken")).thenReturn("token");
     when(USER_VERIFIER.getUserIdByToken("token")).thenReturn(Optional.of("userId"));
-    UserPreferences expectedUserPrefs = UserPreferences.builder()
-        .setCuisines(ImmutableList.of("sushi", "hamburger"))
-        .build();
 
     servlet.doPost(REQUEST, RESPONSE);
 
+    UserPreferences expectedUserPrefs = getValidUserPreferencesBuilder().build();
     verify(DATA_ACCESSOR).storeUserPreferences("userId", expectedUserPrefs);
   }
 
@@ -207,13 +207,15 @@ public final class QueryServletTest {
   // This test checks that storeUserPreferences is not called
   // when the servlet gets an invalid ID token
   public void getRequest_invalidIdToken_userPreferencesAreNotStored() throws Exception {
-    ImmutableList<Place> places = createPlacesListBySize(1);
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
-    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+    initializeRequestParameters();
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
+    when(REQUEST.getParameter("idToken")).thenReturn("");
+    when(USER_VERIFIER.getUserIdByToken("")).thenReturn(Optional.empty());
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(SCORER).getScores(places, new LatLng(00, 00));
+    verify(DATA_ACCESSOR, never())
+        .storeUserPreferences(any(String.class), any(UserPreferences.class));
   }
 
   // Returns an immutable list that has the required number of Place elements. All elements are
@@ -261,6 +263,16 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
     when(REQUEST.getParameter("location")).thenReturn("30.30,35.35");
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi");
+    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
   }
+
+  // Returns a UserPreferences builder that has valid values of all attributes.
+  private UserPreferences.Builder getValidUserPreferencesBuilder() {
+    return UserPreferences.builder()
+        .setMinRating(4)
+        .setMaxPriceLevel(3)
+        .setLocation(new LatLng(30.30, 35.35))
+        .setOpenNow(true)
+        .setCuisines(ImmutableList.of("sushi", "hamburger"));
+    }
 }

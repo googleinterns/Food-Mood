@@ -141,6 +141,11 @@ li {
   margin-top: auto;
 }
 
+#map-warning-container {
+  font-family: sans-serif, Arial;
+  font-size: 14px;
+}
+
 #location-input {
   background-color: #fff;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
