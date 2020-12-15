@@ -162,3 +162,26 @@ li {
   margin-left: auto;
   display: 'none';
 }
+
+#sign-in-segment {
+  width: 100%;
+  text-align: center;
+}
+
+#sign-in-button {
+  display: inline-block;
+}
+
+#sign-out-button {
+  background-color: white;
+  color: #636261;
+  padding: 5px 10px;
+  text-align: center;
+  font-size: 14px;
+  margin: 6px;
+  border: 1px solid #aaaaaf;
+}
+
+#sign-out-button:hover {
+  cursor: pointer;
+}

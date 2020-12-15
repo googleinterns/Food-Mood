@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html>
- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
- <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
- <script src="script.js"></script>
- <head>
-   <meta charset="UTF-8">
-   <title>food-mood</title>
-   <link rel="stylesheet" href="style.css">
-   <base target="_blank" rel="noopener noreferrer">
- </head>
- <body class="text-content">
-  <h1> FoodMood - your food order helper!</h1>
-  <div class="user-input" id="user-input">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
+  <script src="https://apis.google.com/js/platform.js"></script>
+  <meta name="google-signin-client_id" content="CLIENT_ID">
+  <script src="script.js"></script>
+  <head>
+    <meta charset="UTF-8">
+    <title>food-mood</title>
+    <link rel="stylesheet" href="style.css">
+    <base target="_blank" rel="noopener noreferrer">
+  </head>
+  <body class="text-content">
+    <h1> FoodMood - your food order helper!</h1>
+    <div id="sign-in-segment">
+      <div id="sign-in-button" class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account"></div>
+      <div id ="user-welcome-message-container"> Hello! You are welcome to sign in </div>
+      <button id="sign-out-button" onclick="signOut();" style="display: none">Sign out</button>
+      <hr>
+    </div>
+    <div class="user-input" id="user-input">
     <div id="query-form" class="query-form">
       <form id="cuisines-form" class="form-element-toolbar">
         <p>Select cuisines:</p>
