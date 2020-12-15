@@ -1,3 +1,3 @@
-This is the repo of Karen Avner and Tal Bar Nahor's capstone project!
-The name of our project is "food-mood", 
-and it's a web application that helps you decide where to order food from!
+# Karen Avner and Tal Bar Nahor's Google STEP internship project
+Our project's name is "Food-Mood", and it's a web application that helps you decide where to order food from.
+The most recently deployed version of the project can be found here: <https://karenav-step-2020.uc.r.appspot.com/>
