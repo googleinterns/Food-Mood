@@ -77,7 +77,7 @@ public final class QueryServletTest {
     when(SCORER.getScores(eq(placesListWithMoreThanMaxNum), any(LatLng.class)))
         .thenReturn(createScoreMap(placesListWithMoreThanMaxNum));
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
   }
@@ -91,7 +91,7 @@ public final class QueryServletTest {
     when(SCORER.getScores(eq(placesListWithLessThanMaxNum), any(LatLng.class)))
         .thenReturn(createScoreMap(placesListWithLessThanMaxNum));
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     assertEquals(getPlacesAmountInResponse(), numOfFetchedPlaces);
   }
@@ -118,7 +118,7 @@ public final class QueryServletTest {
     when(SCORER.getScores(eq(filteredPlaces), any(LatLng.class)))
         .thenReturn(createScoreMap(filteredPlaces));
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     assertEquals(getPlacesAmountInResponse(), 1);
     assertEquals(
@@ -134,7 +134,7 @@ public final class QueryServletTest {
   public void getRequest_fetcherException_forwardException() throws Exception {
     when(FETCHER.fetch(any(UserPreferences.class))).thenThrow(FetcherException.class);
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     verify(RESPONSE).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
         "Fetching from Google Places API encountered a problem");
@@ -146,7 +146,7 @@ public final class QueryServletTest {
     // throw an IllegalArgumentException
     when(REQUEST.getParameter("rating")).thenReturn("-5");
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     verify(RESPONSE).sendError(HttpServletResponse.SC_BAD_REQUEST,
         "Parsing the user preferences encountered a problem");
@@ -170,7 +170,7 @@ public final class QueryServletTest {
         .setCuisines(ImmutableList.of("sushi", "hamburger"))
         .build();
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     verify(FETCHER).fetch(expectedUserPrefs);
   }
@@ -182,7 +182,7 @@ public final class QueryServletTest {
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
     when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     verify(SCORER).getScores(places, new LatLng(00, 00));
   }
@@ -198,7 +198,7 @@ public final class QueryServletTest {
         .setCuisines(ImmutableList.of("sushi", "hamburger"))
         .build();
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     verify(DATA_ACCESSOR).storeUserPreferences("userId", expectedUserPrefs);
   }
@@ -211,7 +211,7 @@ public final class QueryServletTest {
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
     when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
 
-    servlet.doGet(REQUEST, RESPONSE);
+    servlet.doPost(REQUEST, RESPONSE);
 
     verify(SCORER).getScores(places, new LatLng(00, 00));
   }

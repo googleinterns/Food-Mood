@@ -42,7 +42,7 @@ function fetchFromQuery() {
   displayResultsPage();
   const userCoords = JSON.parse(localStorage.getItem('userLocation'));
   const map = createMap({lat: userCoords.lat, lng: userCoords.lng});
-  fetch('/query?' + params)
+  fetch('/query?' + params, {method: 'POST'})
       .then(response => response.json())
       .then((places) => {
         places.forEach((singlePlace) => {

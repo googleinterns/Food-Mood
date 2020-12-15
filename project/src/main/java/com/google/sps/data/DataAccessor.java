@@ -79,7 +79,6 @@ public class DataAccessor {
 
   /**
    * Stores the UserPreferences in the personalized user database.
-   * If no cuisines were prefered by the user, nothing is stored.
    *
    * @param userId The ID of the user to store the preferred cuisines for.
    * @param userPref The user choices on the query form to store in the user’s database.
