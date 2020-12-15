@@ -66,7 +66,7 @@ public final class QueryServlet extends HttpServlet {
               .build();
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
-          Integer.parseInt(request.getParameter("rating")) /* min rating */,
+          Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
           true /* filter if no website */,
           true /* filter branches of same place */
       );
