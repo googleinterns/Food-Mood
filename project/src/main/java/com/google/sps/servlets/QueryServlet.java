@@ -108,11 +108,6 @@ public final class QueryServlet extends HttpServlet {
     ));
   }
 
-  @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-  }
-
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));

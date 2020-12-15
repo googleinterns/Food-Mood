@@ -33,6 +33,9 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.common.collect.ImmutableList;
+import com.google.maps.model.LatLng;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +44,9 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class DataAccessorTest {
+
+  // The prefered cuisines to be stored in user preferences storing tests
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
 
   // A helper that enables us to test datastore locally.
   // Has to be set up and teared down for each test.
@@ -98,7 +104,7 @@ public final class DataAccessorTest {
     String userId = "12345";
 
     dataAccessor.registerUser(userId);
-    List<Entity> results = createPreparedQueryByUserId(userId)
+    List<Entity> results = createPreparedQueryByUserIdKey(userId)
         .asList(FetchOptions.Builder.withDefaults());
 
     assertEquals(results.size(), 1);
@@ -129,34 +135,37 @@ public final class DataAccessorTest {
   public void storeUserPreferences_validUserIdAndPreferences_userPreferencesStored() {
     String userId = "12345";
 
-    dataAccessor.storeUserPreferences(userId, );
-    List<Entity> results = createPreparedQueryByUserId(userId)
+    dataAccessor.storeUserPreferences(
+      userId, getValidUserPreferencesBuilder().setCuisines(CUISINES).build());
+    List<Entity> results = createPreparedQueryByUserIdProperty(userId)
         .asList(FetchOptions.Builder.withDefaults());
 
-    assertEquals(results.size(), 1);
-    assertEquals(results.get(0), new Entity(DataAccessor.PREFERNCES_ENTITY_KIND));
+    assertEquals(1, results.size());
+    assertEquals(CUISINES, results.get(0).getProperty("preferedCuisines"));
   }
 
   @Test
-  public void storeUserPreferences_validUserIdNoPreferedCuisines_emptyListStored() {
+  public void storeUserPreferences_validUserIdNoPreferedCuisines_nothingStored() {
     String userId = "12345";
 
-    dataAccessor.storeUserPreferences(userId, );
-    List<Entity> results = createPreparedQueryByUserId(userId)
+    dataAccessor.storeUserPreferences(
+      userId, getValidUserPreferencesBuilder().setCuisines(ImmutableList.of()).build());
+    List<Entity> results = createPreparedQueryByUserIdProperty(userId)
         .asList(FetchOptions.Builder.withDefaults());
 
-    assertEquals(results.size(), 1);
-    assertEquals(results.get(0), new Entity(DataAccessor.PREFERNCES_ENTITY_KIND));
+    assertEquals(0, results.size());
   }
-
 
   @Test
   public void storeUserPreferences_emptydUserId_throwIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(""));
+    UserPreferences userPrefs = getValidUserPreferencesBuilder().setCuisines(CUISINES).build();
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> dataAccessor.storeUserPreferences("", userPrefs));
   }
 
-
-  private PreparedQuery createPreparedQueryByUserId(String userId) {
+  // Used to query the registered users database
+  private PreparedQuery createPreparedQueryByUserIdKey(String userId) {
     Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_KIND, userId);
     Filter userIdFilter = new Query.FilterPredicate(
         Entity.KEY_RESERVED_PROPERTY,
@@ -164,5 +173,24 @@ public final class DataAccessorTest {
         userIdKey);
     Query query = new Query(DataAccessor.USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query);
+  }
+
+  // Used to query the user preferences database
+  private PreparedQuery createPreparedQueryByUserIdProperty(String userId) {
+    Filter userIdFilter = new Query.FilterPredicate(
+        "userId",
+        FilterOperator.EQUAL,
+        userId);
+    Query query = new Query(DataAccessor.PREFERNCES_ENTITY_KIND).setFilter(userIdFilter);
+    return datastoreService.prepare(query);
+  }
+
+  // Returns a UserPreferences builder that has valid values of all attributes.
+  private UserPreferences.Builder getValidUserPreferencesBuilder() {
+    return UserPreferences.builder()
+        .setMinRating(4)
+        .setMaxPriceLevel(2)
+        .setLocation(new LatLng(32.08, 34.78))
+        .setOpenNow(true);
   }
 }

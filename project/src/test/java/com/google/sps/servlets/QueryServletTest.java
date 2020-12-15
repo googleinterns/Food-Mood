@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Optional;
+
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.FetcherException;
@@ -40,6 +42,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
 import com.google.sps.data.BusinessStatus;
+import com.google.sps.data.DataAccessor;
+import com.google.sps.data.UserVerifier;
 
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
@@ -48,6 +52,8 @@ public final class QueryServletTest {
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
   private static final PlacesScorer SCORER = mock(PlacesScorer.class);
+  private static final UserVerifier USER_VERIFIER = mock(UserVerifier.class);
+  private static final DataAccessor DATA_ACCESSOR = mock(DataAccessor.class);
   private StringWriter responseStringWriter;
   private PrintWriter responsePrintWriter;
   private QueryServlet servlet;
@@ -57,7 +63,7 @@ public final class QueryServletTest {
     responseStringWriter = new StringWriter();
     responsePrintWriter = new PrintWriter(responseStringWriter);
     servlet = new QueryServlet();
-    servlet.init(FETCHER, SCORER);
+    servlet.init(FETCHER, SCORER, USER_VERIFIER, DATA_ACCESSOR);
     when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
     initializeRequestParameters();
   }
@@ -181,6 +187,34 @@ public final class QueryServletTest {
     verify(SCORER).getScores(places, new LatLng(00, 00));
   }
 
+  @Test
+  // This test checks that storeUserPreferences is called with the expected parameters
+  // when the servlet gets a valid ID token
+  public void getRequest_validIdToken_userIdAndPreferencesForwardedForStoring() throws Exception {
+    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
+    when(REQUEST.getParameter("idToken")).thenReturn("token");
+    when(USER_VERIFIER.getUserIdByToken("token")).thenReturn(Optional.of("userId"));
+    UserPreferences expectedUserPrefs = UserPreferences.builder()
+        .setCuisines(ImmutableList.of("sushi", "hamburger"))
+        .build();
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    verify(DATA_ACCESSOR).storeUserPreferences("userId", expectedUserPrefs);
+  }
+
+  @Test
+  // This test checks that storeUserPreferences is not called
+  // when the servlet gets an invalid ID token
+  public void getRequest_invalidIdToken_userPreferencesAreNotStored() throws Exception {
+    ImmutableList<Place> places = createPlacesListBySize(1);
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
+    when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
+
+    servlet.doGet(REQUEST, RESPONSE);
+
+    verify(SCORER).getScores(places, new LatLng(00, 00));
+  }
 
   // Returns an immutable list that has the required number of Place elements. All elements are
   // identical except for their name, which is serialized - '0', '1', '2', etc.
