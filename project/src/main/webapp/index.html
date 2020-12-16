@@ -100,18 +100,21 @@
         </div>
         <div id="results-map-container"> </div>
       </div>
-      <div id="feedback-box">
+      <div id="feedback-box" style="display: none">
         <label for="liking-feedback">Like these options?<br> Let us know what you chose: <br></label>
-        <select class="button" name="feedback" id="feedback">
-          <option value="1">First option</option>
-          <option value="2">Second option</option>
-          <option value="3">Third option</option>
-          <br>
-          <input type="submit" value="Submit" style="font-weight: bold">
-        </select>
+        <form id="chosen-place-form" class="form-element-toolbar">
+          <input type="radio" id="option-1" value="1" checked="checked">
+          <label for="option-1">First option</label>
+          <input type="radio" id="option-2" value="2">
+          <label for="option-2">Second option</label>
+          <input type="radio" id="option-3" value="3">
+          <label for="option-3">Third option</label>
+        </form>
+        <input type="submit" value="Submit" style="font-weight: bold"
+            onclick="sendUserChoiceAsFeedback()">
         <br><br>
         <label for="disliking-feedback">Don't like these options? <br></label>
-        <button onclick="tryAgain()"><b>Try again</b></button>
+        <button onclick="tryAgainAndSendFeedback()"><b>Try again</b></button>
       </div>
     </div>
   </body>
