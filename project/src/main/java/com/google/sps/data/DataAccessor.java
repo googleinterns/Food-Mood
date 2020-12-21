@@ -90,7 +90,7 @@ public class DataAccessor {
     }
     Entity userEntity = new Entity(PREFERNCES_ENTITY_KIND);
     userEntity.setProperty("userId", userId);
-    userEntity.setProperty("date", new Date());
+    userEntity.setProperty("date", new Date()); // TODO(Tal): Store only if an hour pastfrom last storing
     userEntity.setProperty("preferedCuisines", userPref.cuisines());
     datastoreService.put(userEntity);
   }

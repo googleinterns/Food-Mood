@@ -34,7 +34,7 @@ function fetchFromQuery() {
       `rating=${getUserRatingFromUi()}`,
       `price=${getUserPriceFromUi()}`,
       `open=${getUserOpenNowFromUi()}`,
-      `location=${getUserLocationFromUi()}`
+      `location=${getUserLocationFromUi()}`,
       `idToken=${getUserIdToken()}`
     ].join('&');
   } catch (error) {

@@ -84,7 +84,9 @@ public final class QueryServlet extends HttpServlet {
               .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
               .build();
       String userIdToken = request.getParameter("idToken");
-      storePreferences(userIdToken, userPrefs);
+      if (!userIdToken.isEmpty()) {
+        storePreferences(userIdToken, userPrefs);
+      }
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
@@ -114,13 +116,14 @@ public final class QueryServlet extends HttpServlet {
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
 
-  // Store the user's preferences in the database, only if the user is signed in.
+  // Store the user's preferences in the database, only if the user is signed in an registered.
   private void storePreferences(String userIdToken, UserPreferences userPrefs) {
     Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
     if (!optionalUserId.isPresent()) {
         return;
     }
     String userId = optionalUserId.get();
+    System.out.println(userId);
     dataAccessor.storeUserPreferences(userId, userPrefs);
   }
 }
