@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// The user location map. the map has to be accessed from different functions.
+// This was added in order to let the linter know that we treat 'gapi' (Google API) as a global var.
+/* global gapi */
+
+// The user location map. Has to be accessed from different functions.
 let globalUserMap;
 
 // The current Google user.
@@ -370,4 +373,33 @@ function addPlaceMarker(map, place) {
     map.setZoom(ZOOM_IN);
     map.setCenter(marker.position);
   });
+}
+
+/**
+ * Called when a user signs in with a Google account.
+ * Updates the global google user, and displays a welcoming messege.
+ */
+function onSignIn(user) {
+  document.getElementById('user-welcome-message-container').innerText =
+      "Hello, " + user.getBasicProfile().getName() + "!";
+  googleUser = user;
+  registerUserByToken();
+  document.getElementById('sign-out-button').style.display = 'inline-block';
+}
+
+/** Called when a user signs out of a Google account, updates the screen and the global user. */
+function signOut() {
+  gapi.auth2.getAuthInstance().signOut();
+  document.getElementById('user-welcome-message-container').innerText =
+      'You are currently not logged in with a Google account.';
+  googleUser = null;
+  document.getElementById('sign-out-button').style.display = 'none';
+}
+
+/** Registers the logged in user, using the registration servlet. */
+function registerUserByToken() {
+  if (!googleUser) {
+    return;
+  }
+  fetch('/register?idToken=' + googleUser.getAuthResponse().id_token, {method: 'POST'});
 }

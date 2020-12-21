@@ -54,7 +54,7 @@ public final class QueryServlet extends HttpServlet {
   @Override
   public void init() {
     fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
-    scorer = new PlacesScorerImpl();
+    scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
     userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
     dataAccessor = new DataAccessor();
   }
@@ -87,7 +87,7 @@ public final class QueryServlet extends HttpServlet {
       storePreferences(userIdToken, userPrefs);
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
-          Integer.parseInt(request.getParameter("rating")) /* min rating */,
+          Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
           true /* filter if no website */,
           true /* filter branches of same place */
       );

@@ -29,7 +29,7 @@ public class UserVerifier {
   private GoogleIdTokenVerifier verifier;
 
   /**
-   * A private constructor that takes in a GoogleIdTokenVerifier object.
+   * A package private constructor for testing, that takes in a GoogleIdTokenVerifier object.
    * @param googleVerifier a Google tool for verifying the validity of Google users' tokens
    */
   @VisibleForTesting
