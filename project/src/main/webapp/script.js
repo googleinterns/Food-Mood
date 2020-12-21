@@ -71,9 +71,6 @@ function getUsercuisinesFromUi() {
       checkedCuisines.push(cuisine.value);
     }
   });
-  if (checkedCuisines.length === 0) {
-    throw new Error("Choose at least one cuisine.");
-  }
   // Remove obselete comma
   let result = checkedCuisines.join(',');
   return result;

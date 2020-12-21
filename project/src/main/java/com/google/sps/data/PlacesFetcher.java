@@ -17,6 +17,7 @@ package com.google.sps.data;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -34,6 +35,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
@@ -83,20 +87,27 @@ public class PlacesFetcher {
      *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        PlacesSearchResult[] placesSearchResult;
-        int attemptsCounter = 0;
-        do {
-            attemptsCounter++;
-            try {
-                placesSearchResult = getPlacesSearchResults(
-                    genTextSearchRequest(preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
-            } catch (ApiException | InterruptedException | IOException | IllegalStateException e) {
-                throw new FetcherException("Couldn't fetch places from Places API", e);
-            }
-        } while (
-            placesSearchResult.length < MIN_NUM_OF_RESULTS
-            && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
-        return createPlacesList(placesSearchResult);
+        Map<String, List<String>> placesSearchResults = new HashMap<>();
+        PlacesSearchResult[] resultsForCuisine;
+        for (String cuisine: preferences.cuisines()) {
+            int attemptsCounter = 0;
+            do {
+                attemptsCounter++;
+                try {
+                    resultsForCuisine = getPlacesSearchResults(genTextSearchRequest(
+                        preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
+                } catch (ApiException | InterruptedException | IOException | IllegalStateException e) {
+                    throw new FetcherException("Couldn't fetch places from Places API", e);
+                }
+                for(PlacesSearchResult result : resultsForCuisine) {
+                    placesSearchResults.computeIfAbsent(
+                        result.placeId, k -> new ArrayList<>()).add(cuisine);
+                }
+            } while (
+                placesSearchResults.size() < MIN_NUM_OF_RESULTS
+                && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
+            return createPlacesList(placesSearchResults);
+        }
     }
 
     private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
@@ -126,11 +137,11 @@ public class PlacesFetcher {
         return query.await().results;
     }
 
-    private ImmutableList<Place> createPlacesList(PlacesSearchResult[] searchResultsArr)
+    private ImmutableList<Place> createPlacesList(Map<String, List<String>> searchResults)
             throws FetcherException {
         List<Place> places = new ArrayList<Place>();
-        for (PlacesSearchResult searchResult : searchResultsArr) {
-            PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(searchResult.placeId);
+        for (String placeId : searchResults.keySet()) {
+            PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(placeId);
             PlaceDetails placeDetails;
             try {
                 placeDetails = getPlaceDetails(detailsRequest);

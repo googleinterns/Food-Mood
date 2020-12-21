@@ -17,6 +17,7 @@
  */
 package com.google.sps.data;
 
+import com.google.common.collect.ImmutableList;
 import com.google.auto.value.AutoValue;
 import com.google.maps.model.LatLng;
 
@@ -71,6 +72,11 @@ public abstract class Place {
     * @return the place's business status.
     */
   public abstract BusinessStatus businessStatus();
+
+  /**
+    * @return the place's cuisines.
+    */
+  public abstract ImmutableList<String> cuisines();
 
   /**
    * @return a builder that enables to build a new Place object.
@@ -142,6 +148,18 @@ public abstract class Place {
      * @return a Place builder that enables to continue building
      */
     public abstract Builder setBusinessStatus(BusinessStatus businessStatus);
+
+    // Builds the list of cuisines that a place holds.
+    protected abstract ImmutableList.Builder<String> cuisinesBuilder();
+
+    /**
+     * @param cuisines the place's cuisines.
+     * @return a Place builder that enables to continue building
+     */
+    public Builder addCuisine(String cuisine) {
+      cuisinesBuilder().add(cuisine);
+      return this;
+    }
 
     /**
      * Builds the Place object according to the data that was set so far.

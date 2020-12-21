@@ -6,5 +6,6 @@
     "salad": ["salad"],
     "homemade": ["homemade", "home"],
     "hummus": ["hummus"],
-    "pizza": ["pizza"]
+    "pizza": ["pizza"],
+    "mexican": ["mexican"]
 }
