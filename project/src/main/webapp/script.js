@@ -192,9 +192,7 @@ function tryAgainAndSendFeedback() {
   document.getElementById('user-input').style.display = 'block';
   document.getElementById('results').style.display = 'none';
   document.getElementById('waiting-message').style.display = 'block'
-  document.getElementById('place').innerText = '';
-  document.getElementById('map-error-container').innerText = '';
-  document.getElementById('input-error-container').innerText = '';
+  clearAllMessages();
 
   updateUserFeedback(recommendedPlaces, null /** place user chose */, true /** user tried again */)
 }
@@ -205,6 +203,7 @@ function clearAllMessages() {
   document.getElementById('map-error-container').innerText = '';
   document.getElementById('input-error-container').innerText = '';
   document.getElementById('problem-message-container').innerText = '';
+  document.getElementById('user-feedback-container').innerText = '';
 }
 
 /**
@@ -426,4 +425,6 @@ function updateUserFeedback(recommendedPlaces, chosenPlaceId, tryAgain) {
     `tryAgain=${tryAgain}`
   ].join('&');
   fetch('/feedback?' + params, {method: 'POST'});
+  document.getElementById('user-feedback-container').innerText =
+      'Thank you, your Feedback was received!';
 }
