@@ -105,7 +105,6 @@ public final class PlaceTest {
         .setGoogleUrl(GOOGLE_URL)
         .setPlaceId(PLACE_ID)
         .setBusinessStatus(BUSINESS_STATUS)
-        .addCuisine("sushi")
-        .addCuisine("hamburger");
+        .setCuisines(ImmutableList.of("sushi", "hamburger"));
   }
 }

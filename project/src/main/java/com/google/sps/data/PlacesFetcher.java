@@ -17,7 +17,6 @@ package com.google.sps.data;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.util.Collections;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -35,13 +34,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class PlacesFetcher {
 
@@ -89,13 +86,16 @@ public class PlacesFetcher {
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         Map<String, List<String>> placesSearchResults = new HashMap<>();
         PlacesSearchResult[] resultsForCuisine;
-        for (String cuisine: preferences.cuisines()) {
-            int attemptsCounter = 0;
-            do {
+        // If user didn't choose any cuisines, search on all possible cuisines
+        Collection<String> cuisines =
+            (preferences.cuisines().isEmpty()) ? CUISINE_TO_SEARCH_WORDS.keySet() : preferences.cuisines();
+        int attemptsCounter = 0;
+        do {
+            for(String cuisine: cuisines) {
                 attemptsCounter++;
                 try {
                     resultsForCuisine = getPlacesSearchResults(genTextSearchRequest(
-                        preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
+                        preferences, INIT_SEARCH_RADIUS_M * attemptsCounter, cuisine));
                 } catch (ApiException | InterruptedException | IOException | IllegalStateException e) {
                     throw new FetcherException("Couldn't fetch places from Places API", e);
                 }
@@ -103,16 +103,17 @@ public class PlacesFetcher {
                     placesSearchResults.computeIfAbsent(
                         result.placeId, k -> new ArrayList<>()).add(cuisine);
                 }
-            } while (
-                placesSearchResults.size() < MIN_NUM_OF_RESULTS
-                && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
-            return createPlacesList(placesSearchResults);
-        }
+            }
+        } while (
+            placesSearchResults.size() < MIN_NUM_OF_RESULTS
+            && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
+        return createPlacesList(placesSearchResults);
     }
 
-    private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
+    private TextSearchRequest genTextSearchRequest(
+            UserPreferences preferences, int radius, String cuisine) {
         TextSearchRequest request = PlacesApi.textSearchQuery(
-            context, createCuisinesQuery(preferences.cuisines()), preferences.location())
+            context, getSearchWords(cuisine), preferences.location())
                 .radius(radius)
                 .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
                 .type(TYPE);
@@ -161,6 +162,7 @@ public class PlacesFetcher {
                     .setGoogleUrl(Objects.toString(placeDetails.url, ""))
                     .setBusinessStatus(BusinessStatus.valueOf(
                         Objects.toString(placeDetails.businessStatus, "UNKNOWN")))
+                    .setCuisines(ImmutableList.copyOf(searchResults.get(placeId)))
                     .build());
         }
         return ImmutableList.copyOf(places);
@@ -196,18 +198,12 @@ public class PlacesFetcher {
      /**
      * Creates a String query that includes all text search words matching the specified cuisines.
      *
-     * @param cuisines A list of the cuisines we want to query
+     * @param cuisine The cuisine we want to query
      * @return A String of text search words to query on
      * @throws FetcherException when an invalid cuisine is queried
      */
     @VisibleForTesting
-    String createCuisinesQuery(ImmutableList<String> cuisines) throws FetcherException {
-        return cuisines.stream()
-            .map(cuisine -> getSearchWords(cuisine))
-            .collect(Collectors.joining("|"));
-    }
-
-    private static String getSearchWords(String cuisine) throws FetcherException {
+    String getSearchWords(String cuisine) throws FetcherException {
         try {
             return String.join("|", CUISINE_TO_SEARCH_WORDS.get(cuisine));
         } catch (NullPointerException e) {

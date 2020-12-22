@@ -68,7 +68,7 @@ public final class PlacesFetcherTest {
   private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
 
   /** Valid Place objects. */
-  private static final Place PLACE_1 =
+  private static final Place.Builder PLACE_1_BUILDER =
       Place.builder()
       .setName("name1")
       .setWebsiteUrl(PLACE_WEBSITE)
@@ -78,9 +78,9 @@ public final class PlacesFetcherTest {
       .setLocation(LOCATION)
       .setGoogleUrl(PLACE_GOOGLE_URL)
       .setPlaceId(PLACEID_1)
-      .setBusinessStatus(BUSINESS_STATUS_1)
-      .build();
-  private static final Place PLACE_2 =
+      .setBusinessStatus(BUSINESS_STATUS_1);
+
+  private static final Place.Builder PLACE_2_BUILDER =
       Place.builder()
       .setName("name2")
       .setWebsiteUrl(PLACE_WEBSITE)
@@ -90,8 +90,7 @@ public final class PlacesFetcherTest {
       .setLocation(LOCATION)
       .setGoogleUrl(PLACE_GOOGLE_URL)
       .setPlaceId(PLACEID_2)
-      .setBusinessStatus(BUSINESS_STATUS_2)
-      .build();
+      .setBusinessStatus(BUSINESS_STATUS_2);
 
   /** Valid UserPreferences builder. */
    private static final UserPreferences.Builder PREFERENCES_BUILDER =
@@ -111,6 +110,10 @@ public final class PlacesFetcherTest {
   /** An array of valid PlacesSearchResults. */
   private static final PlacesSearchResult[] SEARCH_RESULT_ARR =
       {SEARCH_RESULT_1, SEARCH_RESULT_2 };
+  private static final PlacesSearchResult[] SEARCH_RESULT_1_ONLY_ARR =
+      {SEARCH_RESULT_1};
+  private static final PlacesSearchResult[] SEARCH_RESULT_2_ONLY_ARR =
+      {SEARCH_RESULT_2};
 
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
@@ -172,15 +175,25 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_validSearchResults_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
+    Place place1 = PLACE_1_BUILDER.setCuisines(ImmutableList.of("sushi", "asian")).build();
+    Place place2 = PLACE_2_BUILDER.setCuisines(ImmutableList.of("hamburger")).build();
+
+
+
+
+    UserPreferences preferences =
+        PREFERENCES_BUILDER.setCuisines(ImmutableList.of("sushi", "asian", "hamburger")).build();
     doReturn(PLACE_DETAILS_1)
       .doReturn(PLACE_DETAILS_2)
       .when(spiedFetcher)
       .getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_ARR)
+    doReturn(SEARCH_RESULT_1_ONLY_ARR)
+      .doReturn(SEARCH_RESULT_1_ONLY_ARR)
+      .doReturn(SEARCH_RESULT_2_ONLY_ARR)
       .when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(
-      ImmutableList.of(PLACE_1, PLACE_2), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
+      ImmutableList.of(place1, place2), spiedFetcher.fetch(preferences));
   }
 
   @Test
@@ -248,15 +261,15 @@ public final class PlacesFetcherTest {
 
   @Test
   public void createCuisinesQuery_getsAnEmptyListOfCuisines_returnsEmptyQuery() throws Exception {
-    assertEquals("", placesFetcher.createCuisinesQuery(ImmutableList.of()));
+    assertEquals("", placesFetcher.getSearchWords(ImmutableList.of()));
   }
 
   @Test
-  public void createCuisinesQuery_getsInvalidCuisines_throwsFetcherException() throws Exception {
+  public void getSearchWords_getsInvalidCuisine_throwsFetcherException() throws Exception {
     FetcherException thrown =
         assertThrows(
             FetcherException.class,
-            () -> placesFetcher.createCuisinesQuery(ImmutableList.of("blah")));
+            () -> placesFetcher.getSearchWords("blah"));
     assertTrue(thrown.getCause() instanceof NullPointerException);
     assertTrue(thrown.getMessage().contains("invalid cuisine"));
   }

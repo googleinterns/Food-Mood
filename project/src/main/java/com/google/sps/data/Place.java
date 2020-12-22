@@ -149,17 +149,11 @@ public abstract class Place {
      */
     public abstract Builder setBusinessStatus(BusinessStatus businessStatus);
 
-    // Builds the list of cuisines that a place holds.
-    protected abstract ImmutableList.Builder<String> cuisinesBuilder();
-
     /**
      * @param cuisines the place's cuisines.
      * @return a Place builder that enables to continue building
      */
-    public Builder addCuisine(String cuisine) {
-      cuisinesBuilder().add(cuisine);
-      return this;
-    }
+    public abstract Builder setCuisines(ImmutableList<String> cuisines);
 
     /**
      * Builds the Place object according to the data that was set so far.
