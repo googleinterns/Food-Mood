@@ -73,7 +73,8 @@ public final class ValidationUtils {
   public static void validateUserTriedAgainOnlyIfdidntchoose(Optional<String> placeUserChose,
       boolean userTriedAgain) throws IllegalArgumentException {
     checkArgument(
-        !(placeUserChose.isPresent() && userTriedAgain), "User can't both try again and choose a place."
+        !(placeUserChose.isPresent() && userTriedAgain),
+        "User can't both try again and choose a place."
     );
   }
 
