@@ -24,6 +24,12 @@ import com.google.common.collect.ImmutableList;
 @AutoValue
 public abstract class UserFeedback {
 
+  /** @return the user thst supplied the feedback. */
+  public abstract String userId();
+
+  /** @return the time in which the feedback was given, in milliseconds. */
+  public abstract long feedbackTimeInMillis();
+
   /** @return a list of IDs of the places that were recommended to the user. */
   public abstract ImmutableList<String> placesRecommendedToUser();
 
@@ -45,6 +51,19 @@ public abstract class UserFeedback {
   /** A builder class for creating a UserFeedback objects. */
   @AutoValue.Builder
   public abstract static class Builder {
+
+    /**
+     * @param userId the user thst supplied the feedback.
+     * @return a UserFeedback builder that enables to continue building.
+     */
+    public abstract Builder setUserId(String userId);
+
+    /**
+     * @param feedbackTimeInMillis the time in which the feedback was given, in milliseconds.
+     * @return a UserFeedback builder that enables to continue building.
+     */
+    public abstract Builder setFeedbackTimeInMillis(long feedbackTimeInMillis);
+
     /**
      * @param placesRecommendedToUser a list of IDs of the places that were recommended to the user.
      * @return a UserFeedback builder that enables to continue building.
@@ -78,11 +97,14 @@ public abstract class UserFeedback {
      * @throws IllegalArgumentException if the user feedback isn't consistent.
      */
     public UserFeedback build() throws IllegalArgumentException {
+      // The feedback time is set to be the time in which the object is created. 
+      setFeedbackTimeInMillis(System.currentTimeMillis());
       UserFeedback feedback = autoBuild();
       ValidationUtils.validateChosenPlaceInReccomendedPlaces(feedback.placeUserChose(),
           feedback.placesRecommendedToUser());
       ValidationUtils.validateUserTriedAgainOnlyIfdidntchoose(feedback.placeUserChose(),
           feedback.userTriedAgain()); // TODO(M5): make sure UI supports this demand
+      ValidationUtils.validateNonEmptyString(feedback.userId(), "User ID cannot be empty.");
       return feedback;
     }
   }
