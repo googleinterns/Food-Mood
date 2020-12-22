@@ -32,6 +32,8 @@ import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.PlacesScorerImpl;
+import com.google.sps.data.SearchRequestGenerator;
+import com.google.sps.data.SearchRequestGeneratorImpl;
 
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
@@ -43,12 +45,14 @@ public final class QueryServlet extends HttpServlet {
 
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
+  static final SearchRequestGenerator SEARCH_REQUEST_GENERATOR =
+      new SearchRequestGeneratorImpl(GeoContext.getGeoApiContext());
   private PlacesFetcher fetcher;
   private PlacesScorer scorer;
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext(), SEARCH_REQUEST_GENERATOR);
     scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
   }
 

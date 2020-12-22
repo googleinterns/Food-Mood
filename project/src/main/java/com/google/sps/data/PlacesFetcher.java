@@ -58,6 +58,9 @@ public class PlacesFetcher {
     // The entry point for a Google GEO API request.
     private GeoApiContext context;
 
+    // The generator of TextSearchRequests.
+    private SearchRequestGenerator requestGenerator;
+
     // The path of the configuration file containing the mapping of cuisines to search words.
     private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
 
@@ -69,9 +72,11 @@ public class PlacesFetcher {
      * PlacesFetcher constructor.
      *
      * @param geoApiContext the GeoApiContext used for all Google GEO API requests
+     * @param requestGenerator used for generating the TextSearchRequests sent to Google Places API
      */
-    public PlacesFetcher(GeoApiContext geoApiContext) {
+    public PlacesFetcher(GeoApiContext geoApiContext, SearchRequestGenerator requestGenerator) {
         this.context = geoApiContext;
+        this.requestGenerator = requestGenerator;
     }
 
     /**
@@ -100,11 +105,12 @@ public class PlacesFetcher {
     }
 
     private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
-        TextSearchRequest request = PlacesApi.textSearchQuery(
-            context, createCuisinesQuery(preferences.cuisines()), preferences.location())
-                .radius(radius)
-                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
-                .type(TYPE);
+        TextSearchRequest request =
+            requestGenerator.create(createCuisinesQuery(preferences.cuisines()));
+        request.location(preferences.location());
+        request.radius(radius);
+        request.maxPrice(PriceLevel.values()[preferences.maxPriceLevel()]);
+        request.type(TYPE);
         if (preferences.openNow()) {
             request.openNow(preferences.openNow());
         }
