@@ -14,16 +14,15 @@
 
 package com.google.sps.data;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import com.google.common.collect.ImmutableList;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class UserFeedbackTest {
@@ -36,7 +35,7 @@ public final class UserFeedbackTest {
   public void build_invalidBothChoosePlaceAndTryagain_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () -> {
       UserFeedback.builder()
-          .setPlacesRecommendedToUser(ImmutableList.of(PLACE_ID_1, "11111", "22222"))
+          .setPlacesRecommendedToUser(PLACES_WITH_PLACE_ID_1)
           .setPlaceUserChose(PLACE_ID_1)
           .setUserTriedAgain(true)
           .build();

@@ -32,7 +32,7 @@ public abstract class UserFeedback {
 
   /**
   * @return true if the user requested to try again and get more recommendations (implying they
-  * weren't satisfied with the recommenrations he recieved).
+  * weren't satisfied with the recommendations they recieved).
   */
   public abstract boolean userTriedAgain();
 
@@ -82,7 +82,7 @@ public abstract class UserFeedback {
       ValidationUtils.validateChosenPlaceInReccomendedPlaces(feedback.placeUserChose(),
           feedback.placesRecommendedToUser());
       ValidationUtils.validateUserTriedAgainOnlyIfdidntchoose(feedback.placeUserChose(),
-          feedback.userTriedAgain());
+          feedback.userTriedAgain()); // TODO(M3): make sure UI supports this demand
       return feedback;
     }
   }

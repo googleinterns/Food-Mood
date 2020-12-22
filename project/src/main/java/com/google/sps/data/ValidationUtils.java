@@ -51,7 +51,6 @@ public final class ValidationUtils {
         "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
   }
 
-
   /**
    * @param placeUserChose the place the user chose to order from
    * @param placesRecommendedToUser the places that the system recommended to the user
