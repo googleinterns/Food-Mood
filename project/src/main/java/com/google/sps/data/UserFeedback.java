@@ -82,7 +82,7 @@ public abstract class UserFeedback {
       ValidationUtils.validateChosenPlaceInReccomendedPlaces(feedback.placeUserChose(),
           feedback.placesRecommendedToUser());
       ValidationUtils.validateUserTriedAgainOnlyIfdidntchoose(feedback.placeUserChose(),
-          feedback.userTriedAgain()); // TODO(M3): make sure UI supports this demand
+          feedback.userTriedAgain()); // TODO(M5): make sure UI supports this demand
       return feedback;
     }
   }
