@@ -26,9 +26,12 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.repackaged.com.google.api.client.util.Strings;
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 
 public class DataAccessor {
 
@@ -79,6 +82,7 @@ public class DataAccessor {
 
   /**
   * Updates the database with information from the user feedback.
+  *
   * @param userId the user who sent the feedback
   * @param recommendedPlaces a map of places that the user sends feedback about, and a boolean
   *    that states whether the user chose the place or not
@@ -99,12 +103,33 @@ public class DataAccessor {
 
   /**
   * Approches the database and gets the places that were recommended to the user in the past.
-  * @param userId the user we want the information about
+  *
+  * @param userId the user we want the information about.
   * @return the IDs of the places that the user received recommendations about in the past.
   */
   public ImmutableList<String> getPlacesThatWereRecommendedToUser(String userId) {
+    Query query = new Query(RECOMMENDATION_ENTITY_NAME).setFilter(
+      new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId)
+    );
+    return datastoreService.prepare(query)
+        .asList(FetchOptions.Builder.withDefaults())
+        .stream()
+        .map(entity -> (String)entity.getProperty("PlaceId"))
+        .collect(ImmutableList.toImmutableList());
+  }
+
+  /**
+  * Approches the database and gets the places that were recommended to the user in the past,
+  * and that he chose to order from.
+  *
+  * @param userId the user we want the information about.
+  * @return the IDs of the places that the user chose to order from in the past.
+  */
+  public ImmutableList<String> getPlacesThatWereChosenByUser(String userId) {
     Filter userIdFilter = new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId);
-    Query query = new Query(RECOMMENDATION_ENTITY_NAME).setFilter(userIdFilter);
+    Filter chosenFilter = new Query.FilterPredicate("WasChosenByUser", FilterOperator.EQUAL, true);
+    Query query = new Query(RECOMMENDATION_ENTITY_NAME)
+        .setFilter(CompositeFilterOperator.and(userIdFilter, chosenFilter));
     return datastoreService.prepare(query)
         .asList(FetchOptions.Builder.withDefaults())
         .stream()
