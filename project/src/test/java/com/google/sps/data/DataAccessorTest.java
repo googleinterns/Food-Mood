@@ -55,13 +55,13 @@ public final class DataAccessorTest {
 
   @Before
   public void setUp() {
-      helper.setUp();
-      dataAccessor = new DataAccessor(datastoreService);
+    helper.setUp();
+    dataAccessor = new DataAccessor(datastoreService);
   }
 
   @After
   public void tearDown() {
-      helper.tearDown();
+    helper.tearDown();
   }
 
   @Test

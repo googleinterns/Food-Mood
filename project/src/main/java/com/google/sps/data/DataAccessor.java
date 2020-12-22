@@ -18,7 +18,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -26,12 +25,10 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.repackaged.com.google.api.client.util.Strings;
-import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 
 public class DataAccessor {
 
@@ -83,20 +80,16 @@ public class DataAccessor {
   /**
   * Updates the database with information from the user feedback.
   *
-  * @param userId the user who sent the feedback
-  * @param recommendedPlaces a map of places that the user sends feedback about, and a boolean
-  *    that states whether the user chose the place or not
-  * @param requestedToTryAgain whether the user decided to try again (and get a new list of places)
+  * @param feedback a UserFeedback that hplds all the information about the user feedback.
   */
-  public void updateUserFeedback(String userId, ImmutableMap<String, Boolean> recommendedPlaces,
-    Boolean requestedToTryAgain) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
-    for (ImmutableMap.Entry<String, Boolean> place : recommendedPlaces.entrySet()) {
+  public void updateUserFeedback(UserFeedback feedback) {
+    for (String place : feedback.placesRecommendedToUser()) {
       Entity recommendationEntity = new Entity(RECOMMENDATION_ENTITY_NAME);
-      recommendationEntity.setProperty("UserId", userId);
-      recommendationEntity.setProperty("PlaceId", place.getKey());
-      recommendationEntity.setProperty("WasChosenByUser", place.getValue());
-      recommendationEntity.setProperty("DidUserRequestToTryAgain", requestedToTryAgain);
+      recommendationEntity.setProperty("UserId", feedback.userId());
+      recommendationEntity.setProperty("PlaceId", place);
+      recommendationEntity.setProperty("WasChosenByUser",
+          feedback.placeUserChose().isPresent() && place == feedback.placeUserChose().get());
+      recommendationEntity.setProperty("DidUserRequestToTryAgain", feedback.userTriedAgain());
       datastoreService.put(recommendationEntity);
     }
   }
