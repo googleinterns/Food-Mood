@@ -19,8 +19,6 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.List;
-
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -33,6 +31,8 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,7 +98,7 @@ public final class DataAccessorTest {
     String userId = "12345";
 
     dataAccessor.registerUser(userId);
-    List<Entity> results = createPreparedQueryByUserId(userId)
+    List<Entity> results = createPreparedQueryByUserIdAsKey(userId)
         .asList(FetchOptions.Builder.withDefaults());
 
     assertEquals(results.size(), 1);
@@ -125,7 +125,44 @@ public final class DataAccessorTest {
     assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(userId));
   }
 
-  private PreparedQuery createPreparedQueryByUserId(String userId) {
+  @Test
+  public void updateUserFeedback_userChosePlace_UpdateFeedback() {
+    String userId = "12345";
+    String chosenPlace = "place1";
+    ImmutableList<String> places = ImmutableList.of(chosenPlace, "place2", "place3");
+
+    dataAccessor.updateUserFeedback(
+        buildUserFeedback(userId, chosenPlace, places, false /**tried again*/));
+
+    List<Entity> results = getRecommendationEntitiesByUserId(userId);
+    assertEquals(results.size(), places.size()); // An entity for each place.
+    for (Entity entity : results) {
+      String placeId = (String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY_NAME);
+      assertTrue(places.contains(placeId));
+      assertFalse((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY_NAME));
+      if (placeId == chosenPlace) {
+        assertTrue((boolean) entity.getProperty(DataAccessor.CHOSEN_PROPERTY_NAME));
+      }
+    }
+  }
+
+  @Test
+  public void updateUserFeedback_userTriedAgain_UpdateFeedback() {
+    String userId = "12345";
+    ImmutableList<String> places = ImmutableList.of("place1", "place2", "place3");
+
+    dataAccessor.updateUserFeedback(
+        buildUserFeedback(userId, "" /**chosen place*/, places, true /**tried again*/));
+
+    List<Entity> results = getRecommendationEntitiesByUserId(userId);
+    assertEquals(results.size(), places.size()); // An entity for each place.
+    for (Entity entity : results) {
+      assertTrue(places.contains((String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY_NAME)));
+      assertTrue((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY_NAME));
+    }
+  }
+
+  private PreparedQuery createPreparedQueryByUserIdAsKey(String userId) {
     Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_NAME, userId);
     Filter userIdFilter = new Query.FilterPredicate(
         Entity.KEY_RESERVED_PROPERTY,
@@ -133,5 +170,23 @@ public final class DataAccessorTest {
         userIdKey);
     Query query = new Query(DataAccessor.USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query);
+  }
+
+  private List<Entity> getRecommendationEntitiesByUserId(String userId) {
+    return datastoreService
+        .prepare(new Query(DataAccessor.RECOMMENDATION_ENTITY_KIND)
+            .setFilter(new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId)))
+        .asList(FetchOptions.Builder.withDefaults());
+  }
+
+  private UserFeedback buildUserFeedback(String userId, String chosenPlace,
+      ImmutableList<String> places, boolean userTriedAgain) {
+    return UserFeedback
+        .builder()
+        .setUserId(userId)
+        .setPlacesRecommendedToUser(places)
+        .setPlaceUserChose(chosenPlace)
+        .setUserTriedAgain(userTriedAgain)
+        .build();
   }
 }
