@@ -101,8 +101,8 @@ public final class DataAccessorTest {
     List<Entity> results = createPreparedQueryByUserIdAsKey(userId)
         .asList(FetchOptions.Builder.withDefaults());
 
-    assertEquals(results.size(), 1);
-    assertEquals(results.get(0), new Entity(DataAccessor.USER_ENTITY_NAME, userId));
+    assertEquals(1, results.size());
+    assertEquals(new Entity(DataAccessor.USER_ENTITY_NAME, userId), results.get(0));
   }
 
   @Test
@@ -135,7 +135,7 @@ public final class DataAccessorTest {
         buildUserFeedback(userId, chosenPlace, places, false /**tried again*/));
 
     List<Entity> results = getRecommendationEntitiesByUserId(userId);
-    assertEquals(results.size(), places.size()); // An entity for each place.
+    assertEquals(places.size(), results.size()); // An entity for each place.
     for (Entity entity : results) {
       String placeId = (String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY_NAME);
       assertTrue(places.contains(placeId));
@@ -155,7 +155,7 @@ public final class DataAccessorTest {
         buildUserFeedback(userId, "" /**chosen place*/, places, true /**tried again*/));
 
     List<Entity> results = getRecommendationEntitiesByUserId(userId);
-    assertEquals(results.size(), places.size()); // An entity for each place.
+    assertEquals(places.size(), results.size()); // An entity for each place.
     for (Entity entity : results) {
       assertTrue(places.contains((String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY_NAME)));
       assertTrue((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY_NAME));
