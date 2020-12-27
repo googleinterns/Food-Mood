@@ -53,6 +53,11 @@ public final class DataAccessorTest {
   // The tested dataAccessor, which will be initialized with a datastore service instance.
   private DataAccessor dataAccessor;
 
+  private static final String USER_ID = "12345";
+  private static final String PLACE_ID_1 = "place1";
+  private static final String PLACE_ID_2 = "place2";
+  private static final String PLACE_ID_3 = "place3";
+
   @Before
   public void setUp() {
     helper.setUp();
@@ -66,11 +71,10 @@ public final class DataAccessorTest {
 
   @Test
   public void isRegistered_registered_true() {
-    String userId = "12345";
-    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, userId);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, USER_ID);
     datastoreService.put(userEntity);
 
-    assertTrue(dataAccessor.isRegistered(userId));
+    assertTrue(dataAccessor.isRegistered(USER_ID));
   }
 
   @Test
@@ -95,14 +99,12 @@ public final class DataAccessorTest {
 
   @Test
   public void registerUser_validUserId_registerUser() {
-    String userId = "12345";
-
-    dataAccessor.registerUser(userId);
-    List<Entity> results = createPreparedQueryByUserIdAsKey(userId)
+    dataAccessor.registerUser(USER_ID);
+    List<Entity> results = createPreparedQueryByUserIdAsKey(USER_ID)
         .asList(FetchOptions.Builder.withDefaults());
 
     assertEquals(1, results.size());
-    assertEquals(new Entity(DataAccessor.USER_ENTITY_NAME, userId), results.get(0));
+    assertEquals(new Entity(DataAccessor.USER_ENTITY_NAME, USER_ID), results.get(0));
   }
 
   @Test
@@ -119,47 +121,126 @@ public final class DataAccessorTest {
   public void registerUser_alreadyRegistered_throwIllegalArgumentException() {
     // This test assumes that "registerUser" adds the user to the system, and makes sure that
     // the same user can't be added to the system more than once.
-    String userId = "12345";
-    dataAccessor.registerUser(userId);
+    dataAccessor.registerUser(USER_ID);
 
-    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(userId));
+    assertThrows(IllegalArgumentException.class, () -> dataAccessor.registerUser(USER_ID));
   }
 
   @Test
   public void updateUserFeedback_userChosePlace_UpdateFeedback() {
-    String userId = "12345";
-    String chosenPlace = "place1";
-    ImmutableList<String> places = ImmutableList.of(chosenPlace, "place2", "place3");
+    String chosenPlace = PLACE_ID_1;
+    ImmutableList<String> places = ImmutableList.of(chosenPlace, PLACE_ID_2, PLACE_ID_3);
 
     dataAccessor.updateUserFeedback(
-        buildUserFeedback(userId, chosenPlace, places, false /**tried again*/));
+        buildUserFeedback(USER_ID, chosenPlace, places, false /**tried again*/));
 
-    List<Entity> results = getRecommendationEntitiesByUserId(userId);
+    List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
     for (Entity entity : results) {
-      String placeId = (String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY_NAME);
+      String placeId = (String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY);
       assertTrue(places.contains(placeId));
-      assertFalse((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY_NAME));
+      assertFalse((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY));
       if (placeId == chosenPlace) {
-        assertTrue((boolean) entity.getProperty(DataAccessor.CHOSEN_PROPERTY_NAME));
+        assertTrue((boolean) entity.getProperty(DataAccessor.CHOSEN_PROPERTY));
       }
     }
   }
 
   @Test
   public void updateUserFeedback_userTriedAgain_UpdateFeedback() {
-    String userId = "12345";
-    ImmutableList<String> places = ImmutableList.of("place1", "place2", "place3");
+    ImmutableList<String> places = ImmutableList.of(PLACE_ID_1, PLACE_ID_2, PLACE_ID_1);
 
     dataAccessor.updateUserFeedback(
-        buildUserFeedback(userId, "" /**chosen place*/, places, true /**tried again*/));
+        buildUserFeedback(USER_ID, null /**chosen place*/, places, true /**tried again*/));
 
-    List<Entity> results = getRecommendationEntitiesByUserId(userId);
+    List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
     for (Entity entity : results) {
-      assertTrue(places.contains((String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY_NAME)));
-      assertTrue((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY_NAME));
+      assertTrue(places.contains((String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY)));
+      assertTrue((boolean) entity.getProperty(DataAccessor.TRY_AGAIN_PROPERTY));
     }
+  }
+
+  @Test
+  public void updateUserFeedback_noPlacesRecommended_noEntities() {
+    ImmutableList<String> places = ImmutableList.of();
+
+    dataAccessor.updateUserFeedback(
+        buildUserFeedback(USER_ID, null /**chosen place*/, places, true /**tried again*/));
+
+    List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
+    assertEquals(0, results.size());
+  }
+
+  @Test
+  public void getUserPlacesHistory_nullUser_throwIllegalArgumentException() {
+    String userId = null;
+
+    assertThrows(IllegalArgumentException.class,
+        () -> dataAccessor.getPlacesRecommendedToUser(userId, true));
+    assertThrows(IllegalArgumentException.class,
+        () -> dataAccessor.getPlacesRecommendedToUser(userId, false));
+  }
+
+  @Test
+  public void getUserPlacesHistory_emptyUser_throwIllegalArgumentException() {
+    String userId = "";
+
+    assertThrows(IllegalArgumentException.class,
+        () -> dataAccessor.getPlacesRecommendedToUser(userId, true));
+    assertThrows(IllegalArgumentException.class,
+        () -> dataAccessor.getPlacesRecommendedToUser(userId, false));
+  }
+
+  @Test
+  public void getUserPlacesHistory_allPlaces_getAllPlaces() {
+    datastoreService.put(createRecomEntityByProperties(
+      USER_ID, PLACE_ID_1, false /** chosen */, false /** tried again */));
+    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, false /** chosen */,
+        false /** tried again */));
+    // Purposely add the same place IDs again, to make sure we get the places only once.
+    // Once making the familiar place chosen, and once leaving in unchosen.
+    datastoreService.put(createRecomEntityByProperties(
+      USER_ID, PLACE_ID_1, true /** chosen */, false /** tried again */));
+    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, false /** chosen */,
+        false /** tried again */));
+
+    ImmutableList<String> results =
+        dataAccessor.getPlacesRecommendedToUser(USER_ID, false /** only places user chose */);
+
+    assertEquals(2, results.size());
+    assertTrue(results.contains(PLACE_ID_1));
+    assertTrue(results.contains(PLACE_ID_2));
+  }
+
+  @Test
+  public void getUserPlacesHistory_onlyChosenPlaces_getAllPlaces() {
+    datastoreService.put(createRecomEntityByProperties(
+      USER_ID, PLACE_ID_1, true /** chosen */, false /** tried again */));
+    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, false /** chosen */,
+        false /** tried again */));
+    // Purposely add the same place IDs again, unchosen, to make sure it doesn't affect the results.
+    datastoreService.put(createRecomEntityByProperties(
+      USER_ID, PLACE_ID_1, false /** chosen */, false /** tried again */));
+    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, false /** chosen */,
+        false /** tried again */));
+
+    ImmutableList<String> results =
+        dataAccessor.getPlacesRecommendedToUser(USER_ID, true /** only places user chose */);
+
+    assertEquals(1, results.size());
+    assertTrue(results.contains(PLACE_ID_1));
+  }
+
+  private Entity createRecomEntityByProperties(String userId, String placeId, boolean chosen,
+      boolean tryAgain) {
+    Entity recommendationEntity = new Entity(DataAccessor.RECOMMENDATION_ENTITY_KIND);
+    recommendationEntity.setProperty(DataAccessor.USER_ID_PROPERTY, userId);
+    recommendationEntity.setProperty(DataAccessor.PLACE_ID_PROPERTY, placeId);
+    recommendationEntity.setProperty(DataAccessor.CHOSEN_PROPERTY, chosen);
+    recommendationEntity.setProperty(DataAccessor.TRY_AGAIN_PROPERTY, tryAgain);
+    recommendationEntity.setProperty(DataAccessor.TIME_PROPERTY, System.currentTimeMillis());
+    return recommendationEntity;
   }
 
   private PreparedQuery createPreparedQueryByUserIdAsKey(String userId) {
@@ -173,20 +254,19 @@ public final class DataAccessorTest {
   }
 
   private List<Entity> getRecommendationEntitiesByUserId(String userId) {
-    return datastoreService
-        .prepare(new Query(DataAccessor.RECOMMENDATION_ENTITY_KIND)
-            .setFilter(new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId)))
-        .asList(FetchOptions.Builder.withDefaults());
+    return datastoreService.prepare(
+        new Query(DataAccessor.RECOMMENDATION_ENTITY_KIND)
+            .setFilter(new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId))
+    ).asList(FetchOptions.Builder.withDefaults());
   }
 
   private UserFeedback buildUserFeedback(String userId, String chosenPlace,
       ImmutableList<String> places, boolean userTriedAgain) {
-    return UserFeedback
+    UserFeedback.Builder temp = UserFeedback
         .builder()
         .setUserId(userId)
         .setPlacesRecommendedToUser(places)
-        .setPlaceUserChose(chosenPlace)
-        .setUserTriedAgain(userTriedAgain)
-        .build();
+        .setUserTriedAgain(userTriedAgain);
+    return chosenPlace == null ? temp.build() : temp.setPlaceUserChose(chosenPlace).build();
   }
 }
