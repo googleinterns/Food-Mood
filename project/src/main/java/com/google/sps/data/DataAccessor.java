@@ -97,7 +97,7 @@ public class DataAccessor {
           feedback.placeUserChose().isPresent() && feedback.placeUserChose().get().equals(place));
       recommendationEntity.setProperty(TRY_AGAIN_PROPERTY, feedback.userTriedAgain());
       recommendationEntity.setProperty(TIME_PROPERTY, feedback.feedbackTimeInMillis());
-          datastoreService.put(recommendationEntity);
+      datastoreService.put(recommendationEntity);
     }
   }
 

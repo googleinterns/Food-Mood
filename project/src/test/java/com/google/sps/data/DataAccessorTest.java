@@ -237,9 +237,9 @@ public final class DataAccessorTest {
     Entity recommendationEntity = new Entity(DataAccessor.RECOMMENDATION_ENTITY_KIND);
     recommendationEntity.setProperty(DataAccessor.USER_ID_PROPERTY, userId);
     recommendationEntity.setProperty(DataAccessor.PLACE_ID_PROPERTY, placeId);
-    recommendationEntity.setProperty(DataAccessor.CHOSEN_PROPERTY, chosen);
-    recommendationEntity.setProperty(DataAccessor.TRY_AGAIN_PROPERTY, tryAgain);
     recommendationEntity.setProperty(DataAccessor.TIME_PROPERTY, System.currentTimeMillis());
+    recommendationEntity.setProperty(DataAccessor.TRY_AGAIN_PROPERTY, tryAgain);
+    recommendationEntity.setProperty(DataAccessor.CHOSEN_PROPERTY, chosen);
     return recommendationEntity;
   }
 
