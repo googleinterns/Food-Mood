@@ -17,7 +17,6 @@ package com.google.sps.data;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Date;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -88,11 +87,11 @@ public class DataAccessor {
     if (userPref.cuisines().isEmpty()) {
       return;
     }
-    Entity userEntity = new Entity(PREFERNCES_ENTITY_KIND);
-    userEntity.setProperty("userId", userId);
-    userEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
-    userEntity.setProperty("preferedCuisines", userPref.cuisines());
-    datastoreService.put(userEntity);
+    Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
+    prefsEntity.setProperty("userId", userId);
+    prefsEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
+    prefsEntity.setProperty("preferedCuisines", userPref.cuisines());
+    datastoreService.put(prefsEntity);
   }
 
 }

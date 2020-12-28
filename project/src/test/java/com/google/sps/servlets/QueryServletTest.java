@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -31,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
-
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.FetcherException;
@@ -67,10 +67,11 @@ public final class QueryServletTest {
     servlet.init(FETCHER, SCORER, USER_VERIFIER, DATA_ACCESSOR);
     when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
     initializeRequestParameters();
+    clearInvocations(DATA_ACCESSOR);
   }
 
   @Test
-  public void getRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
+  public void postRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
     ImmutableList<Place> placesListWithMoreThanMaxNum =
         createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
     when(FETCHER.fetch(any(UserPreferences.class)))
@@ -84,7 +85,7 @@ public final class QueryServletTest {
   }
 
   @Test
-  public void getRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
+  public void postRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
     int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
     when(FETCHER.fetch(any(UserPreferences.class)))
@@ -98,7 +99,7 @@ public final class QueryServletTest {
   }
 
   @Test
-  public void getRequest_fetchedPlacesShouldBeFiltered_filterPlaces() throws Exception {
+  public void postRequest_fetchedPlacesShouldBeFiltered_filterPlaces() throws Exception {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     Place validPlace = createValidPlaceBuilder().setName("validPlace").build();
     Place lowRating = createValidPlaceBuilder().setRating(3).setName("lowRatingPlace").build();
@@ -132,7 +133,7 @@ public final class QueryServletTest {
   }
 
   @Test
-  public void getRequest_fetcherException_forwardException() throws Exception {
+  public void postRequest_fetcherException_forwardException() throws Exception {
     when(FETCHER.fetch(any(UserPreferences.class))).thenThrow(FetcherException.class);
 
     servlet.doPost(REQUEST, RESPONSE);
@@ -142,7 +143,7 @@ public final class QueryServletTest {
   }
 
   @Test
-  public void getRequest_userPreferencesBuildException_forwardException() throws Exception {
+  public void postRequest_userPreferencesBuildException_forwardException() throws Exception {
     // The rating parameter cannot be negative, so this should cause the UserPreferences builder to
     // throw an IllegalArgumentException
     when(REQUEST.getParameter("rating")).thenReturn("-5");
@@ -157,7 +158,7 @@ public final class QueryServletTest {
   // This test checks that the user preferences are processed correctly based on the given
   // parameters. The crucial point of the test is that the strings that are given as parameters
   // match the expect user preferences.
-  public void getRequest_userPreferencesForwardedToFetcher() throws Exception {
+  public void postRequest_userPreferencesForwardedToFetcher() throws Exception {
     when(REQUEST.getParameter("rating")).thenReturn("4");
     when(REQUEST.getParameter("price")).thenReturn("3");
     when(REQUEST.getParameter("open")).thenReturn("1");
@@ -178,7 +179,7 @@ public final class QueryServletTest {
 
   @Test
   // This test checks that the PlacesScorer is called with the expected parameters
-  public void getRequest_placesAndUserLocationForwadedToScorer() throws Exception {
+  public void postRequest_placesAndUserLocationForwadedToScorer() throws Exception {
     ImmutableList<Place> places = createPlacesListBySize(1);
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(places);
     when(REQUEST.getParameter("location")).thenReturn("00.00000000,00.00000000");
@@ -191,10 +192,9 @@ public final class QueryServletTest {
   @Test
   // This test checks that storeUserPreferences is called with the expected parameters
   // when the servlet gets a valid ID token
-  public void getRequest_validIdToken_userIdAndPreferencesForwardedForStoring() throws Exception {
-    initializeRequestParameters();
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
+  public void postRequest_validIdToken_userIdAndPreferencesForwardedForStoring() throws Exception {
     when(REQUEST.getParameter("idToken")).thenReturn("token");
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
     when(USER_VERIFIER.getUserIdByToken("token")).thenReturn(Optional.of("userId"));
 
     servlet.doPost(REQUEST, RESPONSE);
@@ -206,10 +206,9 @@ public final class QueryServletTest {
   @Test
   // This test checks that storeUserPreferences is not called
   // when the servlet gets an invalid ID token
-  public void getRequest_invalidIdToken_userPreferencesAreNotStored() throws Exception {
-    initializeRequestParameters();
-    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
+  public void postRequest_invalidIdToken_userPreferencesAreNotStored() throws Exception {
     when(REQUEST.getParameter("idToken")).thenReturn("");
+    when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
     when(USER_VERIFIER.getUserIdByToken("")).thenReturn(Optional.empty());
 
     servlet.doPost(REQUEST, RESPONSE);
@@ -264,6 +263,7 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("open")).thenReturn("1");
     when(REQUEST.getParameter("location")).thenReturn("30.30,35.35");
     when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
+    when(REQUEST.getParameter("idToken")).thenReturn("token");
   }
 
   // Returns a UserPreferences builder that has valid values of all attributes.

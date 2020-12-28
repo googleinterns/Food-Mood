@@ -116,14 +116,13 @@ public final class QueryServlet extends HttpServlet {
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
   }
 
-  // Store the user's preferences in the database, only if the user is signed in an registered.
+  // Store the user's preferences in the database, only if the user is signed in.
   private void storePreferences(String userIdToken, UserPreferences userPrefs) {
     Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
     if (!optionalUserId.isPresent()) {
         return;
     }
     String userId = optionalUserId.get();
-    System.out.println(userId);
     dataAccessor.storeUserPreferences(userId, userPrefs);
   }
 }
