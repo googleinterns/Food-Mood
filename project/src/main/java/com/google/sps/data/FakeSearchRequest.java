@@ -5,6 +5,7 @@ import com.google.maps.GeoApiContext;
 
 public class FakeSearchRequest extends TextSearchRequest {
 
+    /** The search wirds used for the text search */
     public String searchWords;
 
     /**
