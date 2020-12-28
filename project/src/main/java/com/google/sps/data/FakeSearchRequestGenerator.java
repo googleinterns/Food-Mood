@@ -9,7 +9,7 @@ public class FakeSearchRequestGenerator implements SearchRequestGenerator {
     private GeoApiContext context;
 
     /**
-     * SearchRequestGeneratorImpl constructor.
+     * FakeSearchRequestGenerator constructor.
      *
      * @param geoApiContext the GeoApiContext used for all Google GEO API requests
      */

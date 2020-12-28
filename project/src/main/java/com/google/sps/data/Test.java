@@ -22,9 +22,11 @@ public class Test {
 
     static final SearchRequestGenerator SEARCH_REQUEST_GENERATOR =
         new SearchRequestGeneratorImpl(GeoContext.getGeoApiContext());
+    static final PlaceDetailsRequestGenerator PLACE_DETAILS_REQUEST_GENERATOR =
+        new PlaceDetailsRequestGeneratorImpl(GeoContext.getGeoApiContext());
 
     public static void main(String[] args) {
-        PlacesFetcher fetcher = new PlacesFetcher(GeoContext.getGeoApiContext(), SEARCH_REQUEST_GENERATOR);
+        PlacesFetcher fetcher = new PlacesFetcher(SEARCH_REQUEST_GENERATOR,PLACE_DETAILS_REQUEST_GENERATOR);
         ImmutableList<Place> results = fetcher.fetch(PREFERENCES);
         for (Place place : results) {
             System.out.println(place.name());

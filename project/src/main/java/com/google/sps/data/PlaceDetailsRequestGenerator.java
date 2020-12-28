@@ -30,5 +30,3 @@ public interface PlaceDetailsRequestGenerator {
     PlaceDetailsRequest create(String placeId);
 
 }
-
-}

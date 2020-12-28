@@ -20,12 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
-import com.google.maps.GeoApiContext;
 import com.google.maps.TextSearchRequest;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
-import com.google.maps.PlacesApi;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -55,11 +53,11 @@ public class PlacesFetcher {
     // The maximal number of times the search radius will be extended.
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
-    // The entry point for a Google GEO API request.
-    private GeoApiContext context;
-
     // The generator of TextSearchRequests.
-    private SearchRequestGenerator requestGenerator;
+    private SearchRequestGenerator searchRequestGenerator;
+
+    // The generator of PlaceDetailsRequest.
+    private PlaceDetailsRequestGenerator detailsRequestGenerator;
 
     // The path of the configuration file containing the mapping of cuisines to search words.
     private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
@@ -71,12 +69,14 @@ public class PlacesFetcher {
     /**
      * PlacesFetcher constructor.
      *
-     * @param geoApiContext the GeoApiContext used for all Google GEO API requests
      * @param requestGenerator used for generating the TextSearchRequests sent to Google Places API
+     * @param requestGenerator used for generating the PlaceDetailsRequests sent to Google Places API
      */
-    public PlacesFetcher(GeoApiContext geoApiContext, SearchRequestGenerator requestGenerator) {
-        this.context = geoApiContext;
-        this.requestGenerator = requestGenerator;
+    public PlacesFetcher(
+            SearchRequestGenerator searchRequestGenerator,
+            PlaceDetailsRequestGenerator detailsRequestGenerator) {
+        this.searchRequestGenerator = searchRequestGenerator;
+        this.detailsRequestGenerator = detailsRequestGenerator;
     }
 
     /**
@@ -106,7 +106,7 @@ public class PlacesFetcher {
 
     private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius) {
         TextSearchRequest request =
-            requestGenerator.create(createCuisinesQuery(preferences.cuisines()));
+            searchRequestGenerator.create(createCuisinesQuery(preferences.cuisines()));
         request.location(preferences.location());
         request.radius(radius);
         request.maxPrice(PriceLevel.values()[preferences.maxPriceLevel()]);
@@ -162,7 +162,7 @@ public class PlacesFetcher {
     }
 
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
-        return PlacesApi.placeDetails(context, placeId)
+        return detailsRequestGenerator.create(placeId)
             .fields(
                 PlaceDetailsRequest.FieldMask.NAME,
                 PlaceDetailsRequest.FieldMask.WEBSITE,
