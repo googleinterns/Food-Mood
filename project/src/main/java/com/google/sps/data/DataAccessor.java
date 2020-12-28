@@ -17,6 +17,9 @@ package com.google.sps.data;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -27,7 +30,10 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.repackaged.com.google.api.client.util.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class DataAccessor {
 
@@ -94,4 +100,20 @@ public class DataAccessor {
     datastoreService.put(prefsEntity);
   }
 
+  /**
+   * Gets a map of cuisines the user preferred and the number of times they were preferred.
+   * @param userID: the user ID to get the preferred cuisines for.
+   * @return a mapping from a cuisine to the number of times the user preferred it.
+   */
+  @SuppressWarnings("unchecked")
+  public ImmutableMap<String, Long> getPreferredCuisines(String userId) {
+    Filter userIdFilter = new Query.FilterPredicate("userId", FilterOperator.EQUAL, userId);
+    Query query = new Query(DataAccessor.PREFERNCES_ENTITY_KIND).setFilter(userIdFilter);
+    List<Entity> results =
+        datastoreService.prepare(query).asList(FetchOptions.Builder.withDefaults());
+    return ImmutableMap.copyOf(  // TODO(Tal): Keep one instance of cuisine per hour
+        results.stream()
+            .flatMap(entity -> ((List<String>) entity.getProperty("preferedCuisines")).stream())
+            .collect(Collectors.groupingBy(s -> (String) s, Collectors.counting())));
+  }
 }
