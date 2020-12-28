@@ -69,9 +69,9 @@ public class PlacesFetcher {
     /**
      * PlacesFetcher constructor.
      *
-     * @param searchRequestGenerator
+     * @param textSearchRequestGenerator
      *     used for generating the TextSearchRequests sent to Google Places API
-     * @param detailsRequestGenerator
+     * @param placeDetailsRequestGenerator
      *     used for generating the PlaceDetailsRequests sent to Google Places API
      */
     public PlacesFetcher(
@@ -219,6 +219,6 @@ public class PlacesFetcher {
             new InputStreamReader(
                 PlacesFetcher.class.getResourceAsStream(CUISINES_SEARCH_WORDS_CONFIG_PATH))),
                 mapType);
-        return ImmutableMap.copyOf(map);
+        return ImmutableMap.copyOf(map); // TODO(Tal): verify cuisine in search words
     }
 }
