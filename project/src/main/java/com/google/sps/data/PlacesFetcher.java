@@ -20,12 +20,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
-import com.google.maps.GeoApiContext;
 import com.google.maps.TextSearchRequest;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
-import com.google.maps.PlacesApi;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,8 +34,10 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Map;
 
 public class PlacesFetcher {
@@ -56,8 +56,11 @@ public class PlacesFetcher {
     // The maximal number of times the search radius will be extended.
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
-    // The entry point for a Google GEO API request.
-    private GeoApiContext context;
+    // The generator of TextSearchRequests.
+    private SearchRequestGenerator searchRequestGenerator;
+
+    // The generator of PlaceDetailsRequest.
+    private PlaceDetailsRequestGenerator detailsRequestGenerator;
 
     // The path of the configuration file containing the mapping of cuisines to search words.
     private static final String CUISINES_SEARCH_WORDS_CONFIG_PATH  = "cuisinesSearchWords.json";
@@ -69,10 +72,16 @@ public class PlacesFetcher {
     /**
      * PlacesFetcher constructor.
      *
-     * @param geoApiContext the GeoApiContext used for all Google GEO API requests
+     * @param textSearchRequestGenerator
+     *     used for generating the TextSearchRequests sent to Google Places API
+     * @param placeDetailsRequestGenerator
+     *     used for generating the PlaceDetailsRequests sent to Google Places API
      */
-    public PlacesFetcher(GeoApiContext geoApiContext) {
-        this.context = geoApiContext;
+    public PlacesFetcher(
+            SearchRequestGenerator textSearchRequestGenerator,
+            PlaceDetailsRequestGenerator placeDetailsRequestGenerator) {
+        this.searchRequestGenerator = textSearchRequestGenerator;
+        this.detailsRequestGenerator = placeDetailsRequestGenerator;
     }
 
     /**
@@ -84,7 +93,7 @@ public class PlacesFetcher {
      *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        Map<String, List<String>> placesSearchResults = new HashMap<>();
+        Map<String, Set<String>> placesSearchResults = new HashMap<>();
         PlacesSearchResult[] resultsForCuisine;
         // If user didn't choose any cuisines, search on all possible cuisines
         Collection<String> cuisines =
@@ -101,7 +110,7 @@ public class PlacesFetcher {
                 }
                 for(PlacesSearchResult result : resultsForCuisine) {
                     placesSearchResults.computeIfAbsent(
-                        result.placeId, k -> new ArrayList<>()).add(cuisine);
+                        result.placeId, k -> new HashSet<>()).add(cuisine);
                 }
             }
         } while (
@@ -110,13 +119,13 @@ public class PlacesFetcher {
         return createPlacesList(placesSearchResults);
     }
 
-    private TextSearchRequest genTextSearchRequest(
-            UserPreferences preferences, int radius, String cuisine) {
-        TextSearchRequest request = PlacesApi.textSearchQuery(
-            context, getSearchWords(cuisine), preferences.location())
-                .radius(radius)
-                .maxPrice(PriceLevel.values()[preferences.maxPriceLevel()])
-                .type(TYPE);
+    private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius, String cuisine) {
+        TextSearchRequest request =
+            searchRequestGenerator.create(cuisine);
+        request.location(preferences.location());
+        request.radius(radius);
+        request.maxPrice(PriceLevel.values()[preferences.maxPriceLevel()]);
+        request.type(TYPE);
         if (preferences.openNow()) {
             request.openNow(preferences.openNow());
         }
@@ -138,7 +147,7 @@ public class PlacesFetcher {
         return query.await().results;
     }
 
-    private ImmutableList<Place> createPlacesList(Map<String, List<String>> searchResults)
+    private ImmutableList<Place> createPlacesList(Map<String, Set<String>> searchResults)
             throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (String placeId : searchResults.keySet()) {
@@ -169,7 +178,7 @@ public class PlacesFetcher {
     }
 
     private PlaceDetailsRequest genPlaceDetailsRequest(String placeId) {
-        return PlacesApi.placeDetails(context, placeId)
+        return detailsRequestGenerator.create(placeId)
             .fields(
                 PlaceDetailsRequest.FieldMask.NAME,
                 PlaceDetailsRequest.FieldMask.WEBSITE,
@@ -218,6 +227,6 @@ public class PlacesFetcher {
             new InputStreamReader(
                 PlacesFetcher.class.getResourceAsStream(CUISINES_SEARCH_WORDS_CONFIG_PATH))),
                 mapType);
-        return ImmutableMap.copyOf(map);
+        return ImmutableMap.copyOf(map); // TODO(Tal): verify cuisine in search words
     }
 }

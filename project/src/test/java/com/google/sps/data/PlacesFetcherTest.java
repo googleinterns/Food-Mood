@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -35,9 +36,11 @@ import com.google.maps.model.PriceLevel;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatcher;
 
 @RunWith(JUnit4.class)
 public final class PlacesFetcherTest {
@@ -110,10 +113,6 @@ public final class PlacesFetcherTest {
   /** An array of valid PlacesSearchResults. */
   private static final PlacesSearchResult[] SEARCH_RESULT_ARR =
       {SEARCH_RESULT_1, SEARCH_RESULT_2 };
-  private static final PlacesSearchResult[] SEARCH_RESULT_1_ONLY_ARR =
-      {SEARCH_RESULT_1};
-  private static final PlacesSearchResult[] SEARCH_RESULT_2_ONLY_ARR =
-      {SEARCH_RESULT_2};
 
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
@@ -157,8 +156,23 @@ public final class PlacesFetcherTest {
     return searchResult;
   }
 
+  private static ArgumentMatcher<FakeSearchRequest> matchExpectedSearchRequest(
+      final String cuisine) {
+    return request -> request != null
+        && Arrays.asList(request.searchWords.split("\\|")).contains(cuisine);
+  }
+
+  private static ArgumentMatcher<FakePlaceDetailsRequest> matchExpectedDetailsRequest(
+      final String placeId) {
+    return request -> request != null
+        && request.placeId.equals(placeId);
+}
+
   /** A PlacesFetcher instance to be tested. */
-  private static PlacesFetcher placesFetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+  private static PlacesFetcher placesFetcher =
+      new PlacesFetcher(
+        new FakeSearchRequestGenerator(GeoContext.getGeoApiContext()),
+        new FakePlaceDetailsRequestGenerator(GeoContext.getGeoApiContext()));
 
   @Test
   public void fetch_zeroSearchResults_returnsEmptyList() throws Exception {
@@ -175,55 +189,75 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_validSearchResults_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    Place place1 = PLACE_1_BUILDER.setCuisines(ImmutableList.of("sushi", "asian")).build();
+    Place place1 = PLACE_1_BUILDER.setCuisines(ImmutableList.of("asian", "sushi")).build();
     Place place2 = PLACE_2_BUILDER.setCuisines(ImmutableList.of("hamburger")).build();
-
-
-
-
-    UserPreferences preferences =
+    UserPreferences userPrefs =
         PREFERENCES_BUILDER.setCuisines(ImmutableList.of("sushi", "asian", "hamburger")).build();
     doReturn(PLACE_DETAILS_1)
-      .doReturn(PLACE_DETAILS_2)
       .when(spiedFetcher)
-      .getPlaceDetails(any(PlaceDetailsRequest.class));
-    doReturn(SEARCH_RESULT_1_ONLY_ARR)
-      .doReturn(SEARCH_RESULT_1_ONLY_ARR)
-      .doReturn(SEARCH_RESULT_2_ONLY_ARR)
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_1)));
+    doReturn(PLACE_DETAILS_2)
       .when(spiedFetcher)
-      .getPlacesSearchResults(any(TextSearchRequest.class));
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_2)));
+    doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
+      .when(spiedFetcher)
+      .getPlacesSearchResults(argThat(matchExpectedSearchRequest("sushi")));
+    doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
+      .when(spiedFetcher)
+      .getPlacesSearchResults(argThat(matchExpectedSearchRequest("asian")));
+    doReturn(new PlacesSearchResult[] {SEARCH_RESULT_2 })
+      .when(spiedFetcher)
+      .getPlacesSearchResults(argThat(matchExpectedSearchRequest("hamburger")));
     assertEquals(
-      ImmutableList.of(place1, place2), spiedFetcher.fetch(preferences));
+      ImmutableList.of(place1, place2), spiedFetcher.fetch(userPrefs));
   }
 
   @Test
   public void fetch_noPreferedCuisines_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
+    Place place1 = PLACE_1_BUILDER.setCuisines(ImmutableList.of("sushi")).build();
+    Place place2 = PLACE_2_BUILDER.setCuisines(ImmutableList.of("sushi")).build();
+    UserPreferences prefsNoCuisines = PREFERENCES_BUILDER.setCuisines(ImmutableList.of()).build();
     doReturn(PLACE_DETAILS_1)
-      .doReturn(PLACE_DETAILS_2)
       .when(spiedFetcher)
-      .getPlaceDetails(any(PlaceDetailsRequest.class));
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_1)));
+    doReturn(PLACE_DETAILS_2)
+      .when(spiedFetcher)
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_2)));
     doReturn(SEARCH_RESULT_ARR)
       .when(spiedFetcher)
-      .getPlacesSearchResults(any(TextSearchRequest.class));
+      .getPlacesSearchResults(argThat(matchExpectedSearchRequest("sushi")));
+    doReturn(new PlacesSearchResult[0])
+      .when(spiedFetcher)
+      .getPlacesSearchResults(argThat(
+          (ArgumentMatcher<FakeSearchRequest>) request -> !request.searchWords.contains("sushi")));
     assertEquals(
-      ImmutableList.of(PLACE_1, PLACE_2),
-      spiedFetcher.fetch(PREFERENCES_BUILDER.setCuisines(ImmutableList.of()).build()));
+      ImmutableList.of(place1, place2),
+      spiedFetcher.fetch(prefsNoCuisines));
   }
 
   @Test
   public void fetch_noOpenNowPreference_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
+    Place place1 = PLACE_1_BUILDER.setCuisines(CUISINES).build();
+    Place place2 = PLACE_2_BUILDER.setCuisines(CUISINES).build();
+    UserPreferences userPrefs =
+        PREFERENCES_BUILDER.setCuisines(CUISINES).setOpenNow(false).build();
     doReturn(PLACE_DETAILS_1)
-      .doReturn(PLACE_DETAILS_2)
       .when(spiedFetcher)
-      .getPlaceDetails(any(PlaceDetailsRequest.class));
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_1)));
+    doReturn(PLACE_DETAILS_2)
+      .when(spiedFetcher)
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_2)));
     doReturn(SEARCH_RESULT_ARR)
       .when(spiedFetcher)
-      .getPlacesSearchResults(any(TextSearchRequest.class));
+      .getPlacesSearchResults(argThat(matchExpectedSearchRequest(CUISINES.get(0))));
+    doReturn(SEARCH_RESULT_ARR)
+      .when(spiedFetcher)
+      .getPlacesSearchResults(argThat(matchExpectedSearchRequest(CUISINES.get(1))));
     assertEquals(
-      ImmutableList.of(PLACE_1, PLACE_2),
-      spiedFetcher.fetch(PREFERENCES_BUILDER.setOpenNow(false).build()));
+      ImmutableList.of(place1, place2),
+      spiedFetcher.fetch(userPrefs));
   }
 
   @Test
@@ -254,14 +288,9 @@ public final class PlacesFetcherTest {
   }
 
   @Test
-  public void createCuisinesQuery_getsValidCuisines_returnsQuery() throws Exception {
+  public void getSearchWords_getsValidCuisines_returnsQuery() throws Exception {
     assertEquals(
-      "sushi|burger|hamburger", placesFetcher.createCuisinesQuery(CUISINES));
-  }
-
-  @Test
-  public void createCuisinesQuery_getsAnEmptyListOfCuisines_returnsEmptyQuery() throws Exception {
-    assertEquals("", placesFetcher.getSearchWords(ImmutableList.of()));
+      "burger|hamburger", placesFetcher.getSearchWords("hamburger"));
   }
 
   @Test
@@ -277,14 +306,16 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
+    UserPreferences userPrefs = PREFERENCES_BUILDER.setCuisines(CUISINES).setOpenNow(true).build();
+    Place place1 = PLACE_1_BUILDER.setCuisines(CUISINES).build();
     doReturn(new PlacesSearchResult[0])
       .doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
       .when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
     doReturn(PLACE_DETAILS_1)
       .when(spiedFetcher)
-      .getPlaceDetails(any(PlaceDetailsRequest.class));
+      .getPlaceDetails(argThat(matchExpectedDetailsRequest(PLACEID_1)));
     assertEquals(
-      ImmutableList.of(PLACE_1), spiedFetcher.fetch(PREFERENCES_BUILDER.build()));
+      ImmutableList.of(place1), spiedFetcher.fetch(userPrefs));
   }
 }
