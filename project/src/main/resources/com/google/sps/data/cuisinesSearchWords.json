@@ -1,5 +1,4 @@
 {
-    // The cuisine should always apear in the search words list
     "sushi": ["sushi"],
     "italian": ["italian", "pasta"],
     "asian": ["asian", "noodles", "thai"],
