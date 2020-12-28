@@ -69,14 +69,16 @@ public class PlacesFetcher {
     /**
      * PlacesFetcher constructor.
      *
-     * @param requestGenerator used for generating the TextSearchRequests sent to Google Places API
-     * @param requestGenerator used for generating the PlaceDetailsRequests sent to Google Places API
+     * @param searchRequestGenerator
+     *     used for generating the TextSearchRequests sent to Google Places API
+     * @param detailsRequestGenerator
+     *     used for generating the PlaceDetailsRequests sent to Google Places API
      */
     public PlacesFetcher(
-            SearchRequestGenerator searchRequestGenerator,
-            PlaceDetailsRequestGenerator detailsRequestGenerator) {
-        this.searchRequestGenerator = searchRequestGenerator;
-        this.detailsRequestGenerator = detailsRequestGenerator;
+            SearchRequestGenerator textSearchRequestGenerator,
+            PlaceDetailsRequestGenerator placeDetailsRequestGenerator) {
+        this.searchRequestGenerator = textSearchRequestGenerator;
+        this.detailsRequestGenerator = placeDetailsRequestGenerator;
     }
 
     /**

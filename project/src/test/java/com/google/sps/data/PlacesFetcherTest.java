@@ -160,14 +160,14 @@ public final class PlacesFetcherTest {
 
   private static ArgumentMatcher<FakeSearchRequest> matchExpectedSearchRequest(
       final ImmutableList<String> cuisines) {
-    return request -> request != null &&
-        Arrays.asList(request.searchWords.split("\\|")).containsAll(cuisines);
+    return request -> request != null
+        && Arrays.asList(request.searchWords.split("\\|")).containsAll(cuisines);
   }
 
   private static ArgumentMatcher<FakePlaceDetailsRequest> matchExpectedDetailsRequest(
-    final String placeId) {
-  return request -> request != null &&
-    request.placeId.equals(placeId);
+      final String placeId) {
+    return request -> request != null
+        && request.placeId.equals(placeId);
 }
 
   /** A PlacesFetcher instance to be tested. */
@@ -218,7 +218,7 @@ public final class PlacesFetcherTest {
     doReturn(SEARCH_RESULT_ARR)
       .when(spiedFetcher)
       .getPlacesSearchResults(
-          argThat((ArgumentMatcher<FakeSearchRequest>)request -> request.searchWords.isEmpty()));
+          argThat((ArgumentMatcher<FakeSearchRequest>) request -> request.searchWords.isEmpty()));
     assertEquals(
       ImmutableList.of(PLACE_1, PLACE_2),
       spiedFetcher.fetch(prefsNoCuisines));
