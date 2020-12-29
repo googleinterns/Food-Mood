@@ -50,7 +50,8 @@ public class PlacesScorerImplTest {
         .setGoogleUrl("google.com")
         .setPlaceId("placeid")
         .setName("name")
-        .setBusinessStatus(BusinessStatus.OPERATIONAL);
+        .setBusinessStatus(BusinessStatus.OPERATIONAL)
+        .setCuisines(ImmutableList.of("sushi", "hamburger"));
 
     private static final LatLng USER_LOCATION = new LatLng(33.12, 34.56);
     private static final String[] PLACES_ADDRESSES = {"Place1 Address", "Place2 Address"};
