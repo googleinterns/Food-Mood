@@ -89,7 +89,7 @@ public class PlacesFetcher {
      *     used for generating the PlaceDetailsRequests sent to Google Places API
      */
     @VisibleForTesting
-    PlacesFetcher(
+    public PlacesFetcher(
             SearchRequestGenerator textSearchRequestGenerator,
             PlaceDetailsRequestGenerator placeDetailsRequestGenerator) {
         this.searchRequestGenerator = textSearchRequestGenerator;
