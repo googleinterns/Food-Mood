@@ -54,7 +54,8 @@ public final class ValidationUtils {
   }
 
   /**
-   * @param priceLevel the price level of a place, should be represented by a number between 0-4.
+   * @param str the String that we want to validate
+   * @param errorMsg the error message to be shown in case the exception is thrown
    * @throws IllegalArgumentException
    */
   public static void validateNonEmptyString(String str, String errorMsg)
