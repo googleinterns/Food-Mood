@@ -22,6 +22,7 @@ import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
 import com.google.maps.TextSearchRequest;
 import com.google.maps.PlaceDetailsRequest;
+import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.common.base.Strings;
@@ -53,10 +54,10 @@ public class PlacesFetcher {
     // The maximal number of times the search radius will be extended.
     private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
-    // The generator of TextSearchRequests.
+    // A generator of TextSearchRequests.
     private SearchRequestGenerator searchRequestGenerator;
 
-    // The generator of PlaceDetailsRequest.
+    // A generator of PlaceDetailsRequest.
     private PlaceDetailsRequestGenerator detailsRequestGenerator;
 
     // The path of the configuration file containing the mapping of cuisines to search words.
@@ -69,12 +70,26 @@ public class PlacesFetcher {
     /**
      * PlacesFetcher constructor.
      *
+     * @param geoApiContext the GeoApiContext used for all Google GEO API requests
+     */
+    public PlacesFetcher(GeoApiContext geoApiContext) {
+        this.searchRequestGenerator =
+            new SearchRequestGeneratorImpl(GeoContext.getGeoApiContext());
+        this.detailsRequestGenerator =
+            new PlaceDetailsRequestGeneratorImpl(GeoContext.getGeoApiContext());
+        ;
+    }
+
+    /**
+     * PlacesFetcher constructor used for tests.
+     *
      * @param textSearchRequestGenerator
      *     used for generating the TextSearchRequests sent to Google Places API
      * @param placeDetailsRequestGenerator
      *     used for generating the PlaceDetailsRequests sent to Google Places API
      */
-    public PlacesFetcher(
+    @VisibleForTesting
+    PlacesFetcher(
             SearchRequestGenerator textSearchRequestGenerator,
             PlaceDetailsRequestGenerator placeDetailsRequestGenerator) {
         this.searchRequestGenerator = textSearchRequestGenerator;
