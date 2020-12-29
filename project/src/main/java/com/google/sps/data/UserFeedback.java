@@ -14,12 +14,15 @@
 
 package com.google.sps.data;
 
+import static com.google.sps.data.ValidationUtils.validateNonEmptyString;
+import static com.google.sps.data.ValidationUtils.validateChosenPlaceInReccomendedPlaces;;
+
 import java.util.Optional;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Represents the feedback that users enter about the recommendations they were given.
+ * Represents the input feedback a user provides for a Food-Mood recommendation.
  */
 @AutoValue
 public abstract class UserFeedback {
@@ -30,11 +33,11 @@ public abstract class UserFeedback {
   /** @return the time in which the feedback was given, in milliseconds. */
   public abstract long feedbackTimeInMillis();
 
-  /** @return a list of IDs of the places that were recommended to the user. */
-  public abstract ImmutableList<String> placesRecommendedToUser();
+  /** @return the list of places IDs that were recommended to the user. */
+  public abstract ImmutableList<String> recommendedPlaces();
 
   /** @return the ID of the place the user chose, if any. */
-  public abstract Optional<String> placeUserChose();
+  public abstract Optional<String> chosenPlace();
 
   /**
   * @return true if the user requested to try again and get more recommendations (implying they
@@ -68,14 +71,13 @@ public abstract class UserFeedback {
      * @param placesRecommendedToUser a list of IDs of the places that were recommended to the user.
      * @return a UserFeedback builder that enables to continue building.
      */
-    public abstract Builder setPlacesRecommendedToUser(ImmutableList<String>
-        placesRecommendedToUser);
+    public abstract Builder setRecommendedPlaces(ImmutableList<String> recommendedPlaces);
 
     /**
      * @param chosenPlaceId the ID of the place the user chose, if any.
      * @return a UserFeedback builder that enables to continue building.
      */
-    public abstract Builder setPlaceUserChose(String placeUserChose);
+    public abstract Builder setChosenPlace(String chosenPlace);
 
     /**
      * @param triedAgain true if the user requested to try again and get more recommendations
@@ -97,14 +99,12 @@ public abstract class UserFeedback {
      * @throws IllegalArgumentException if the user feedback isn't consistent.
      */
     public UserFeedback build() throws IllegalArgumentException {
-      // The feedback time is set to be the time in which the object is created. 
+      // The feedback time is set to be the time in which the object is created.
       setFeedbackTimeInMillis(System.currentTimeMillis());
       UserFeedback feedback = autoBuild();
-      ValidationUtils.validateChosenPlaceInReccomendedPlaces(feedback.placeUserChose(),
-          feedback.placesRecommendedToUser());
-      ValidationUtils.validateUserTriedAgainOnlyIfdidntchoose(feedback.placeUserChose(),
-          feedback.userTriedAgain()); // TODO(M5): make sure UI supports this demand
-      ValidationUtils.validateNonEmptyString(feedback.userId(), "User ID cannot be empty.");
+      validateChosenPlaceInReccomendedPlaces(feedback.chosenPlace(),
+          feedback.recommendedPlaces());
+      validateNonEmptyString(feedback.userId(), "User ID cannot be empty.");
       return feedback;
     }
   }

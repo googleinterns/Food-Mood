@@ -32,50 +32,39 @@ public final class UserFeedbackTest {
       ImmutableList.of(PLACE_ID_1, "11111", "22222");
 
   @Test
-  public void build_invalidBothChoosePlaceAndTryagain_throwsIllegalArgumentException() {
+  public void build_choosePlaceNotInRecommendedPlaces_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () -> {
       UserFeedback.builder()
-          .setPlacesRecommendedToUser(PLACES_WITH_PLACE_ID_1)
-          .setPlaceUserChose(PLACE_ID_1)
-          .setUserTriedAgain(true)
-          .build();
-    });
-  }
-
-  @Test
-  public void build_invalidChoosePlaceNotInRecommendedPlaces_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () -> {
-      UserFeedback.builder()
-          .setPlacesRecommendedToUser(ImmutableList.of("11111", "22222", "33333"))
-          .setPlaceUserChose("44444")
+          .setRecommendedPlaces(ImmutableList.of("11111", "22222", "33333"))
+          .setChosenPlace("44444")
           .setUserTriedAgain(false)
           .build();
     });
   }
 
   @Test
-  public void build_validUserChosePlace_returnsValidUserFeedback() {
+  public void build_userChosePlace_returnsValidUserFeedback() {
     UserFeedback userFeedback = UserFeedback.builder()
-        .setPlacesRecommendedToUser(PLACES_WITH_PLACE_ID_1)
-        .setPlaceUserChose(PLACE_ID_1)
+        .setRecommendedPlaces(PLACES_WITH_PLACE_ID_1)
+        .setChosenPlace(PLACE_ID_1)
         .setUserTriedAgain(false)
         .build();
     assertAll(
-        () -> assertEquals(PLACES_WITH_PLACE_ID_1, userFeedback.placesRecommendedToUser()),
-        () -> assertEquals(Optional.of(PLACE_ID_1), userFeedback.placeUserChose()),
+        () -> assertEquals(PLACES_WITH_PLACE_ID_1, userFeedback.recommendedPlaces()),
+        () -> assertEquals(Optional.of(PLACE_ID_1), userFeedback.chosenPlace()),
         () -> assertEquals(false, userFeedback.userTriedAgain())
     );
   }
 
   @Test
-  public void build_validUserTriedAgain_returnsValidUserFeedback() {
+  public void build_userTriedAgain_returnsValidUserFeedback() {
     UserFeedback userFeedback = UserFeedback.builder()
-        .setPlacesRecommendedToUser(PLACES_WITH_PLACE_ID_1)
+        .setRecommendedPlaces(PLACES_WITH_PLACE_ID_1)
         .setUserTriedAgain(true)
         .build();
     assertAll(
-        () -> assertEquals(PLACES_WITH_PLACE_ID_1, userFeedback.placesRecommendedToUser()),
-        () -> assertEquals(Optional.empty(), userFeedback.placeUserChose()),
+        () -> assertEquals(PLACES_WITH_PLACE_ID_1, userFeedback.recommendedPlaces()),
+        () -> assertEquals(Optional.empty(), userFeedback.chosenPlace()),
         () -> assertEquals(true, userFeedback.userTriedAgain())
     );
   }

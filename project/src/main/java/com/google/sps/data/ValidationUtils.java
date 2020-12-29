@@ -71,24 +71,9 @@ public final class ValidationUtils {
       ImmutableList<String> placesRecommendedToUser) throws IllegalArgumentException {
     checkArgument(
         !placeUserChose.isPresent() || placesRecommendedToUser.contains(placeUserChose.get()),
-        "Chosen place must be one of places that were recommended to the user."
+        "Chosen place must be contained in the places that were recommended to the user."
     );
   }
 
-  /**
-   * @param placeUserChose the place the user chose to order from
-   * @param userTriedAgain whether the user requested the system for new recommendations
-   * @throws IllegalArgumentException if the user chose a place and yet requested new
-   *                                  recommendations
-   */
-  public static void validateUserTriedAgainOnlyIfdidntchoose(Optional<String> placeUserChose,
-      boolean userTriedAgain) throws IllegalArgumentException {
-    checkArgument(
-        !(placeUserChose.isPresent() && userTriedAgain),
-        "User can't both try again and choose a place."
-    );
-  }
-
-  private ValidationUtils() {
-  }
+  private ValidationUtils() { }
 }
