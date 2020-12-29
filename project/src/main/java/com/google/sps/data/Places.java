@@ -68,20 +68,21 @@ public final class Places {
   /**
    * Filters the given list of places according to the given parameters.
    * @param places the list we want to filter.
-   * @param minRating The minimal rating we want to limit the list by. A number between 1 and 5.
+   * @param approxMinRating The approximate minimum Place's rating, an int between 1 and 5. Places
+   *        will only be approved if their rating's nearest int is higher than this (or equal to).
    * @param filterIfNoWebsite Specifies whether we should filter if there is no available website
    *        for the restaurant.
    * @param filterBranchesOfSamePlace Specifies whether we should remove different branches of the
    *        same place from the results. Places are considered the same if they have the same name.
    * @return the filtered list.
    */
-  public static ImmutableList<Place> filter(ImmutableList<Place> places, int minRating, Boolean
-      filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
+  public static ImmutableList<Place> filter(ImmutableList<Place> places, int approxMinRating,
+      Boolean filterIfNoWebsite, Boolean filterBranchesOfSamePlace) {
     ImmutableList<Place> result =
         places.stream()
             .sorted(Comparator.comparing(Place::rating).reversed())
             .filter(place -> place.businessStatus() == BusinessStatus.OPERATIONAL)
-            .filter(place -> place.rating() >= minRating)
+            .filter(place -> Math.rint(place.rating()) >= approxMinRating)
             .filter(place -> !(filterIfNoWebsite && placeHasNoWebsiteLink(place)))
             .collect(ImmutableList.toImmutableList());
     if (filterBranchesOfSamePlace) {
