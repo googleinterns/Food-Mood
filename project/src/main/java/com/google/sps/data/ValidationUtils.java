@@ -17,8 +17,6 @@ package com.google.sps.data;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Optional;
-
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -51,16 +49,6 @@ public final class ValidationUtils {
   public static void validatePriceLevel(int priceLevel) throws IllegalArgumentException {
     checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
         "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
-  }
-
-  /**
-   * @param str the String that we want to validate
-   * @param errorMsg the error message to be shown in case the exception is thrown
-   * @throws IllegalArgumentException
-   */
-  public static void validateNonEmptyString(String str, String errorMsg)
-      throws IllegalArgumentException {
-    checkArgument(!Strings.isNullOrEmpty(str), errorMsg);
   }
 
   /**

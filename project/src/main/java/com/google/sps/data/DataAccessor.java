@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -51,7 +52,7 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegistered(String userId) {
-    ValidationUtils.validateNonEmptyString(userId, "Invalid user ID.");
+    checkArgument(!isNullOrEmpty(userId), "Invalid user ID.");
     Key userIdKey = KeyFactory.createKey(USER_ENTITY_NAME, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
@@ -67,7 +68,7 @@ public class DataAccessor {
   * @param userId the id of the user that we want to register to our system
   */
   public void registerUser(String userId) {
-    ValidationUtils.validateNonEmptyString(userId, "Invalid user ID.");
+    checkArgument(!isNullOrEmpty(userId), "Invalid user ID.");
     checkArgument(!isRegistered(userId), "User already registered.");
     Entity userEntity = new Entity(USER_ENTITY_NAME, userId);
     datastoreService.put(userEntity);

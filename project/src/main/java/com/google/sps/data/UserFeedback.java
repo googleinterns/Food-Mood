@@ -14,8 +14,9 @@
 
 package com.google.sps.data;
 
-import static com.google.sps.data.ValidationUtils.validateNonEmptyString;
-import static com.google.sps.data.ValidationUtils.validateChosenPlaceInReccomendedPlaces;;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.sps.data.ValidationUtils.validateChosenPlaceInReccomendedPlaces;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.util.Optional;
 import com.google.auto.value.AutoValue;
@@ -104,7 +105,7 @@ public abstract class UserFeedback {
       UserFeedback feedback = autoBuild();
       validateChosenPlaceInReccomendedPlaces(feedback.chosenPlace(),
           feedback.recommendedPlaces());
-      validateNonEmptyString(feedback.userId(), "User ID cannot be empty.");
+      checkArgument(!isNullOrEmpty(feedback.userId()), "User ID cannot be empty.");
       return feedback;
     }
   }

@@ -32,7 +32,7 @@ public final class UserFeedbackTest {
       ImmutableList.of(PLACE_ID_1, "11111", "22222");
 
   @Test
-  public void build_choosePlaceNotInRecommendedPlaces_throwsIllegalArgumentException() {
+  public void build_chosenPlaceNotInRecommendedPlaces_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () -> {
       UserFeedback.builder()
           .setRecommendedPlaces(ImmutableList.of("11111", "22222", "33333"))
@@ -43,7 +43,7 @@ public final class UserFeedbackTest {
   }
 
   @Test
-  public void build_userChosePlace_returnsValidUserFeedback() {
+  public void build_chosenPlace_returnsValidUserFeedback() {
     UserFeedback userFeedback = UserFeedback.builder()
         .setRecommendedPlaces(PLACES_WITH_PLACE_ID_1)
         .setChosenPlace(PLACE_ID_1)
