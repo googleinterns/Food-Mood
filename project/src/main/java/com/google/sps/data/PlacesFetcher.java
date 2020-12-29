@@ -77,7 +77,6 @@ public class PlacesFetcher {
             new SearchRequestGeneratorImpl(geoApiContext);
         this.detailsRequestGenerator =
             new PlaceDetailsRequestGeneratorImpl(geoApiContext);
-        ;
     }
 
     /**
