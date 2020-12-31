@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -28,7 +29,6 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.repackaged.com.google.api.client.util.Strings;
 
 public class DataAccessor {
 
@@ -61,7 +61,7 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegistered(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), INVALID_USER_MSG);
+    checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
     Key userIdKey = KeyFactory.createKey(USER_ENTITY_NAME, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
@@ -77,7 +77,7 @@ public class DataAccessor {
   * @param userId the ID of the user that we want to register to our system
   */
   public void registerUser(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), INVALID_USER_MSG);
+    checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
     checkArgument(!isRegistered(userId), "User already registered.");
     Entity userEntity = new Entity(USER_ENTITY_NAME, userId);
     datastoreService.put(userEntity);
@@ -89,12 +89,12 @@ public class DataAccessor {
   * @param feedback a UserFeedback that holds all the information about the user feedback.
   */
   public void updateUserFeedback(UserFeedback feedback) {
-    for (String place : feedback.placesRecommendedToUser()) {
+    for (String place : feedback.recommendedPlaces()) {
       Entity recommendationEntity = new Entity(RECOMMENDATION_ENTITY_KIND);
       recommendationEntity.setProperty(USER_ID_PROPERTY, feedback.userId());
       recommendationEntity.setProperty(PLACE_ID_PROPERTY, place);
       recommendationEntity.setProperty(CHOSEN_PROPERTY,
-          feedback.placeUserChose().isPresent() && feedback.placeUserChose().get().equals(place));
+          feedback.chosenPlace().isPresent() && feedback.chosenPlace().get().equals(place));
       recommendationEntity.setProperty(TRY_AGAIN_PROPERTY, feedback.userTriedAgain());
       recommendationEntity.setProperty(TIME_PROPERTY, feedback.feedbackTimeInMillis());
       datastoreService.put(recommendationEntity);
@@ -112,7 +112,7 @@ public class DataAccessor {
   */
   public ImmutableList<String> getPlacesRecommendedToUser(String userId,
       boolean getOnlyPlacesUserChose) {
-    checkArgument(!Strings.isNullOrEmpty(userId), INVALID_USER_MSG);
+    checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
     Filter userIdFilter =
         new Query.FilterPredicate(USER_ID_PROPERTY, FilterOperator.EQUAL, userId);
     Filter chosenPlacesFilter =
@@ -121,8 +121,6 @@ public class DataAccessor {
         ? CompositeFilterOperator.and(userIdFilter, chosenPlacesFilter)
         : userIdFilter;
     Query query = new Query(RECOMMENDATION_ENTITY_KIND).setFilter(filter);
-    System.err.println(datastoreService.prepare(query)
-    .asList(FetchOptions.Builder.withDefaults()));
     return datastoreService.prepare(query)
         .asList(FetchOptions.Builder.withDefaults())
         .stream()

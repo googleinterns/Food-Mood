@@ -38,9 +38,8 @@ import com.google.sps.data.PlacesScorerImpl;
  * recommended places (in Json format).
  */
 @WebServlet("/query")
+@SuppressWarnings("serial")
 public final class QueryServlet extends HttpServlet {
-
-  private static final long serialVersionUID = 1L;
 
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
@@ -73,7 +72,7 @@ public final class QueryServlet extends HttpServlet {
               .build();
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
-          Integer.parseInt(request.getParameter("rating")) /* min rating */,
+          Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
           true /* filter if no website */,
           true /* filter branches of same place */
       );
