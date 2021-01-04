@@ -15,6 +15,7 @@
 package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.util.Date;
 import com.google.common.annotations.VisibleForTesting;
@@ -27,7 +28,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.repackaged.com.google.api.client.util.Strings;
 
 public class DataAccessor {
 
@@ -54,7 +54,7 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegistered(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
+    checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
     Key userIdKey = KeyFactory.createKey(USER_ENTITY_KIND, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
