@@ -258,7 +258,8 @@ public final class QueryServletTest {
           .setLocation(new LatLng(35.35, 30.30))
           .setBusinessStatus(BusinessStatus.OPERATIONAL)
           .setGoogleUrl("google.com")
-          .setPlaceId("placeId");
+          .setPlaceId("placeId")
+          .setCuisines(ImmutableList.of("sushi", "hamburger"));
   }
 
   // Returns the number of json elements in the servlet's response

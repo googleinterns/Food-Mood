@@ -32,7 +32,7 @@ import com.google.maps.model.LatLng;
 import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
-import com.google.sps.data.PlacesScorerImpl;
+import com.google.sps.data.PlacesScorerFactory;
 import com.google.sps.data.SearchRequestGenerator;
 import com.google.sps.data.SearchRequestGeneratorImpl;
 import com.google.sps.data.PlaceDetailsRequestGenerator;
@@ -55,25 +55,26 @@ public final class QueryServlet extends HttpServlet {
   static final PlaceDetailsRequestGenerator PLACE_DETAILS_REQUEST_GENERATOR =
       new PlaceDetailsRequestGeneratorImpl(GeoContext.getGeoApiContext());
   private PlacesFetcher fetcher;
-  private PlacesScorer scorer;
+  private PlacesScorerFactory scorerFactory;
   private UserVerifier userVerifier;
   private DataAccessor dataAccessor;
+  private PlacesScorer scorer;
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher(SEARCH_REQUEST_GENERATOR, PLACE_DETAILS_REQUEST_GENERATOR);
-    scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
-    userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
+    userVerifier = UserVerifier.create("");
     dataAccessor = new DataAccessor();
+    scorerFactory = new PlacesScorerFactory(GeoContext.getGeoApiContext());
   }
 
   void init(
       PlacesFetcher inputFetcher,
-      PlacesScorer inputScorer,
+      PlacesScorerFactory inputScorerFactory,
       UserVerifier inputUserVerifier,
       DataAccessor inputDataAccessor) {
     fetcher = inputFetcher;
-    scorer = inputScorer;
+    scorerFactory = inputScorerFactory;
     userVerifier = inputUserVerifier;
     dataAccessor = inputDataAccessor;
   }
@@ -92,8 +93,13 @@ public final class QueryServlet extends HttpServlet {
               .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
               .build();
       String userIdToken = request.getParameter("idToken");
-      if (!userIdToken.isEmpty()) {
-        storePreferences(userIdToken, userPrefs);
+      Optional<String> optionalUserId;
+      if (!userIdToken.isEmpty()
+          && (optionalUserId = userVerifier.getUserIdByToken(userIdToken)).isPresent()) {
+        dataAccessor.storeUserPreferences(optionalUserId.get(), userPrefs);
+        scorer = scorerFactory.create(optionalUserId.get(), dataAccessor);
+      } else { // User is not signed in
+        scorer = scorerFactory.create();
       }
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
@@ -122,15 +128,5 @@ public final class QueryServlet extends HttpServlet {
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
-  }
-
-  // Store the user's preferences in the database, only if the user is signed in.
-  private void storePreferences(String userIdToken, UserPreferences userPrefs) {
-    Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
-    if (!optionalUserId.isPresent()) {
-        return;
-    }
-    String userId = optionalUserId.get();
-    dataAccessor.storeUserPreferences(userId, userPrefs);
   }
 }

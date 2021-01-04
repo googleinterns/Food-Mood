@@ -93,6 +93,7 @@ public class PlacesFetcher {
      *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
+
         Map<String, Set<String>> placesSearchResults = new HashMap<>();
         PlacesSearchResult[] resultsForCuisine;
         // If user didn't choose any cuisines, search on all possible cuisines

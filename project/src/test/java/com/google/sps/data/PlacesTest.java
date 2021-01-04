@@ -222,6 +222,7 @@ public final class PlacesTest {
         .setLocation(new LatLng(35.35, 30.30))
         .setGoogleUrl("googleurl.com")
         .setPlaceId("ChIJN1t_tDeuEmsRUsoyG83frY4")
-        .setBusinessStatus(BusinessStatus.OPERATIONAL);
+        .setBusinessStatus(BusinessStatus.OPERATIONAL)
+        .setCuisines(ImmutableList.of("sushi", "hamburger"));
   }
 }
