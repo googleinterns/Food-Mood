@@ -74,7 +74,7 @@ public final class QueryServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     ImmutableList<Place> filteredPlaces;
     UserPreferences userPrefs;
-    String cuisines;
+    String cuisines = request.getParameter("cuisines");
     try {
       userPrefs =
           UserPreferences.builder()
@@ -82,7 +82,7 @@ public final class QueryServlet extends HttpServlet {
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
               .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
               .setLocation(getLatLngFromString(request.getParameter("location")))
-              .setCuisines((cuisines = request.getParameter("cuisines")).isEmpty()
+              .setCuisines(cuisines.isEmpty()
                   ? ImmutableList.of() : ImmutableList.copyOf(cuisines.split(",")))
               .build();
       String userIdToken = request.getParameter("idToken");

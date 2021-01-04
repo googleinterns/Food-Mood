@@ -80,7 +80,7 @@ public class DataAccessor {
    * Stores the UserPreferences in the personalized user database.
    *
    * @param userId The ID of the user to store the preferred cuisines for.
-   * @param userPref The user choices on the query form to store in the user’s database.
+   * @param userPreferences The user choices on the query form to store in the user’s database.
    */
   public void storeUserPreferences(String userId, UserPreferences userPreferences) {
     checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
