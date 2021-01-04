@@ -34,7 +34,8 @@ function fetchFromQuery() {
       `rating=${getUserRatingFromUi()}`,
       `price=${getUserPriceFromUi()}`,
       `open=${getUserOpenNowFromUi()}`,
-      `location=${getUserLocationFromUi()}`
+      `location=${getUserLocationFromUi()}`,
+      `idToken=${getUserIdToken()}`
     ].join('&');
   } catch (error) {
     document.getElementById('input-error-container').innerText = 'ERROR: ' + error.message;
@@ -44,7 +45,7 @@ function fetchFromQuery() {
   displayResultsPage();
   const userCoords = JSON.parse(localStorage.getItem('userLocation'));
   const map = createMap({lat: userCoords.lat, lng: userCoords.lng});
-  fetch('/query?' + params)
+  fetch('/query?' + params, {method: 'POST'})
       .then(response => response.json())
       .then((places) => {
         places.forEach((singlePlace) => {
@@ -71,9 +72,6 @@ function getUsercuisinesFromUi() {
       checkedCuisines.push(cuisine.value);
     }
   });
-  if (checkedCuisines.length === 0) {
-    throw new Error("Choose at least one cuisine.");
-  }
   // Remove obselete comma
   let result = checkedCuisines.join(',');
   return result;
@@ -81,6 +79,13 @@ function getUsercuisinesFromUi() {
 
 function getUserRatingFromUi() {
   return getCheckedValueByElementId('rating-form', 'Choose exactly one rating.');
+}
+
+function getUserIdToken() {
+  if (!googleUser) {
+    return "";
+  }
+  return googleUser.getAuthResponse().id_token;
 }
 
 function getUserPriceFromUi() {

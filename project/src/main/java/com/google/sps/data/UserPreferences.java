@@ -53,7 +53,7 @@ public abstract class UserPreferences {
 
 
   /**
-   * @return a builder that enables to build a new Place object
+   * @return a builder that enables to build a new UserPreferences object
    */
   public static Builder builder() {
     return new AutoValue_UserPreferences.Builder();
@@ -67,32 +67,32 @@ public abstract class UserPreferences {
     /**
      * @param minRating the minimum rating that the user wants to consider,
      *      represented by a number between 1-5
-     * @return a Place builder that enables to continue building
+     * @return a UserPreferences builder that enables to continue building
      */
     public abstract Builder setMinRating(float minRating);
 
     /**
      * @param maxPriceLevel the maximal range of prices the user wants to consider,
      *      represented by a number between 0-4
-     * @return a Place builder that enables to continue building
+     * @return a UserPreferences builder that enables to continue building
      */
     public abstract Builder setMaxPriceLevel(int maxPriceLevel);
 
     /**
      * @param location the coordinates of the location the user wants the food to be delivered to
-     * @return a Place builder that enables to continue building
+     * @return a UserPreferences builder that enables to continue building
      */
     public abstract Builder setLocation(LatLng location);
 
     /**
      * @param cuisines the cuisine types that the user prefers
-     * @return a Place builder that enables to continue building
+     * @return a UserPreferences builder that enables to continue building
      */
     public abstract Builder setCuisines(ImmutableList<String> cuisines);
 
     /**
      * @param openNow a boolean representing whether the users wants the place to be currently open
-     * @return a Place builder that enables to continue building
+     * @return a UserPreferences builder that enables to continue building
      */
     public abstract Builder setOpenNow(boolean openNow);
 

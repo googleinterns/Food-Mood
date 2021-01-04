@@ -33,6 +33,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import com.google.maps.model.LatLng;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,9 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class DataAccessorTest {
+
+  // The prefered cuisines to be stored in user preferences storing tests
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "burger");
 
   // A helper that enables us to test datastore locally.
   // Has to be set up and teared down for each test.
@@ -71,7 +75,7 @@ public final class DataAccessorTest {
 
   @Test
   public void isRegistered_registered_true() {
-    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, USER_ID);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_KIND, USER_ID);
     datastoreService.put(userEntity);
 
     assertTrue(dataAccessor.isRegistered(USER_ID));
@@ -81,7 +85,7 @@ public final class DataAccessorTest {
   public void isRegistered_notRegistered_false() {
     String registeredUserId = "12345";
     String unRegisteredUserId = "54321";
-    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_NAME, registeredUserId);
+    Entity userEntity = new Entity(DataAccessor.USER_ENTITY_KIND, registeredUserId);
     datastoreService.put(userEntity);
 
     assertFalse(dataAccessor.isRegistered(unRegisteredUserId));
@@ -100,11 +104,11 @@ public final class DataAccessorTest {
   @Test
   public void registerUser_validUserId_registerUser() {
     dataAccessor.registerUser(USER_ID);
-    List<Entity> results = createPreparedQueryByUserIdAsKey(USER_ID)
+    List<Entity> results = createPreparedQueryByUserIdKey(USER_ID)
         .asList(FetchOptions.Builder.withDefaults());
 
     assertEquals(1, results.size());
-    assertEquals(new Entity(DataAccessor.USER_ENTITY_NAME, USER_ID), results.get(0));
+    assertEquals(new Entity(DataAccessor.USER_ENTITY_KIND, USER_ID), results.get(0));
   }
 
   @Test
@@ -177,8 +181,6 @@ public final class DataAccessorTest {
     String userId = null;
 
     assertThrows(IllegalArgumentException.class,
-        () -> dataAccessor.getPlacesRecommendedToUser(userId, true));
-    assertThrows(IllegalArgumentException.class,
         () -> dataAccessor.getPlacesRecommendedToUser(userId, false));
   }
 
@@ -186,8 +188,6 @@ public final class DataAccessorTest {
   public void getUserPlacesHistory_emptyUser_throwIllegalArgumentException() {
     String userId = "";
 
-    assertThrows(IllegalArgumentException.class,
-        () -> dataAccessor.getPlacesRecommendedToUser(userId, true));
     assertThrows(IllegalArgumentException.class,
         () -> dataAccessor.getPlacesRecommendedToUser(userId, false));
   }
@@ -199,7 +199,7 @@ public final class DataAccessorTest {
     datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, /** chosen */ false,
         false /** tried again */));
     // Purposely add the same place IDs again, to make sure we get the places only once.
-    // Once making the familiar place chosen, and once leaving in unchosen.
+    // Once making the familiar place chosen, and once leaving it unchosen.
     datastoreService.put(createRecomEntityByProperties(
         USER_ID, PLACE_ID_1, /** chosen */ true, /** tried again */ false));
     datastoreService.put(createRecomEntityByProperties(
@@ -232,8 +232,37 @@ public final class DataAccessorTest {
     assertTrue(results.contains(PLACE_ID_1));
   }
 
+  @Test
+  public void storeUserPreferences_validUserIdAndPreferences_userPreferencesStored() {
+    dataAccessor.storeUserPreferences(
+      USER_ID, getValidUserPreferencesBuilder().setCuisines(CUISINES).build());
+    List<Entity> results = createPreparedQueryByUserIdProperty(USER_ID)
+        .asList(FetchOptions.Builder.withDefaults());
+
+    assertEquals(1, results.size());
+    assertEquals(CUISINES, results.get(0).getProperty("preferedCuisines"));
+  }
+
+  @Test
+  public void storeUserPreferences_validUserIdNoPreferredCuisines_nothingStored() {
+    dataAccessor.storeUserPreferences(USER_ID,
+        getValidUserPreferencesBuilder().setCuisines(ImmutableList.of()).build());
+    List<Entity> results = createPreparedQueryByUserIdProperty(USER_ID)
+        .asList(FetchOptions.Builder.withDefaults());
+
+    assertEquals(0, results.size());
+  }
+
+  @Test
+  public void storeUserPreferences_emptydUserId_throwIllegalArgumentException() {
+    UserPreferences userPrefs = getValidUserPreferencesBuilder().setCuisines(CUISINES).build();
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> dataAccessor.storeUserPreferences("", userPrefs));
+  }
+
   private Entity createRecomEntityByProperties(String userId, String placeId, boolean chosen,
-      boolean tryAgain) {
+  boolean tryAgain) {
     Entity recommendationEntity = new Entity(DataAccessor.RECOMMENDATION_ENTITY_KIND);
     recommendationEntity.setProperty(DataAccessor.USER_ID_PROPERTY, userId);
     recommendationEntity.setProperty(DataAccessor.PLACE_ID_PROPERTY, placeId);
@@ -241,16 +270,6 @@ public final class DataAccessorTest {
     recommendationEntity.setProperty(DataAccessor.TRY_AGAIN_PROPERTY, tryAgain);
     recommendationEntity.setProperty(DataAccessor.CHOSEN_PROPERTY, chosen);
     return recommendationEntity;
-  }
-
-  private PreparedQuery createPreparedQueryByUserIdAsKey(String userId) {
-    Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_NAME, userId);
-    Filter userIdFilter = new Query.FilterPredicate(
-        Entity.KEY_RESERVED_PROPERTY,
-        FilterOperator.EQUAL,
-        userIdKey);
-    Query query = new Query(DataAccessor.USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
-    return datastoreService.prepare(query);
   }
 
   private List<Entity> getRecommendationEntitiesByUserId(String userId) {
@@ -268,5 +287,35 @@ public final class DataAccessorTest {
         .setRecommendedPlaces(places)
         .setUserTriedAgain(userTriedAgain);
     return chosenPlace == null ? temp.build() : temp.setChosenPlace(chosenPlace).build();
+  }
+
+  // Used to query the registered users database
+  private PreparedQuery createPreparedQueryByUserIdKey(String userId) {
+    Key userIdKey = KeyFactory.createKey(DataAccessor.USER_ENTITY_KIND, userId);
+    Filter userIdFilter = new Query.FilterPredicate(
+        Entity.KEY_RESERVED_PROPERTY,
+        FilterOperator.EQUAL,
+        userIdKey);
+    Query query = new Query(DataAccessor.USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
+    return datastoreService.prepare(query);
+  }
+
+  // Used to query the user preferences database
+  private PreparedQuery createPreparedQueryByUserIdProperty(String userId) {
+    Filter userIdFilter = new Query.FilterPredicate(
+        "userId",
+        FilterOperator.EQUAL,
+        userId);
+    Query query = new Query(DataAccessor.PREFERNCES_ENTITY_KIND).setFilter(userIdFilter);
+    return datastoreService.prepare(query);
+  }
+
+  // Returns a UserPreferences builder that has valid values of all attributes.
+  private UserPreferences.Builder getValidUserPreferencesBuilder() {
+    return UserPreferences.builder()
+        .setMinRating(4)
+        .setMaxPriceLevel(2)
+        .setLocation(new LatLng(32.08, 34.78))
+        .setOpenNow(true);
   }
 }

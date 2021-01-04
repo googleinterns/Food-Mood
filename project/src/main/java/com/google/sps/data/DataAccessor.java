@@ -17,6 +17,7 @@ package com.google.sps.data;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import java.util.Date;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -33,14 +34,15 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 public class DataAccessor {
 
   private final DatastoreService datastoreService;
-  private static final String INVALID_USER_MSG = "Invalid user ID";
+  private static final String INVALID_USER_MSG = "User ID may not be null or empty";
   @VisibleForTesting // Applies to all the following
-  static final String USER_ENTITY_NAME = "User";
+  static final String USER_ENTITY_KIND = "User";
   static final String RECOMMENDATION_ENTITY_KIND = "Recommendation";
+  static final String PREFERNCES_ENTITY_KIND = "UserPreferences";
   static final String USER_ID_PROPERTY = "UserId";
   static final String PLACE_ID_PROPERTY = "PlaceId";
   static final String CHOSEN_PROPERTY = "WasChosenByUser";
-  static final String TRY_AGAIN_PROPERTY = "WasChosenByUser";
+  static final String TRY_AGAIN_PROPERTY = "UserTriedAgain";
   static final String TIME_PROPERTY = "Time";
 
   /**
@@ -62,10 +64,10 @@ public class DataAccessor {
   */
   public boolean isRegistered(String userId) {
     checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
-    Key userIdKey = KeyFactory.createKey(USER_ENTITY_NAME, userId);
+    Key userIdKey = KeyFactory.createKey(USER_ENTITY_KIND, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
-    Query query = new Query(USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
+    Query query = new Query(USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
     return !datastoreService.prepare(query)
         .asList(FetchOptions.Builder.withDefaults())
         .isEmpty();
@@ -79,12 +81,14 @@ public class DataAccessor {
   public void registerUser(String userId) {
     checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
     checkArgument(!isRegistered(userId), "User already registered.");
-    Entity userEntity = new Entity(USER_ENTITY_NAME, userId);
+    Entity userEntity = new Entity(USER_ENTITY_KIND, userId);
     datastoreService.put(userEntity);
   }
 
   /**
-  * Updates the database with information from the user feedback.
+  * Updates the database with information from the user feedback. Each entity represents the
+  * relations between the user and a single place that was recommended to them. So for each user
+  * feedback, multiple entities are generated, to represent each place seperately.
   *
   * @param feedback a UserFeedback that holds all the information about the user feedback.
   */
@@ -102,7 +106,7 @@ public class DataAccessor {
   }
 
   /**
-  * Approches the database and gets the places that were recommended to the user in the past.
+  * Approaches the database and gets the places that were recommended to the user in the past.
   * It is possible to get only places that the user chose, according to their feedback.
   *
   * @param userId the user we want the information about.
@@ -127,5 +131,22 @@ public class DataAccessor {
         .map(entity -> (String)entity.getProperty(PLACE_ID_PROPERTY))
         .distinct()
         .collect(ImmutableList.toImmutableList());
+  }
+
+  /**
+   * Stores the UserPreferences in the personalized user database.
+   *
+   * @param userId The ID of the user to store the preferred cuisines for.
+   * @param userPreferences The user choices on the query form to store in the user’s database.
+   */
+  public void storeUserPreferences(String userId, UserPreferences userPreferences) {
+    checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
+    if (!userPreferences.cuisines().isEmpty()) {
+      Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
+      prefsEntity.setProperty("userId", userId);
+      prefsEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
+      prefsEntity.setProperty("preferedCuisines", userPreferences.cuisines());
+      datastoreService.put(prefsEntity);
+    }
   }
 }
