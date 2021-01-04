@@ -88,7 +88,6 @@ public class PlacesFetcher {
         do {
             attemptsCounter++;
             try {
-                System.out.println(preferences.cuisines().size());
                 placesSearchResult = getPlacesSearchResults(
                     genTextSearchRequest(preferences, INIT_SEARCH_RADIUS_M * attemptsCounter));
             } catch (ApiException | InterruptedException | IOException | IllegalStateException e) {
