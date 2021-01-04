@@ -15,6 +15,7 @@
 package com.google.sps.servlets;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -36,6 +37,9 @@ import com.google.sps.data.SearchRequestGenerator;
 import com.google.sps.data.SearchRequestGeneratorImpl;
 import com.google.sps.data.PlaceDetailsRequestGenerator;
 import com.google.sps.data.PlaceDetailsRequestGeneratorImpl;
+import com.google.sps.data.DataAccessor;
+import com.google.sps.data.UserVerifier;
+
 /**
  * A servlet that handles the user's food-mood recommendation query, and responds with a list of
  * recommended places (in Json format).
@@ -52,22 +56,33 @@ public final class QueryServlet extends HttpServlet {
       new PlaceDetailsRequestGeneratorImpl(GeoContext.getGeoApiContext());
   private PlacesFetcher fetcher;
   private PlacesScorer scorer;
+  private UserVerifier userVerifier;
+  private DataAccessor dataAccessor;
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher(SEARCH_REQUEST_GENERATOR, PLACE_DETAILS_REQUEST_GENERATOR);
     scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
+    userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
+    dataAccessor = new DataAccessor();
   }
 
-  void init(PlacesFetcher inputFetcher, PlacesScorer inputScorer) {
+  void init(
+      PlacesFetcher inputFetcher,
+      PlacesScorer inputScorer,
+      UserVerifier inputUserVerifier,
+      DataAccessor inputDataAccessor) {
     fetcher = inputFetcher;
     scorer = inputScorer;
+    userVerifier = inputUserVerifier;
+    dataAccessor = inputDataAccessor;
   }
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     ImmutableList<Place> filteredPlaces;
     UserPreferences userPrefs;
+    String cuisines = request.getParameter("cuisines");
     try {
       userPrefs =
           UserPreferences.builder()
@@ -75,8 +90,11 @@ public final class QueryServlet extends HttpServlet {
               .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
               .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
               .setLocation(getLatLngFromString(request.getParameter("location")))
-              .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
+              .setCuisines(cuisines.isEmpty()
+                  ? ImmutableList.of() : ImmutableList.copyOf(cuisines.split(",")))
               .build();
+      String userIdToken = request.getParameter("idToken");
+      storePreferences(userIdToken, userPrefs);
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
@@ -104,5 +122,16 @@ public final class QueryServlet extends HttpServlet {
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
+  }
+
+  // Store the user's preferences in the database, only if the user is signed in.
+  private void storePreferences(String userIdToken, UserPreferences userPrefs) {
+    if (!userIdToken.isEmpty()) {
+      Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
+      if (optionalUserId.isPresent()) {
+        String userId = optionalUserId.get();
+        dataAccessor.storeUserPreferences(userId, userPrefs);
+      }
+    }
   }
 }
