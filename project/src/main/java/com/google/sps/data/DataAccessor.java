@@ -70,7 +70,7 @@ public class DataAccessor {
   * @param userId the id of the user that we want to register to our system
   */
   public void registerUser(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
+    checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
     checkArgument(!isRegistered(userId), "User already registered.");
     Entity userEntity = new Entity(USER_ENTITY_KIND, userId);
     datastoreService.put(userEntity);
@@ -82,16 +82,14 @@ public class DataAccessor {
    * @param userId The ID of the user to store the preferred cuisines for.
    * @param userPref The user choices on the query form to store in the user’s database.
    */
-  public void storeUserPreferences(String userId, UserPreferences userPref) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
-    if (userPref.cuisines().isEmpty()) {
-      return;
+  public void storeUserPreferences(String userId, UserPreferences userPreferences) {
+    checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
+    if (!userPreferences.cuisines().isEmpty()) {
+      Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
+      prefsEntity.setProperty("userId", userId);
+      prefsEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
+      prefsEntity.setProperty("preferedCuisines", userPreferences.cuisines());
+      datastoreService.put(prefsEntity);
     }
-    Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
-    prefsEntity.setProperty("userId", userId);
-    prefsEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
-    prefsEntity.setProperty("preferedCuisines", userPref.cuisines());
-    datastoreService.put(prefsEntity);
   }
-
 }

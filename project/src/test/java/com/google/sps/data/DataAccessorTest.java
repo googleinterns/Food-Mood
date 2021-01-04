@@ -143,7 +143,7 @@ public final class DataAccessorTest {
   }
 
   @Test
-  public void storeUserPreferences_validUserIdNoPreferedCuisines_nothingStored() {
+  public void storeUserPreferences_validUserIdNoPreferredCuisines_nothingStored() {
     String userId = "12345";
 
     dataAccessor.storeUserPreferences(
