@@ -54,7 +54,7 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegistered(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
+    checkArgument(!isNullOrEmpty(userId), "User ID may not be null or empty");
     Key userIdKey = KeyFactory.createKey(USER_ENTITY_KIND, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
@@ -70,7 +70,7 @@ public class DataAccessor {
   * @param userId the id of the user that we want to register to our system
   */
   public void registerUser(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
+    checkArgument(!isNullOrEmpty(userId), "User ID may not be null or empty");
     checkArgument(!isRegistered(userId), "User already registered.");
     Entity userEntity = new Entity(USER_ENTITY_KIND, userId);
     datastoreService.put(userEntity);
@@ -83,7 +83,7 @@ public class DataAccessor {
    * @param userPreferences The user choices on the query form to store in the user’s database.
    */
   public void storeUserPreferences(String userId, UserPreferences userPreferences) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "User ID may not be null or empty");
+    checkArgument(!isNullOrEmpty(userId), "User ID may not be null or empty");
     if (!userPreferences.cuisines().isEmpty()) {
       Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
       prefsEntity.setProperty("userId", userId);
