@@ -56,7 +56,7 @@ public final class QueryServletTest {
   private static final String LOCATION_STRING = "30.30,35.35";
   private static final LatLng LOCATION = new LatLng(30.30, 35.35);
   private static final String CUISINES_STRING = "sushi,hamburger";
-  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi" ,"hamburger");
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "hamburger");
   private static final String VALID_ID_TOKEN = "token";
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
