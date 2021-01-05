@@ -136,7 +136,7 @@ public final class DataAccessorTest {
     ImmutableList<String> places = ImmutableList.of(chosenPlace, PLACE_ID_2, PLACE_ID_3);
 
     dataAccessor.updateUserFeedback(
-        buildUserFeedback(USER_ID, chosenPlace, places, false /**tried again*/));
+        buildUserFeedback(USER_ID, chosenPlace, places, /* tried again*/ false));
 
     List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
@@ -155,7 +155,7 @@ public final class DataAccessorTest {
     ImmutableList<String> places = ImmutableList.of(PLACE_ID_1, PLACE_ID_2, PLACE_ID_1);
 
     dataAccessor.updateUserFeedback(
-        buildUserFeedback(USER_ID, /**chosen place*/ null, places, /**tried again*/ true));
+        buildUserFeedback(USER_ID, /*chosen place*/ null, places, /*tried again*/ true));
 
     List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
@@ -170,7 +170,7 @@ public final class DataAccessorTest {
     ImmutableList<String> places = ImmutableList.of();
 
     dataAccessor.updateUserFeedback(
-        buildUserFeedback(USER_ID, /**chosen place*/ null, places, /**tried again*/ true));
+        buildUserFeedback(USER_ID, /*chosen place*/ null, places, /*tried again*/ true));
 
     List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
     assertEquals(0, results.size());
@@ -195,18 +195,18 @@ public final class DataAccessorTest {
   @Test
   public void getUserPlacesHistory_allPlaces_getAllPlaces() {
     datastoreService.put(createRecomEntityByProperties(
-      USER_ID, PLACE_ID_1, /** chosen */ false, /** tried again */ false));
-    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, /** chosen */ false,
-        false /** tried again */));
+      USER_ID, PLACE_ID_1, /* chosen */ false, /* tryAgain */ false));
+    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, /* chosen */ false,
+        false /* tryAgain */));
     // Purposely add the same place IDs again, to make sure we get the places only once.
     // Once making the familiar place chosen, and once leaving it unchosen.
     datastoreService.put(createRecomEntityByProperties(
-        USER_ID, PLACE_ID_1, /** chosen */ true, /** tried again */ false));
+        USER_ID, PLACE_ID_1, /* chosen */ true, /* tryAgain */ false));
     datastoreService.put(createRecomEntityByProperties(
-        USER_ID, PLACE_ID_2, /** chosen */ false, /** tried again */ false));
+        USER_ID, PLACE_ID_2, /* chosen */ false, /* tryAgain */ false));
 
     ImmutableList<String> results =
-        dataAccessor.getPlacesRecommendedToUser(USER_ID, /** only places user chose */ false);
+        dataAccessor.getPlacesRecommendedToUser(USER_ID, /* getOnlyPlacesUserChose */ false);
 
     assertEquals(2, results.size());
     assertTrue(results.contains(PLACE_ID_1));
@@ -216,17 +216,17 @@ public final class DataAccessorTest {
   @Test
   public void getUserPlacesHistory_onlyChosenPlaces_getAllPlaces() {
     datastoreService.put(createRecomEntityByProperties(
-        USER_ID, PLACE_ID_1, /** chosen */ true, /** tried again */ false));
+        USER_ID, PLACE_ID_1, /* chosen */ true, /* tryAgain */ false));
     datastoreService.put(createRecomEntityByProperties(
-        USER_ID, PLACE_ID_2, /** chosen */ false, /** tried again */ false));
+        USER_ID, PLACE_ID_2, /* chosen */ false, /* tryAgain */ false));
     // Purposely add the same place IDs again, unchosen, to make sure it doesn't affect the results.
     datastoreService.put(createRecomEntityByProperties(
-        USER_ID, PLACE_ID_1, /** chosen */ false, /** tried again */ false));
+        USER_ID, PLACE_ID_1, /* chosen */ false, /* tryAgain */ false));
     datastoreService.put(createRecomEntityByProperties(
-        USER_ID, PLACE_ID_2, /** chosen */ false, /** tried again */ false));
+        USER_ID, PLACE_ID_2, /* chosen */ false, /* tryAgain */ false));
 
     ImmutableList<String> results =
-        dataAccessor.getPlacesRecommendedToUser(USER_ID, /** only places user chose */ true);
+        dataAccessor.getPlacesRecommendedToUser(USER_ID, /* getOnlyPlacesUserChose */ true);
 
     assertEquals(1, results.size());
     assertTrue(results.contains(PLACE_ID_1));
