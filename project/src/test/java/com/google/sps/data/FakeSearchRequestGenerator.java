@@ -29,4 +29,22 @@ public class FakeSearchRequestGenerator implements SearchRequestGenerator {
         request.query(cuisineSearchWords);
         return request;
     }
+
+    public static class FakeSearchRequest extends TextSearchRequest {
+
+        /** The search words used for the text search */
+        public String searchWords;
+
+        /**
+         * FakePlaceDetailsRequest constructor.
+         *
+         * @param geoApiContext the GeoApiContext used for all Google GEO API requests
+         * @param searchWords the search words used for the text search
+         */
+        public FakeSearchRequest(GeoApiContext context, String searchWords) {
+            super(context);
+            this.searchWords = searchWords;
+        }
+
+    }
 }
