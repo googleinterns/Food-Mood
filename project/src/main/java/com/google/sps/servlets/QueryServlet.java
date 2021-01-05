@@ -94,6 +94,7 @@ public final class QueryServlet extends HttpServlet {
               .build();
       String userIdToken = request.getParameter("idToken");
       Optional<String> optionalUserId;
+      // ###########################################################put this into function
       if (!userIdToken.isEmpty()
           && (optionalUserId = userVerifier.getUserIdByToken(userIdToken)).isPresent()) {
         dataAccessor.storeUserPreferences(optionalUserId.get(), userPrefs);
@@ -101,6 +102,7 @@ public final class QueryServlet extends HttpServlet {
       } else { // User is not signed in
         scorer = scorerFactory.create();
       }
+      // ##################################################################################
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
