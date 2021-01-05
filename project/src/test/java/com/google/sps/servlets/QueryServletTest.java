@@ -36,6 +36,7 @@ import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.FetcherException;
 import com.google.sps.data.PlacesScorer;
+import com.google.sps.data.PlacesScorerFactory;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -52,6 +53,7 @@ public final class QueryServletTest {
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
+  private static final PlacesScorerFactory SCORER_FACTORY = mock(PlacesScorerFactory.class);
   private static final PlacesScorer SCORER = mock(PlacesScorer.class);
   private static final UserVerifier USER_VERIFIER = mock(UserVerifier.class);
   private static final DataAccessor DATA_ACCESSOR = mock(DataAccessor.class);
@@ -64,8 +66,9 @@ public final class QueryServletTest {
     responseStringWriter = new StringWriter();
     responsePrintWriter = new PrintWriter(responseStringWriter);
     servlet = new QueryServlet();
-    servlet.init(FETCHER, SCORER, USER_VERIFIER, DATA_ACCESSOR);
+    servlet.init(FETCHER, SCORER_FACTORY, USER_VERIFIER, DATA_ACCESSOR);
     when(RESPONSE.getWriter()).thenReturn(responsePrintWriter);
+    when(SCORER_FACTORY.create(any(String.class))).thenReturn(SCORER);
     initializeRequestParameters();
     clearInvocations(DATA_ACCESSOR);
     clearInvocations(FETCHER);

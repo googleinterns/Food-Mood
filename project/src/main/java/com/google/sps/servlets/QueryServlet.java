@@ -58,14 +58,14 @@ public final class QueryServlet extends HttpServlet {
   private PlacesScorerFactory scorerFactory;
   private UserVerifier userVerifier;
   private DataAccessor dataAccessor;
-  private PlacesScorer scorer;
 
   @Override
   public void init() {
     fetcher = new PlacesFetcher(SEARCH_REQUEST_GENERATOR, PLACE_DETAILS_REQUEST_GENERATOR);
     userVerifier = UserVerifier.create("");
     dataAccessor = new DataAccessor();
-    scorerFactory = new PlacesScorerFactory(GeoContext.getGeoApiContext());
+    scorerFactory =
+        new PlacesScorerFactory(GeoContext.getGeoApiContext(), userVerifier, dataAccessor);
   }
 
   void init(
@@ -83,26 +83,12 @@ public final class QueryServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     ImmutableList<Place> filteredPlaces;
     UserPreferences userPrefs;
+    PlacesScorer scorer;
     try {
-      userPrefs =
-          UserPreferences.builder()
-              .setMinRating(Float.parseFloat(request.getParameter("rating")))
-              .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
-              .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
-              .setLocation(getLatLngFromString(request.getParameter("location")))
-              .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
-              .build();
+      userPrefs = processPostRequest(request);
       String userIdToken = request.getParameter("idToken");
-      Optional<String> optionalUserId;
-      // ###########################################################put this into function
-      if (!userIdToken.isEmpty()
-          && (optionalUserId = userVerifier.getUserIdByToken(userIdToken)).isPresent()) {
-        dataAccessor.storeUserPreferences(optionalUserId.get(), userPrefs);
-        scorer = scorerFactory.create(optionalUserId.get(), dataAccessor);
-      } else { // User is not signed in
-        scorer = scorerFactory.create();
-      }
-      // ##################################################################################
+      scorer = scorerFactory.create(userIdToken);
+      storePreferences(userIdToken, userPrefs);
       filteredPlaces = Places.filter(
           fetcher.fetch(userPrefs) /* places */,
           Integer.parseInt(request.getParameter("rating")) /* approximate minimum rating */,
@@ -130,5 +116,26 @@ public final class QueryServlet extends HttpServlet {
   private static LatLng getLatLngFromString(String coordinates) {
     String[] latLng = coordinates.split(",");
     return new LatLng(Double.parseDouble(latLng[0]), Double.parseDouble(latLng[1]));
+  }
+
+  private static UserPreferences processPostRequest(HttpServletRequest request)
+      throws IllegalArgumentException {
+    return UserPreferences.builder()
+      .setMinRating(Float.parseFloat(request.getParameter("rating")))
+      .setMaxPriceLevel(Integer.parseInt(request.getParameter("price")))
+      .setOpenNow(Integer.parseInt(request.getParameter("open")) != 0)
+      .setLocation(getLatLngFromString(request.getParameter("location")))
+      .setCuisines(ImmutableList.copyOf(request.getParameter("cuisines").split(",")))
+      .build();
+  }
+
+  private void storePreferences(String userIdToken, UserPreferences userPrefs) {
+    if (!userIdToken.isEmpty()) {
+      Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
+      if (optionalUserId.isPresent()) {
+        String userId = optionalUserId.get();
+        dataAccessor.storeUserPreferences(userId, userPrefs);
+      }
+    }
   }
 }
