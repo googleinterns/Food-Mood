@@ -15,7 +15,9 @@
 package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
+import java.util.Date;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -26,13 +28,13 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.repackaged.com.google.api.client.util.Strings;
 
 public class DataAccessor {
 
   private final DatastoreService datastoreService;
   @VisibleForTesting
-  static final String USER_ENTITY_NAME = "User";
+  static final String USER_ENTITY_KIND = "User";
+  static final String PREFERNCES_ENTITY_KIND = "UserPreferences";
 
   /**
    * A constructor that creates a DatastoreService instance for the class.
@@ -52,11 +54,11 @@ public class DataAccessor {
   *     previously added to datastore.
   */
   public boolean isRegistered(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
-    Key userIdKey = KeyFactory.createKey(USER_ENTITY_NAME, userId);
+    checkArgument(!isNullOrEmpty(userId), "User ID may not be null or empty");
+    Key userIdKey = KeyFactory.createKey(USER_ENTITY_KIND, userId);
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
-    Query query = new Query(USER_ENTITY_NAME).setFilter(userIdFilter).setKeysOnly();
+    Query query = new Query(USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
     return datastoreService.prepare(query)
         .asList(FetchOptions.Builder.withDefaults())
         .size() > 0;
@@ -68,9 +70,26 @@ public class DataAccessor {
   * @param userId the id of the user that we want to register to our system
   */
   public void registerUser(String userId) {
-    checkArgument(!Strings.isNullOrEmpty(userId), "Invalid user ID");
+    checkArgument(!isNullOrEmpty(userId), "User ID may not be null or empty");
     checkArgument(!isRegistered(userId), "User already registered.");
-    Entity userEntity = new Entity(USER_ENTITY_NAME, userId);
+    Entity userEntity = new Entity(USER_ENTITY_KIND, userId);
     datastoreService.put(userEntity);
+  }
+
+  /**
+   * Stores the UserPreferences in the personalized user database.
+   *
+   * @param userId The ID of the user to store the preferred cuisines for.
+   * @param userPreferences The user choices on the query form to store in the user’s database.
+   */
+  public void storeUserPreferences(String userId, UserPreferences userPreferences) {
+    checkArgument(!isNullOrEmpty(userId), "User ID may not be null or empty");
+    if (!userPreferences.cuisines().isEmpty()) {
+      Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
+      prefsEntity.setProperty("userId", userId);
+      prefsEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
+      prefsEntity.setProperty("preferedCuisines", userPreferences.cuisines());
+      datastoreService.put(prefsEntity);
+    }
   }
 }
