@@ -107,7 +107,7 @@ public class DataAccessor {
 
   /**
   * Approaches the database and gets the places that were recommended to the user in the past.
-  * It is possible to get only places that the user chose, according to their feedback.
+  * There is a possibility to get only places that the user chose, according to their feedback.
   *
   * @param userId the user we want the information about.
   * @param getOnlyPlacesUserChose if this is true, the returned places would consist only of places
@@ -128,7 +128,7 @@ public class DataAccessor {
     return datastoreService.prepare(query)
         .asList(FetchOptions.Builder.withDefaults())
         .stream()
-        .map(entity -> (String)entity.getProperty(PLACE_ID_PROPERTY))
+        .map(entity -> (String) entity.getProperty(PLACE_ID_PROPERTY))
         .distinct()
         .collect(ImmutableList.toImmutableList());
   }

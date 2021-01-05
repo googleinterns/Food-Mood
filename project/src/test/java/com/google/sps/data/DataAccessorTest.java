@@ -136,7 +136,7 @@ public final class DataAccessorTest {
     ImmutableList<String> places = ImmutableList.of(chosenPlace, PLACE_ID_2, PLACE_ID_3);
 
     dataAccessor.updateUserFeedback(
-        buildUserFeedback(USER_ID, chosenPlace, places, /**tried again*/ false));
+        buildUserFeedback(USER_ID, chosenPlace, places, false /**tried again*/));
 
     List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
