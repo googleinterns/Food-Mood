@@ -410,7 +410,7 @@ function registerUserByToken() {
 
 /** Sends feedback that includes the place the user chose. */
 function sendUserChoiceAsFeedback() {
-  indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
+  let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
     updateUserFeedback(recommendedPlaces, recommendedPlaces[indexOfPlaceUserChose].placeId,
@@ -423,7 +423,7 @@ function updateUserFeedback(recommendedPlaces, chosenPlaceId, tryAgain) {
   if (!googleUser) {
     return;
   }
-  params = [
+  let params = [
     `idToken=${googleUser.getAuthResponse().id_token}`,
     `recommendedPlaces=${recommendedPlaces}`,
     `chosenPlace=${chosenPlaceId}`,
