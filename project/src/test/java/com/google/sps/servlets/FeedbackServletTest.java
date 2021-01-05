@@ -15,12 +15,14 @@
 package com.google.sps.servlets;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +30,7 @@ import org.junit.runners.JUnit4;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.DataAccessor;
+import com.google.sps.data.UserFeedback;
 import com.google.sps.data.UserVerifier;
 
 @RunWith(JUnit4.class)
@@ -39,7 +42,7 @@ public class FeedbackServletTest {
   private static final String USER_ID = "12345";
   private static UserVerifier mockUserVerifier;
   private static DataAccessor mockDataAccessor;
-  private RegistrationServlet servlet;
+  private FeedbackServlet servlet;
 
   @Before
   public void setUp() throws Exception {
@@ -50,22 +53,60 @@ public class FeedbackServletTest {
   }
 
   @Test
-  public void doPost_validToken_documentFeedback() throws Exception {
-    String idToken = "abcde";
-    String userId = "12345";
-    when(REQUEST.getParameter("idToken")).thenReturn(idToken);
+  public void doPost_validToken_updatesFeedback() throws Exception {
+    mockValidRequestParams();
+    when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
 
     servlet.doPost(REQUEST, RESPONSE);
 
-  // Make sure what we expect happens
-  }
+    // We are unable to make sure the exact function input, because we can't create an identical
+    // instance of "UserFeedback", because it has a time in milliseconds attribute.
+    verify(mockDataAccessor).updateUserFeedback(any(UserFeedback.class));
+}
 
   @Test
-  public void doPost_invalidToken_doesntRegister() throws Exception {
+  public void doPost_invalidToken_badRequestResponseSent() throws Exception {
+    mockValidRequestParams();
     when(REQUEST.getParameter("idToken")).thenReturn(null);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-  // Make sure what we expect doesn't happen
+    verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
+    verify(RESPONSE)
+        .sendError(HttpServletResponse.SC_BAD_REQUEST,FeedbackServlet.INVALID_TOKEN_MSG);
+  }
+
+  @Test
+  public void doPost_getUserByTokenFails_badRequestResponseSent() throws Exception {
+    mockValidRequestParams();
+    when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.empty());
+
+    servlet.doPost(REQUEST, RESPONSE);
+
+    verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
+    verify(RESPONSE, atLeastOnce())
+        .sendError(HttpServletResponse.SC_NOT_FOUND, FeedbackServlet.NO_USER_TOKEN_MSG);
+  }
+
+  @Test
+  public void doPost_invalidUserFeedback_badRequestResponseSent() throws Exception {
+    when(REQUEST.getParameter("idToken")).thenReturn(ID_TOKEN);
+    when(REQUEST.getParameter("recommendedPlaces")).thenReturn("place1,place2,place3");
+    when(REQUEST.getParameter("chosenPlace")).thenReturn("place4"); // Not in recommendedPlaces
+    when(REQUEST.getParameter("tryAgain")).thenReturn("true");
+    when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
+
+    servlet.doPost(REQUEST, RESPONSE);
+
+    verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
+    verify(RESPONSE, atLeastOnce())
+        .sendError(HttpServletResponse.SC_BAD_REQUEST, FeedbackServlet.INVALID_USER_FEEDBACK_MSG);
+  }
+
+  private void mockValidRequestParams() {
+    when(REQUEST.getParameter("idToken")).thenReturn(ID_TOKEN);
+    when(REQUEST.getParameter("recommendedPlaces")).thenReturn("place1,place2,place3");
+    when(REQUEST.getParameter("chosenPlace")).thenReturn("place1");
+    when(REQUEST.getParameter("tryAgain")).thenReturn("false");
   }
 }
