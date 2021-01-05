@@ -111,18 +111,22 @@ public class PlacesFetcher {
         PlacesSearchResult[] resultsForCuisine;
         // If user didn't choose any cuisines, search on all possible cuisines
         Collection<String> cuisines =
-            (preferences.cuisines().isEmpty()) ? CUISINE_TO_SEARCH_WORDS.keySet() : preferences.cuisines();
+            (preferences.cuisines().isEmpty())
+                ? CUISINE_TO_SEARCH_WORDS.keySet() : preferences.cuisines();
         int attemptsCounter = 0;
         do {
-            for(String cuisine: cuisines) {
+            for (String cuisine: cuisines) {
                 attemptsCounter++;
                 try {
                     resultsForCuisine = getPlacesSearchResults(genTextSearchRequest(
                         preferences, INIT_SEARCH_RADIUS_M * attemptsCounter, cuisine));
-                } catch (ApiException | InterruptedException | IOException | IllegalStateException e) {
+                } catch (ApiException
+                        | InterruptedException
+                        | IOException
+                        | IllegalStateException e) {
                     throw new FetcherException("Couldn't fetch places from Places API", e);
                 }
-                for(PlacesSearchResult result : resultsForCuisine) {
+                for (PlacesSearchResult result : resultsForCuisine) {
                     placesSearchResults.computeIfAbsent(
                         result.placeId, k -> new HashSet<>()).add(cuisine);
                 }
@@ -133,7 +137,8 @@ public class PlacesFetcher {
         return createPlacesList(placesSearchResults);
     }
 
-    private TextSearchRequest genTextSearchRequest(UserPreferences preferences, int radius, String cuisine) {
+    private TextSearchRequest genTextSearchRequest(
+            UserPreferences preferences, int radius, String cuisine) {
         TextSearchRequest request =
             searchRequestGenerator.create(cuisine);
         request.location(preferences.location());
