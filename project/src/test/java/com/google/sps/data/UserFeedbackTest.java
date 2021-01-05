@@ -27,6 +27,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class UserFeedbackTest {
 
+  private static final String USER_ID = "abcde";
   private static final String PLACE_ID_1 = "12345";
   private static final ImmutableList<String> PLACES_WITH_PLACE_ID_1 =
       ImmutableList.of(PLACE_ID_1, "11111", "22222");
@@ -35,6 +36,7 @@ public final class UserFeedbackTest {
   public void build_chosenPlaceNotInRecommendedPlaces_throwsIllegalArgumentException() {
     assertThrows(IllegalArgumentException.class, () -> {
       UserFeedback.builder()
+          .setUserId(USER_ID)
           .setRecommendedPlaces(ImmutableList.of("11111", "22222", "33333"))
           .setChosenPlace("44444")
           .setUserTriedAgain(false)
@@ -45,6 +47,7 @@ public final class UserFeedbackTest {
   @Test
   public void build_chosenPlace_returnsValidUserFeedback() {
     UserFeedback userFeedback = UserFeedback.builder()
+        .setUserId(USER_ID)
         .setRecommendedPlaces(PLACES_WITH_PLACE_ID_1)
         .setChosenPlace(PLACE_ID_1)
         .setUserTriedAgain(false)
@@ -59,6 +62,7 @@ public final class UserFeedbackTest {
   @Test
   public void build_userTriedAgain_returnsValidUserFeedback() {
     UserFeedback userFeedback = UserFeedback.builder()
+        .setUserId(USER_ID)
         .setRecommendedPlaces(PLACES_WITH_PLACE_ID_1)
         .setUserTriedAgain(true)
         .build();
