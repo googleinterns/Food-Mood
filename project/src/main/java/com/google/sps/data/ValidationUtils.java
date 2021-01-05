@@ -16,38 +16,53 @@ package com.google.sps.data;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.Optional;
+import com.google.common.collect.ImmutableList;
+
 /**
  * A utility class for validation.
  */
 public final class ValidationUtils {
 
-    /** The maximal valid rating value. */
-    private static final float MAX_RATING = 5.0f;
-    /** The minimal valid rating value. */
-    private static final float MIN_RATING = 1.0f;
-    /** The maximal valid price level value. */
-    private static final int MAX_PRICE_LEVEL = 4;
-    /** The minimal valid price level value. */
-    private static final int MIN_PRICE_LEVEL = 0;
+  /** The maximal valid rating value. */
+  private static final float MAX_RATING = 5.0f;
+  /** The minimal valid rating value. */
+  private static final float MIN_RATING = 1.0f;
+  /** The maximal valid price level value. */
+  private static final int MAX_PRICE_LEVEL = 4;
+  /** The minimal valid price level value. */
+  private static final int MIN_PRICE_LEVEL = 0;
 
-    /**
-     * @param rating the rating of a place, should be represented by a number between 1-5.
-     * @throws IllegalArgumentException
-     */
-    public static void validateRating(float rating) throws IllegalArgumentException {
-        checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
+  /**
+   * @param rating the rating of a place, should be represented by a number between 1-5.
+   * @throws IllegalArgumentException
+   */
+  public static void validateRating(float rating) throws IllegalArgumentException {
+    checkArgument(rating >= MIN_RATING && rating <= MAX_RATING,
         "Rating should be between %s-%s", MIN_RATING, MAX_RATING);
-    }
+  }
 
-    /**
-     * @param priceLevel the price level of a place, should be represented by a number between 0-4.
-     * @throws IllegalArgumentException
-     */
-    public static void validatePriceLevel(int priceLevel) throws IllegalArgumentException {
-        checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
+  /**
+   * @param priceLevel the price level of a place, should be represented by a number between 0-4.
+   * @throws IllegalArgumentException
+   */
+  public static void validatePriceLevel(int priceLevel) throws IllegalArgumentException {
+    checkArgument(priceLevel >= MIN_PRICE_LEVEL && priceLevel <= MAX_PRICE_LEVEL,
         "Price level should be between %s-%s", MIN_PRICE_LEVEL, MAX_PRICE_LEVEL);
-    }
+  }
 
-    private ValidationUtils() {
-    }
+  /**
+   * @param placeUserChose the place the user chose to order from
+   * @param placesRecommendedToUser the places that the system recommended to the user
+   * @throws IllegalArgumentException if chosen place wasn't one of the recommended places
+   */
+  public static void validateChosenPlaceInReccomendedPlaces(Optional<String> placeUserChose,
+      ImmutableList<String> placesRecommendedToUser) throws IllegalArgumentException {
+    checkArgument(
+        !placeUserChose.isPresent() || placesRecommendedToUser.contains(placeUserChose.get()),
+        "Chosen place must be contained in the places that were recommended to the user."
+    );
+  }
+
+  private ValidationUtils() { }
 }
