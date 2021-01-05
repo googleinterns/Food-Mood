@@ -226,6 +226,9 @@ public final class PlacesFetcherTest {
       .getPlaceDetails(argThat(matchesDetailsRequest(PLACEID_2)));
     doReturn(SEARCH_RESULT_ARR)
       .when(spiedFetcher)
+      .getPlacesSearchResults(argThat(matchesSearchRequest("sushi")));
+    doReturn(new PlacesSearchResult[0])
+      .when(spiedFetcher)
       .getPlacesSearchResults(
           argThat(
             (ArgumentMatcher<FakeSearchRequestGenerator.FakeSearchRequest>) request
