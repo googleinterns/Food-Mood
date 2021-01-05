@@ -194,7 +194,7 @@ function tryAgainAndSendFeedback() {
   document.getElementById('waiting-message').style.display = 'block'
   clearAllMessages();
 
-  updateUserFeedback(recommendedPlaces, null /** place user chose */, true /** user tried again */)
+  updateUserFeedback(null /** chosenPlaceId */, true /** tryAgain */)
 }
 
 /** Clears all the messages that are displayed to the user during the user session. */
@@ -408,13 +408,13 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    updateUserFeedback(recommendedPlaces, recommendedPlaces[indexOfPlaceUserChose].placeId,
-        false /** user tried again */)
+    updateUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
+        false /** tryAgain */)
   }
 }
 
 /** Updates user feedback in the database, by using the feedback servlet. */
-function updateUserFeedback(recommendedPlaces, chosenPlaceId, tryAgain) {
+function updateUserFeedback(chosenPlaceId, tryAgain) {
   if (!googleUser) {
     return;
   }
