@@ -35,7 +35,6 @@ li {
   width: 150px;
   padding: 5px;
   background-color: rgb(228 231 232);
-  margin-top: 10px;
 }
 
 .form-element-toolbar {
@@ -55,7 +54,7 @@ li {
   font-family: sans-serif, Arial;
   font-size: 16px;
   margin: 2px;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   border-radius: 30px;
 }
 
@@ -105,6 +104,11 @@ li {
 
 .form-button:hover {
   background-color: rgb(78, 136, 243);
+}
+
+.question {
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
 }
 
 #results-content {

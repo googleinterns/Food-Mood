@@ -3,7 +3,7 @@
   <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places"> </script>
   <script src="https://apis.google.com/js/platform.js"></script>
-  <meta name="google-signin-client_id" content="CLIENT_ID">
+  <meta name="google-signin-client_id" content="CLIENT-ID">
   <script src="script.js"></script>
   <head>
     <meta charset="UTF-8">
@@ -13,16 +13,16 @@
   </head>
   <body class="text-content">
     <h1> FoodMood - your food order helper!</h1>
+    <div class="user-input" id="user-input">
     <div id="sign-in-segment">
       <div id="sign-in-button" class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account"></div>
       <div id ="user-welcome-message-container"> Hello! You are welcome to sign in </div>
       <button id="sign-out-button" onclick="signOut();" style="display: none">Sign out</button>
       <hr>
     </div>
-    <div class="user-input" id="user-input">
     <div id="query-form" class="query-form">
       <form id="cuisines-form" class="form-element-toolbar">
-        <p>If you prefer specific cuisines, please select them:</p>
+        <p class="question">If you prefer specific cuisines, please select them:</p>
         <input type="checkbox" id="cuisine-italian" name="cuisine" value="italian">
         <label for="cuisine-italian">Italian</label>
         <input type="checkbox" id="cuisine-asian" name="cuisine" value="asian">
@@ -38,7 +38,7 @@
         <label for="cuisine-homemade">Homemade</label>
       </form>
       <form id="rating-form" class="form-element-toolbar">
-        <p>Desired rating (out of 5):</p>
+        <p class="question">Desired rating (out of 5):</p>
         <input type="radio" id="rating-0" name="rating" value="1" checked="checked">
         <label for="rating-0">I don't mind</label>
         <input type="radio" id="rating-1" name="rating" value="1">
@@ -53,7 +53,7 @@
         <label for="rating-5">5 star</label>
       </form>
       <form id="price-form" class="form-element-toolbar">
-        <p>Desired price level:</p>
+        <p class="question">Desired price level:</p>
         <input type="radio" id="price-all" name="price" value="4" checked="checked">
         <label for="price-all">I don't mind</label>
         <input type="radio" id="price-1" name="price" value="1">
@@ -65,12 +65,20 @@
         <input type="radio" id="price-4" name="price" value="4">
         <label for="price-4">Very Expensive</label>
       </form>
+      <form id="old-new-form" class="form-element-toolbar">
+        <p class="question">Do you want mainly new recommendations?
+            <br>(That you didn't get from us before)</p>
+        <input type="radio" id="old-new-dont-mind" name="old-new" value="0" checked="checked">
+        <label for="old-new-dont-mind">I don't mind</label>
+        <input type="radio" id="old-new-yes" name="old-new" value="1">
+        <label for="old-new-yes">Yes</label>
+      </form>
       <form id="open-now-form" class="form-element-toolbar">
-        <p>Should it be open now?</p>
-        <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
-        <label for="open-now-yes">Yes</label>
+        <p class="question">Should it be open now?</p>
         <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
         <label for="open-now-dont-mind">I don't mind</label>
+        <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
+        <label for="open-now-yes">Yes</label>
       </form>
       <div id="input-error-container" class="error-text"></div>
     </div>
