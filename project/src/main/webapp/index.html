@@ -22,7 +22,7 @@
     </div>
     <div id="query-form" class="query-form">
       <form id="cuisines-form" class="form-element-toolbar">
-        <p class="question">If you prefer specific cuisines, please select them:</p>
+        <p>If you prefer specific cuisines, please select them:</p>
         <input type="checkbox" id="cuisine-italian" name="cuisine" value="italian">
         <label for="cuisine-italian">Italian</label>
         <input type="checkbox" id="cuisine-asian" name="cuisine" value="asian">
@@ -38,7 +38,7 @@
         <label for="cuisine-homemade">Homemade</label>
       </form>
       <form id="rating-form" class="form-element-toolbar">
-        <p class="question">Desired rating (out of 5):</p>
+        <p>Desired rating (out of 5):</p>
         <input type="radio" id="rating-0" name="rating" value="1" checked="checked">
         <label for="rating-0">I don't mind</label>
         <input type="radio" id="rating-1" name="rating" value="1">
@@ -53,7 +53,7 @@
         <label for="rating-5">5 star</label>
       </form>
       <form id="price-form" class="form-element-toolbar">
-        <p class="question">Desired price level:</p>
+        <p>Desired price level:</p>
         <input type="radio" id="price-all" name="price" value="4" checked="checked">
         <label for="price-all">I don't mind</label>
         <input type="radio" id="price-1" name="price" value="1">
@@ -66,15 +66,15 @@
         <label for="price-4">Very Expensive</label>
       </form>
       <form id="old-new-form" class="form-element-toolbar" style="display: none">
-        <p class="question">Mainly new recommendations?
-            <br>(That you didn't get from us before)</p>
+        <p>Mainly new recommendations?
+          <span style="font-size: 80%">(that you didn't get from us before)</span></p>
         <input type="radio" id="old-new-dont-mind" name="old-new" value="0" checked="checked">
         <label for="old-new-dont-mind">I don't mind</label>
         <input type="radio" id="old-new-yes" name="old-new" value="1">
         <label for="old-new-yes">Yes</label>
       </form>
       <form id="open-now-form" class="form-element-toolbar">
-        <p class="question">Should it be open now?</p>
+        <p>Should it be open now?</p>
         <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
         <label for="open-now-dont-mind">I don't mind</label>
         <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
@@ -83,7 +83,6 @@
       <div id="input-error-container" class="error-text"></div>
     </div>
     <div id="user-map-container">
-      <br> <br>
       <form id="location-form" class="form-element-toolbar">
         <input type="radio" id="device-location" class="device-location" name="location"
         value="device-location" onclick="getDeviceLocationAndShowOnMap()">
@@ -95,6 +94,7 @@
       <div id="map-error-container" class="error-text"></div>
       <div id="map"></div>
       <script> addMapWithSearchBox() </script>
+      <br>
      </div>
      <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
