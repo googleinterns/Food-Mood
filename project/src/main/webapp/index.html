@@ -9,17 +9,18 @@
     <meta charset="UTF-8">
     <title>food-mood</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <base target="_blank" rel="noopener noreferrer">
   </head>
   <body class="text-content">
     <h1> FoodMood - your food order helper!</h1>
+    <div class="user-input" id="user-input">
     <div id="sign-in-segment">
       <div id="sign-in-button" class="g-signin2" data-onsuccess="onSignIn" data-prompt="select_account"></div>
       <div id ="user-welcome-message-container"> Hello! You are welcome to sign in </div>
       <button id="sign-out-button" onclick="signOut();" style="display: none">Sign out</button>
       <hr>
     </div>
-    <div class="user-input" id="user-input">
     <div id="query-form" class="query-form">
       <form id="cuisines-form" class="form-element-toolbar">
         <p>If you prefer specific cuisines, please select them:</p>
@@ -76,17 +77,24 @@
         <input type="radio" id="price-4" name="price" value="4">
         <label for="price-4">Very Expensive</label>
       </form>
+      <form id="old-new-form" class="form-element-toolbar" style="display: none">
+        <p>Mainly new recommendations?
+          <span style="font-size: 80%">(that you didn't get from us before)</span></p>
+        <input type="radio" id="old-new-dont-mind" name="old-new" value="0" checked="checked">
+        <label for="old-new-dont-mind">I don't mind</label>
+        <input type="radio" id="old-new-yes" name="old-new" value="1">
+        <label for="old-new-yes">Yes</label>
+      </form>
       <form id="open-now-form" class="form-element-toolbar">
         <p>Should it be open now?</p>
-        <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
-        <label for="open-now-yes">Yes</label>
         <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
         <label for="open-now-dont-mind">I don't mind</label>
+        <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
+        <label for="open-now-yes">Yes</label>
       </form>
       <div id="input-error-container" class="error-text"></div>
     </div>
     <div id="user-map-container">
-      <br> <br>
       <form id="location-form" class="form-element-toolbar">
         <input type="radio" id="device-location" class="device-location" name="location"
         value="device-location" onclick="getDeviceLocationAndShowOnMap()">
@@ -98,6 +106,7 @@
       <div id="map-error-container" class="error-text"></div>
       <div id="map"></div>
       <script> addMapWithSearchBox() </script>
+      <br>
      </div>
      <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
