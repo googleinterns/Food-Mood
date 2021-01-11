@@ -119,9 +119,9 @@ li {
   margin-top: auto;
 }
 
-#feedback-box {
+.feedback-box {
   border: 1px solid grey;
-  width: 340px;
+  width: 360px;
   background-color: rgb(199, 232, 245);
   padding: 2%;
   margin-top: 20px;

@@ -208,7 +208,6 @@ function clearAllMessages() {
   document.getElementById('map-error-container').innerText = '';
   document.getElementById('input-error-container').innerText = '';
   document.getElementById('problem-message-container').innerText = '';
-  document.getElementById('user-feedback-container').innerText = '';
 }
 
 /**
@@ -398,6 +397,7 @@ function signOut() {
   googleUser = null;
   document.getElementById('sign-out-button').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
+  document.getElementById('user-feedback-container').style.display = 'none';
 }
 
 /** Registers the logged in user, using the registration servlet. */
@@ -416,6 +416,8 @@ function sendUserChoiceAsFeedback() {
     updateUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
         false /** tryAgain */)
   }
+  document.getElementById('user-feedback-container').style.display = 'inline-block';
+  document.getElementById('feedback-box').style.display = 'none';
 }
 
 /** Updates user feedback in the database, by using the feedback servlet. */
@@ -430,6 +432,4 @@ function updateUserFeedback(chosenPlaceId, tryAgain) {
     `tryAgain=${tryAgain}`
   ].join('&');
   fetch('/feedback?' + params, {method: 'POST'});
-  document.getElementById('user-feedback-container').innerText =
-      'Thank you, your Feedback was received!';
 }
