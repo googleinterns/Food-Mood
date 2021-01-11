@@ -14,6 +14,8 @@
 
 package com.google.sps.servlets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -47,7 +49,7 @@ public final class RegistrationServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String userIdToken = request.getParameter("idToken");
-    if (userIdToken == null) {
+    if (isNullOrEmpty(userIdToken)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST,
           "No user ID token was received, so can't register user.");
       return;

@@ -199,7 +199,7 @@ function tryAgainAndSendFeedback() {
   document.getElementById('waiting-message').style.display = 'block'
   clearAllMessages();
 
-  updateUserFeedback(recommendedPlaces, null /** place user chose */, true /** user tried again */)
+  storeUserFeedback(recommendedPlaces, null /** place user chose */, true /** user tried again */)
 }
 
 /** Clears all the messages that are displayed to the user during the user session. */
@@ -413,18 +413,18 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    updateUserFeedback(recommendedPlaces, recommendedPlaces[indexOfPlaceUserChose].placeId,
+    storeUserFeedback(recommendedPlaces, recommendedPlaces[indexOfPlaceUserChose].placeId,
         false /** user tried again */)
   }
 }
 
-/** Updates user feedback in the database, by using the feedback servlet. */
-function updateUserFeedback(recommendedPlaces, chosenPlaceId, tryAgain) {
+/** Stores user feedback in the database, by using the feedback servlet. */
+function storeUserFeedback(recommendedPlaces, chosenPlaceId, tryAgain) {
   if (!googleUser) {
     return;
   }
   let params = [
-    `idToken=${googleUser.getAuthResponse().id_token}`,
+    `idToken=${getUserIdToken()}`,
     `recommendedPlaces=${recommendedPlaces}`,
     `chosenPlace=${chosenPlaceId}`,
     `tryAgain=${tryAgain}`

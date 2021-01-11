@@ -14,9 +14,10 @@
 
 package com.google.sps.servlets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import java.io.IOException;
 import java.util.Optional;
-
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +59,7 @@ public final class FeedbackServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String userIdToken = request.getParameter("idToken");
-    if (userIdToken == null) {
+    if (isNullOrEmpty(userIdToken)) {
       response.sendError(HttpServletResponse.SC_BAD_REQUEST, INVALID_TOKEN_MSG);
       return;
     }
