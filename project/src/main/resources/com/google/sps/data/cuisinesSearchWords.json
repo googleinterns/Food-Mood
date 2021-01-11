@@ -7,7 +7,7 @@
     "homemade": ["homemade", "home"],
     "hummus": ["hummus"],
     "pizza": ["pizza"],
-    "mexican": ["mexican, taco, tacos, nachos"],
+    "mexican": ["mexican", "taco", "tacos", "nachos"],
     "sandwich": ["sandwich"],
     "indian": ["indian", "india"]
 }
