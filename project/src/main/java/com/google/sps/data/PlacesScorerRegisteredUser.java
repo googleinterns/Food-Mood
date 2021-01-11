@@ -2,9 +2,6 @@ package com.google.sps.data;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.maps.GeoApiContext;
