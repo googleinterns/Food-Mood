@@ -131,14 +131,14 @@ public final class DataAccessorTest {
   }
 
   @Test
-  public void updateUserFeedback_userChosePlace_UpdateFeedback() {
+  public void updateUserFeedback_userChosePlace_updateFeedback() {
     String chosenPlace = PLACE_ID_1;
     ImmutableList<String> places = ImmutableList.of(chosenPlace, PLACE_ID_2, PLACE_ID_3);
 
     dataAccessor.updateUserFeedback(
         buildUserFeedback(USER_ID, chosenPlace, places, /* tried again*/ false));
 
-    List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
+    List<Entity> results = fetchRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
     for (Entity entity : results) {
       String placeId = (String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY);
@@ -157,7 +157,7 @@ public final class DataAccessorTest {
     dataAccessor.updateUserFeedback(
         buildUserFeedback(USER_ID, /*chosen place*/ null, places, /*tried again*/ true));
 
-    List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
+    List<Entity> results = fetchRecommendationEntitiesByUserId(USER_ID);
     assertEquals(places.size(), results.size()); // An entity for each place.
     for (Entity entity : results) {
       assertTrue(places.contains((String) entity.getProperty(DataAccessor.PLACE_ID_PROPERTY)));
@@ -172,7 +172,7 @@ public final class DataAccessorTest {
     dataAccessor.updateUserFeedback(
         buildUserFeedback(USER_ID, /*chosen place*/ null, places, /*tried again*/ true));
 
-    List<Entity> results = getRecommendationEntitiesByUserId(USER_ID);
+    List<Entity> results = fetchRecommendationEntitiesByUserId(USER_ID);
     assertEquals(0, results.size());
   }
 
@@ -194,15 +194,15 @@ public final class DataAccessorTest {
 
   @Test
   public void getUserPlacesHistory_allPlaces_getAllPlaces() {
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
       USER_ID, PLACE_ID_1, /* chosen */ false, /* tryAgain */ false));
-    datastoreService.put(createRecomEntityByProperties(USER_ID, PLACE_ID_2, /* chosen */ false,
+    datastoreService.put(createRecommendationEntity(USER_ID, PLACE_ID_2, /* chosen */ false,
         false /* tryAgain */));
     // Purposely add the same place IDs again, to make sure we get the places only once.
     // Once making the familiar place chosen, and once leaving it unchosen.
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
         USER_ID, PLACE_ID_1, /* chosen */ true, /* tryAgain */ false));
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
         USER_ID, PLACE_ID_2, /* chosen */ false, /* tryAgain */ false));
 
     ImmutableList<String> results =
@@ -215,14 +215,14 @@ public final class DataAccessorTest {
 
   @Test
   public void getUserPlacesHistory_onlyChosenPlaces_getAllPlaces() {
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
         USER_ID, PLACE_ID_1, /* chosen */ true, /* tryAgain */ false));
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
         USER_ID, PLACE_ID_2, /* chosen */ false, /* tryAgain */ false));
     // Purposely add the same place IDs again, unchosen, to make sure it doesn't affect the results.
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
         USER_ID, PLACE_ID_1, /* chosen */ false, /* tryAgain */ false));
-    datastoreService.put(createRecomEntityByProperties(
+    datastoreService.put(createRecommendationEntity(
         USER_ID, PLACE_ID_2, /* chosen */ false, /* tryAgain */ false));
 
     ImmutableList<String> results =
@@ -261,7 +261,7 @@ public final class DataAccessorTest {
         () -> dataAccessor.storeUserPreferences("", userPrefs));
   }
 
-  private Entity createRecomEntityByProperties(String userId, String placeId, boolean chosen,
+  private Entity createRecommendationEntity(String userId, String placeId, boolean chosen,
   boolean tryAgain) {
     Entity recommendationEntity = new Entity(DataAccessor.RECOMMENDATION_ENTITY_KIND);
     recommendationEntity.setProperty(DataAccessor.USER_ID_PROPERTY, userId);
@@ -272,7 +272,7 @@ public final class DataAccessorTest {
     return recommendationEntity;
   }
 
-  private List<Entity> getRecommendationEntitiesByUserId(String userId) {
+  private List<Entity> fetchRecommendationEntitiesByUserId(String userId) {
     return datastoreService.prepare(
         new Query(DataAccessor.RECOMMENDATION_ENTITY_KIND)
             .setFilter(new Query.FilterPredicate("UserId", FilterOperator.EQUAL, userId))
@@ -281,12 +281,13 @@ public final class DataAccessorTest {
 
   private UserFeedback buildUserFeedback(String userId, String chosenPlace,
       ImmutableList<String> places, boolean userTriedAgain) {
-    UserFeedback.Builder temp = UserFeedback
+    UserFeedback.Builder userFeedback = UserFeedback
         .builder()
         .setUserId(userId)
         .setRecommendedPlaces(places)
         .setUserTriedAgain(userTriedAgain);
-    return chosenPlace == null ? temp.build() : temp.setChosenPlace(chosenPlace).build();
+    if (chosenPlace != null) { userFeedback.setChosenPlace(chosenPlace); }
+    return userFeedback.build();
   }
 
   // Used to query the registered users database

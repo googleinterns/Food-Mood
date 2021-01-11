@@ -18,6 +18,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.util.Date;
+import java.util.Optional;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -33,8 +34,6 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 
 public class DataAccessor {
 
-  private final DatastoreService datastoreService;
-  private static final String INVALID_USER_MSG = "User ID may not be null or empty";
   @VisibleForTesting // Applies to all the following
   static final String USER_ENTITY_KIND = "User";
   static final String RECOMMENDATION_ENTITY_KIND = "Recommendation";
@@ -44,6 +43,11 @@ public class DataAccessor {
   static final String CHOSEN_PROPERTY = "WasChosenByUser";
   static final String TRY_AGAIN_PROPERTY = "UserTriedAgain";
   static final String TIME_PROPERTY = "Time";
+
+  private final DatastoreService datastoreService;
+  private static final String INVALID_USER_MSG = "User ID may not be null or empty";
+  private static final Filter CHOSEN_PLACE_FILTER =
+      new Query.FilterPredicate(CHOSEN_PROPERTY, FilterOperator.EQUAL, true);
 
   /**
    * A constructor that creates a DatastoreService instance for the class.
@@ -68,9 +72,7 @@ public class DataAccessor {
     Filter userIdFilter =
         new Query.FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, userIdKey);
     Query query = new Query(USER_ENTITY_KIND).setFilter(userIdFilter).setKeysOnly();
-    return !datastoreService.prepare(query)
-        .asList(FetchOptions.Builder.withDefaults())
-        .isEmpty();
+    return datastoreService.prepare(query).countEntities(FetchOptions.Builder.withDefaults()) > 0;
   }
 
   /**
@@ -98,7 +100,7 @@ public class DataAccessor {
       recommendationEntity.setProperty(USER_ID_PROPERTY, feedback.userId());
       recommendationEntity.setProperty(PLACE_ID_PROPERTY, place);
       recommendationEntity.setProperty(CHOSEN_PROPERTY,
-          feedback.chosenPlace().isPresent() && feedback.chosenPlace().get().equals(place));
+          feedback.chosenPlace().equals(Optional.of(place)));
       recommendationEntity.setProperty(TRY_AGAIN_PROPERTY, feedback.userTriedAgain());
       recommendationEntity.setProperty(TIME_PROPERTY, feedback.feedbackTimeInMillis());
       datastoreService.put(recommendationEntity);
@@ -106,7 +108,7 @@ public class DataAccessor {
   }
 
   /**
-  * Approaches the database and gets the places that were recommended to the user in the past.
+  * Queries the database and gets the places that were recommended to the user in the past.
   * There is a possibility to get only places that the user chose, according to their feedback.
   *
   * @param userId the user we want the information about.
@@ -119,10 +121,8 @@ public class DataAccessor {
     checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
     Filter userIdFilter =
         new Query.FilterPredicate(USER_ID_PROPERTY, FilterOperator.EQUAL, userId);
-    Filter chosenPlacesFilter =
-        new Query.FilterPredicate(CHOSEN_PROPERTY, FilterOperator.EQUAL, true);
     Filter filter = getOnlyPlacesUserChose
-        ? CompositeFilterOperator.and(userIdFilter, chosenPlacesFilter)
+        ? CompositeFilterOperator.and(userIdFilter, CHOSEN_PLACE_FILTER)
         : userIdFilter;
     Query query = new Query(RECOMMENDATION_ENTITY_KIND).setFilter(filter);
     return datastoreService.prepare(query)
