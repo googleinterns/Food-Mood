@@ -286,7 +286,9 @@ public final class DataAccessorTest {
         .setUserId(userId)
         .setRecommendedPlaces(places)
         .setUserTriedAgain(userTriedAgain);
-    if (chosenPlace != null) { userFeedback.setChosenPlace(chosenPlace); }
+    if (chosenPlace != null) {
+      userFeedback.setChosenPlace(chosenPlace);
+    }
     return userFeedback.build();
   }
 
