@@ -114,20 +114,14 @@ public class PlacesFetcher {
             (preferences.cuisines().isEmpty())
                 ? ImmutableList.<String>builder().addAll(CUISINE_TO_SEARCH_WORDS.keySet()).build()
                     : preferences.cuisines();
-        AtomicInteger attemptsCounter = new AtomicInteger(0);
+        int attemptsCounter = 0;
         do {
-            try {
-                placesSearchResults = cuisines.stream()
-                    .map(cuisine -> {
-                        attemptsCounter.getAndIncrement();
-                        getPlacesSearchResults(generateTextSearchRequest(
-                            preferences,
-                            INIT_SEARCH_RADIUS_M * attemptsCounter.intValue(),
-                            cuisine)
-                            );
-                        })
-                    .collect
-              } catch (ApiException
+            for (String cuisine: cuisines) {
+                attemptsCounter++;
+                try {
+                    cuisineResults = getPlacesSearchResults(generateTextSearchRequest(
+                        preferences, INIT_SEARCH_RADIUS_M * attemptsCounter, cuisine));
+                } catch (ApiException
                         | InterruptedException
                         | IOException
                         | IllegalStateException e) {
