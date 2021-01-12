@@ -1,3 +1,7 @@
+:root {
+  --special-font: 'FontAwesome';
+}
+
 .text-content {
   margin-left: auto;
   margin-right: auto;
@@ -198,7 +202,7 @@ h2 {
 .stars-outer {
   display: inline-block;
   position: relative;
-  font-family: 'FontAwesome', 'sans-serif' !important;
+  font-family: var(--special-font);
 }
 
 .stars-outer::before {
