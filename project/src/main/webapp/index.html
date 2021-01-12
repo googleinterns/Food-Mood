@@ -29,11 +29,22 @@
           <label for="cuisine-asian">Asian</label>
           <input type="checkbox" id="cuisine-sushi" name="cuisine" value="sushi">
           <label for="cuisine-sushi">Sushi</label>
-          <input type="checkbox" id="cuisine-hamburger" name="cuisine" value="hamburger">
-          <label for="cuisine-hamburger">Hamburger</label>
+          <input type="checkbox" id="cuisine-burger" name="cuisine" value="hamburger">
+          <label for="cuisine-burger">Burger</label>
           <br>
           <input type="checkbox" id="cuisine-salad" name="cuisine" value="salad">
           <label for="cuisine-salad">Salad</label>
+          <input type="checkbox" id="cuisine-hummus" name="cuisine" value="hummus">
+          <label for="cuisine-hummus">Hummus</label>
+          <input type="checkbox" id="cuisine-pizza" name="cuisine" value="pizza">
+          <label for="cuisine-pizza">Pizza</label>
+          <input type="checkbox" id="cuisine-indian" name="cuisine" value="indian">
+          <label for="cuisine-indian">Indian</label>
+          <br>
+          <input type="checkbox" id="cuisine-mexican" name="cuisine" value="mexican">
+          <label for="cuisine-mexican">Mexican</label>
+          <input type="checkbox" id="cuisine-sandwich" name="cuisine" value="sandwich">
+          <label for="cuisine-sandwich">Sandwich</label>
           <input type="checkbox" id="cuisine-homemade" name="cuisine" value="homemade">
           <label for="cuisine-homemade">Homemade</label>
         </form>
@@ -87,21 +98,21 @@
         <div id="map-error-container" class="error-text"></div>
         <div id="map"></div>
         <script> addMapWithSearchBox() </script>
-       </div>
-       <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
       </div>
-      <div id="results" style="display: none">
-        <div id="results-content-and-map">
-          <div id="results-content" class="results-content">
-            <h2>Food Mood's recommendation:</h2>
-            <div id="waiting-message">Please wait while we are finding the best results for you</div>
-            <div id="problem-message-container" class="error-text"></div>
-            <ol id="place"> </ol>
-          </div>
-          <div id="results-map-container"> </div>
+      <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
+    </div>
+    <div id="results" style="display: none">
+      <div id="results-content-and-map">
+        <div id="results-content" class="results-content">
+          <h2>Food Mood's recommendation:</h2>
+          <div id="waiting-message">Please wait while we are finding the best results for you</div>
+          <div id="problem-message-container" class="error-text"></div>
+          <ol id="place"> </ol>
         </div>
-        <div id="user-feedback-container" class="feedback-box" style="display: none">
-        Thank you, we received your Feedback!
+        <div id="results-map-container"> </div>
+      </div>
+      <div id="user-feedback-container" class="feedback-box" style="display: none">
+      Thank you, we received your Feedback!
       </div>
       <div id="feedback-box" class="feedback-box" style="display: none">
         <p>Like these options?<br> Let us know what you chose: <br></p>
