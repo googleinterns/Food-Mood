@@ -198,7 +198,7 @@ h2 {
 .stars-outer {
   display: inline-block;
   position: relative;
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', 'sans-serif';
 }
 
 .stars-outer::before {
