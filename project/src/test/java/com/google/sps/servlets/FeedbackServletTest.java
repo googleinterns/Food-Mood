@@ -15,23 +15,25 @@
 package com.google.sps.servlets;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import com.google.sps.data.DataAccessor;
+import com.google.sps.data.UserFeedback;
+import com.google.sps.data.UserVerifier;
 import java.util.Optional;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import com.google.sps.data.DataAccessor;
-import com.google.sps.data.UserFeedback;
-import com.google.sps.data.UserVerifier;
+import org.mockito.ArgumentMatcher;
 
 @RunWith(JUnit4.class)
 public class FeedbackServletTest {
@@ -54,15 +56,24 @@ public class FeedbackServletTest {
 
   @Test
   public void doPost_validToken_updatesFeedback() throws Exception {
-    mockValidRequestParams();
+    mockValidRequestParams(ID_TOKEN,
+        "place1,place2,place3" /* recommendedPlaces */,
+        "place1" /* chosenPlace */,
+        "false" /* tryAgain */);
     when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    // We are unable to make sure the exact function input, because we can't create an identical
-    // instance of "UserFeedback", because it has a time in milliseconds attribute.
-    verify(mockDataAccessor).updateUserFeedback(any(UserFeedback.class));
-}
+    // The parameters here must match those that are mocked in the request.
+    // We can't compare instances of UserFeedback, because of the "feedbackTimeInMillis" attribute.
+    verify(mockDataAccessor).updateUserFeedback(argThat(feedback -> {
+      return feedback != null
+          && feedback.userId().equals(USER_ID)
+          && feedback.recommendedPlaces().equals(ImmutableList.of("place1","place2","place3"))
+          && feedback.chosenPlace().equals(Optional.of("place1"))
+          && feedback.userTriedAgain() == false;
+    }));
+  }
 
   @Test
   public void doPost_invalidToken_badRequestResponseSent() throws Exception {
@@ -90,10 +101,11 @@ public class FeedbackServletTest {
 
   @Test
   public void doPost_invalidUserFeedback_badRequestResponseSent() throws Exception {
-    when(REQUEST.getParameter("idToken")).thenReturn(ID_TOKEN);
-    when(REQUEST.getParameter("recommendedPlaces")).thenReturn("place1,place2,place3");
-    when(REQUEST.getParameter("chosenPlace")).thenReturn("place4"); // Not in recommendedPlaces
-    when(REQUEST.getParameter("tryAgain")).thenReturn("true");
+    // Chosen place not in recommended places
+    mockValidRequestParams(ID_TOKEN,
+        "place1,place2,place3" /* recommendedPlaces */,
+        "place4" /* chosenPlace */,
+        "true" /* tryAgain */);
     when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
 
     servlet.doPost(REQUEST, RESPONSE);
@@ -108,5 +120,13 @@ public class FeedbackServletTest {
     when(REQUEST.getParameter("recommendedPlaces")).thenReturn("place1,place2,place3");
     when(REQUEST.getParameter("chosenPlace")).thenReturn("place1");
     when(REQUEST.getParameter("tryAgain")).thenReturn("false");
+  }
+
+  private void mockValidRequestParams(String idToken, String recommendedPlaces, String chosenPlace,
+      String tryAgain ) {
+    when(REQUEST.getParameter("idToken")).thenReturn(idToken);
+    when(REQUEST.getParameter("recommendedPlaces")).thenReturn(recommendedPlaces);
+    when(REQUEST.getParameter("chosenPlace")).thenReturn(chosenPlace);
+    when(REQUEST.getParameter("tryAgain")).thenReturn(tryAgain);
   }
 }
