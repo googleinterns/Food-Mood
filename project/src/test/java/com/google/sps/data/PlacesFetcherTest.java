@@ -303,7 +303,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    UserPreferences userPrefs = PREFERENCES_BUILDER.setCuisines(CUISINES_LIST).setOpenNow(true).build();
+    UserPreferences userPrefs =
+        PREFERENCES_BUILDER.setCuisines(CUISINES_LIST).setOpenNow(true).build();
     Place place1 = createValidPlace(NAME_1, PLACEID_1, CUISINES_SET);
     doReturn(new PlacesSearchResult[0])
       .doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })

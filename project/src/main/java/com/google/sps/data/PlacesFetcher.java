@@ -34,11 +34,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 
 public class PlacesFetcher {
@@ -139,7 +137,7 @@ public class PlacesFetcher {
         return createPlacesList(
             placesSearchResults.entrySet().stream()
                 .collect(ImmutableMap.toImmutableMap(
-                    Map.Entry::getKey, e-> e.getValue().build())));
+                    Map.Entry::getKey, e -> e.getValue().build())));
     }
 
     private TextSearchRequest generateTextSearchRequest(
