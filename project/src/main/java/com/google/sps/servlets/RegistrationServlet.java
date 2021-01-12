@@ -41,9 +41,9 @@ public final class RegistrationServlet extends HttpServlet {
   }
 
   @VisibleForTesting
-  void init(UserVerifier userVerifier, DataAccessor dataAccessor) {
-    this.userVerifier = userVerifier;
-    this.dataAccessor = dataAccessor;
+  void init(UserVerifier inUserVerifier, DataAccessor inDataAccessor) {
+    this.userVerifier = inUserVerifier;
+    this.dataAccessor = inDataAccessor;
   }
 
   @Override
@@ -61,7 +61,7 @@ public final class RegistrationServlet extends HttpServlet {
       return;
     }
     String finalUserId = optionalUserId.get();
-    if (!dataAccessor.isRegistered(finalUserId)){
+    if (!dataAccessor.isRegistered(finalUserId)) {
       dataAccessor.registerUser(finalUserId);
     }
   }
