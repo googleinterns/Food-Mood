@@ -125,6 +125,7 @@ public class PlacesFetcher {
                         | IOException
                         | IllegalStateException e) {
                     throw new FetcherException("Couldn't fetch places from Places API", e);
+                    // TODO(Tal): Treat differently if some results were found in other oterations
                 }
                 for (PlacesSearchResult result : resultsForCuisine) {
                     placesSearchResults.computeIfAbsent(

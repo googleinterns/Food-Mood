@@ -14,16 +14,15 @@
 
 package com.google.sps.data;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import com.google.maps.model.LatLng;
-import com.google.common.collect.ImmutableList;
-
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import com.google.maps.model.LatLng;
+import com.google.common.collect.ImmutableList;
 
 @RunWith(JUnit4.class)
 public final class PlaceTest {
