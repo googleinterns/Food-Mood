@@ -17,6 +17,7 @@ package com.google.sps.data;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PriceLevel;
@@ -35,10 +36,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.Map;
 
 public class PlacesFetcher {
@@ -107,7 +106,7 @@ public class PlacesFetcher {
      *     for places or for places details
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
-        Map<String, Set<String>> placesSearchResults = new HashMap<>();
+        Map<String, ImmutableSet.Builder<String>> placesSearchResults = new HashMap<>();
         PlacesSearchResult[] resultsForCuisine;
         // If user didn't choose any cuisines, search on all possible cuisines
         Collection<String> cuisines =
@@ -129,13 +128,16 @@ public class PlacesFetcher {
                 }
                 for (PlacesSearchResult result : resultsForCuisine) {
                     placesSearchResults.computeIfAbsent(
-                        result.placeId, k -> new HashSet<>()).add(cuisine);
+                        result.placeId, k -> new ImmutableSet.Builder<String>()).add(cuisine);
                 }
             }
         } while (
             placesSearchResults.size() < MIN_NUM_OF_RESULTS
             && attemptsCounter < MAX_NUM_OF_RADIUS_EXTENSIONS);
-        return createPlacesList(placesSearchResults);
+        return createPlacesList(
+            placesSearchResults.entrySet().stream()
+                .collect(ImmutableMap.toImmutableMap(
+                    Map.Entry::getKey, e-> e.getValue().build())));
     }
 
     private TextSearchRequest genTextSearchRequest(
@@ -167,8 +169,8 @@ public class PlacesFetcher {
         return query.await().results;
     }
 
-    private ImmutableList<Place> createPlacesList(Map<String, Set<String>> searchResults)
-            throws FetcherException {
+    private ImmutableList<Place> createPlacesList(
+            ImmutableMap<String, ImmutableSet<String>> searchResults) throws FetcherException {
         List<Place> places = new ArrayList<Place>();
         for (String placeId : searchResults.keySet()) {
             PlaceDetailsRequest detailsRequest = genPlaceDetailsRequest(placeId);
@@ -191,7 +193,7 @@ public class PlacesFetcher {
                     .setGoogleUrl(Objects.toString(placeDetails.url, ""))
                     .setBusinessStatus(BusinessStatus.valueOf(
                         Objects.toString(placeDetails.businessStatus, "UNKNOWN")))
-                    .setCuisines(ImmutableList.copyOf(searchResults.get(placeId)))
+                    .setCuisines(searchResults.get(placeId))
                     .build());
         }
         return ImmutableList.copyOf(places);

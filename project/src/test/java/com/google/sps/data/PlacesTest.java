@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.maps.model.LatLng;
 
 @RunWith(JUnit4.class)
@@ -223,6 +224,6 @@ public final class PlacesTest {
         .setGoogleUrl("googleurl.com")
         .setPlaceId("ChIJN1t_tDeuEmsRUsoyG83frY4")
         .setBusinessStatus(BusinessStatus.OPERATIONAL)
-        .setCuisines(ImmutableList.of("sushi", "hamburger"));
+        .setCuisines(ImmutableSet.of("sushi", "hamburger"));
   }
 }
