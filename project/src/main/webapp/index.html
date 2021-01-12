@@ -21,75 +21,86 @@
       <hr>
     </div>
     <div class="user-input" id="user-input">
-      <div id="query-form" class="query-form">
-        <form id="cuisines-form" class="form-element-toolbar">
-          <p>If you prefer specific cuisines, please select them:</p>
-          <input type="checkbox" id="cuisine-italian" name="cuisine" value="italian">
-          <label for="cuisine-italian">Italian</label>
-          <input type="checkbox" id="cuisine-asian" name="cuisine" value="asian">
-          <label for="cuisine-asian">Asian</label>
-          <input type="checkbox" id="cuisine-sushi" name="cuisine" value="sushi">
-          <label for="cuisine-sushi">Sushi</label>
-          <input type="checkbox" id="cuisine-hamburger" name="cuisine" value="hamburger">
-          <label for="cuisine-hamburger">Hamburger</label>
-          <br>
-          <input type="checkbox" id="cuisine-salad" name="cuisine" value="salad">
-          <label for="cuisine-salad">Salad</label>
-          <input type="checkbox" id="cuisine-homemade" name="cuisine" value="homemade">
-          <label for="cuisine-homemade">Homemade</label>
-        </form>
-        <form id="rating-form" class="form-element-toolbar">
-          <p>Desired rating (out of 5):</p>
-          <input type="radio" id="rating-0" name="rating" value="1" checked="checked">
-          <label for="rating-0">I don't mind</label>
-          <input type="radio" id="rating-1" name="rating" value="1">
-          <label for="rating-1">1 star</label>
-          <input type="radio" id="rating-2" name="rating" value="2">
-          <label for="rating-2">2 star</label>
-          <input type="radio" id="rating-3" name="rating" value="3">
-          <label for="rating-3">3 star</label>
-          <input type="radio" id="rating-4" name="rating" value="4">
-          <label for="rating-4">4 star</label>
-          <input type="radio" id="rating-5" name="rating" value="5">
-          <label for="rating-5">5 star</label>
-        </form>
-        <form id="price-form" class="form-element-toolbar">
-          <p>Desired price level:</p>
-          <input type="radio" id="price-all" name="price" value="4" checked="checked">
-          <label for="price-all">I don't mind</label>
-          <input type="radio" id="price-1" name="price" value="1">
-          <label for="price-1">Inexpensive</label>
-          <input type="radio" id="price-2" name="price" value="2">
-          <label for="price-2">Moderate</label>
-          <input type="radio" id="price-3" name="price" value="3">
-          <label for="price-3">Expensive</label>
-          <input type="radio" id="price-4" name="price" value="4">
-          <label for="price-4">Very Expensive</label>
-        </form>
-        <form id="open-now-form" class="form-element-toolbar">
-          <p>Should it be open now?</p>
-          <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
-          <label for="open-now-yes">Yes</label>
-          <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
-          <label for="open-now-dont-mind">I don't mind</label>
-        </form>
-        <div id="input-error-container" class="error-text"></div>
-      </div>
-      <div id="user-map-container">
-        <br> <br>
-        <form id="location-form" class="form-element-toolbar">
-          <input type="radio" id="device-location" class="device-location" name="location"
-          value="device-location" onclick="getDeviceLocationAndShowOnMap()">
-          <label for="device-location">Press here to use your device's location!</label>
-          <div id="map-warning-container">Please note: Mac devices might display an inaccurate location.
-            <br> It is recommended for Mac users to use the search box.</div>
-        </form>
-        <input id="location-input" class="controls" type="text" placeholder="Search Box"/>
-        <div id="map-error-container" class="error-text"></div>
-        <div id="map"></div>
-        <script> addMapWithSearchBox() </script>
-      </div>
-      <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
+    <div id="query-form" class="query-form">
+      <form id="cuisines-form" class="form-element-toolbar">
+        <p>If you prefer specific cuisines, please select them:</p>
+        <input type="checkbox" id="cuisine-italian" name="cuisine" value="italian">
+        <label for="cuisine-italian">Italian</label>
+        <input type="checkbox" id="cuisine-asian" name="cuisine" value="asian">
+        <label for="cuisine-asian">Asian</label>
+        <input type="checkbox" id="cuisine-sushi" name="cuisine" value="sushi">
+        <label for="cuisine-sushi">Sushi</label>
+        <input type="checkbox" id="cuisine-burger" name="cuisine" value="hamburger">
+        <label for="cuisine-burger">Burger</label>
+        <br>
+        <input type="checkbox" id="cuisine-salad" name="cuisine" value="salad">
+        <label for="cuisine-salad">Salad</label>
+        <input type="checkbox" id="cuisine-hummus" name="cuisine" value="hummus">
+        <label for="cuisine-hummus">Hummus</label>
+        <input type="checkbox" id="cuisine-pizza" name="cuisine" value="pizza">
+        <label for="cuisine-pizza">Pizza</label>
+        <input type="checkbox" id="cuisine-indian" name="cuisine" value="indian">
+        <label for="cuisine-indian">Indian</label>
+        <br>
+        <input type="checkbox" id="cuisine-mexican" name="cuisine" value="mexican">
+        <label for="cuisine-mexican">Mexican</label>
+        <input type="checkbox" id="cuisine-sandwich" name="cuisine" value="sandwich">
+        <label for="cuisine-sandwich">Sandwich</label>
+        <input type="checkbox" id="cuisine-homemade" name="cuisine" value="homemade">
+        <label for="cuisine-homemade">Homemade</label>
+      </form>
+      <form id="rating-form" class="form-element-toolbar">
+        <p>Desired rating (out of 5):</p>
+        <input type="radio" id="rating-0" name="rating" value="1" checked="checked">
+        <label for="rating-0">I don't mind</label>
+        <input type="radio" id="rating-1" name="rating" value="1">
+        <label for="rating-1">1 star</label>
+        <input type="radio" id="rating-2" name="rating" value="2">
+        <label for="rating-2">2 star</label>
+        <input type="radio" id="rating-3" name="rating" value="3">
+        <label for="rating-3">3 star</label>
+        <input type="radio" id="rating-4" name="rating" value="4">
+        <label for="rating-4">4 star</label>
+        <input type="radio" id="rating-5" name="rating" value="5">
+        <label for="rating-5">5 star</label>
+      </form>
+      <form id="price-form" class="form-element-toolbar">
+        <p>Desired price level:</p>
+        <input type="radio" id="price-all" name="price" value="4" checked="checked">
+        <label for="price-all">I don't mind</label>
+        <input type="radio" id="price-1" name="price" value="1">
+        <label for="price-1">Inexpensive</label>
+        <input type="radio" id="price-2" name="price" value="2">
+        <label for="price-2">Moderate</label>
+        <input type="radio" id="price-3" name="price" value="3">
+        <label for="price-3">Expensive</label>
+        <input type="radio" id="price-4" name="price" value="4">
+        <label for="price-4">Very Expensive</label>
+      </form>
+      <form id="open-now-form" class="form-element-toolbar">
+        <p>Should it be open now?</p>
+        <input type="radio" id="open-now-yes" name="open-now" value="1" checked="checked">
+        <label for="open-now-yes">Yes</label>
+        <input type="radio" id="open-now-dont-mind" name="open-now" value="0">
+        <label for="open-now-dont-mind">I don't mind</label>
+      </form>
+      <div id="input-error-container" class="error-text"></div>
+    </div>
+    <div id="user-map-container">
+      <br> <br>
+      <form id="location-form" class="form-element-toolbar">
+        <input type="radio" id="device-location" class="device-location" name="location"
+        value="device-location" onclick="getDeviceLocationAndShowOnMap()">
+        <label for="device-location">Press here to use your device's location!</label>
+        <div id="map-warning-container">Please note: Mac devices might display an inaccurate location.
+          <br> It is recommended for Mac users to use the search box.</div>
+      </form>
+      <input id="location-input" class="controls" type="text" placeholder="Search Box"/>
+      <div id="map-error-container" class="error-text"></div>
+      <div id="map"></div>
+      <script> addMapWithSearchBox() </script>
+     </div>
+     <input class="form-button" id="submit-query" value="Decide for me!" onclick="fetchFromQuery()">
     </div>
     <div id="results" style="display: none">
       <div id="results-content-and-map">
