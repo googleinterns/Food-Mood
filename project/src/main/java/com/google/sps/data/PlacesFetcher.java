@@ -107,17 +107,18 @@ public class PlacesFetcher {
      */
     public ImmutableList<Place> fetch(UserPreferences preferences) throws FetcherException {
         Map<String, ImmutableSet.Builder<String>> placesSearchResults = new HashMap<>();
-        PlacesSearchResult[] resultsForCuisine;
+        PlacesSearchResult[] cuisineResults;
         // If user didn't choose any cuisines, search on all possible cuisines
-        Collection<String> cuisines =
+        ImmutableList<String> cuisines =
             (preferences.cuisines().isEmpty())
-                ? CUISINE_TO_SEARCH_WORDS.keySet() : preferences.cuisines();
+                ? ImmutableList.<String>builder().addAll(CUISINE_TO_SEARCH_WORDS.keySet()).build()
+                    : preferences.cuisines();
         int attemptsCounter = 0;
         do {
             for (String cuisine: cuisines) {
                 attemptsCounter++;
                 try {
-                    resultsForCuisine = getPlacesSearchResults(genTextSearchRequest(
+                    cuisineResults = getPlacesSearchResults(generateTextSearchRequest(
                         preferences, INIT_SEARCH_RADIUS_M * attemptsCounter, cuisine));
                 } catch (ApiException
                         | InterruptedException
@@ -126,7 +127,7 @@ public class PlacesFetcher {
                     throw new FetcherException("Couldn't fetch places from Places API", e);
                     // TODO(Tal): Treat differently if some results were found in other oterations
                 }
-                for (PlacesSearchResult result : resultsForCuisine) {
+                for (PlacesSearchResult result : cuisineResults) {
                     placesSearchResults.computeIfAbsent(
                         result.placeId, k -> new ImmutableSet.Builder<String>()).add(cuisine);
                 }
@@ -140,7 +141,7 @@ public class PlacesFetcher {
                     Map.Entry::getKey, e-> e.getValue().build())));
     }
 
-    private TextSearchRequest genTextSearchRequest(
+    private TextSearchRequest generateTextSearchRequest(
             UserPreferences preferences, int radius, String cuisine) {
         TextSearchRequest request =
             searchRequestGenerator.create(cuisine);

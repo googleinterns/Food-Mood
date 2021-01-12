@@ -62,42 +62,16 @@ public final class PlacesFetcherTest {
   private static final ImmutableSet<String> CUISINES_SET =
       ImmutableSet.of("sushi", "hamburger"); // used for places
   private static final boolean OPEN_NOW = true;
-  private static final BusinessStatus BUSINESS_STATUS_1 =
-      BusinessStatus.OPERATIONAL; // used for Places and UserPreferences
-  private static final BusinessStatus BUSINESS_STATUS_2 =
+  private static final BusinessStatus BUSINESS_STATUS =
       BusinessStatus.UNKNOWN; // used for Places and UserPreferences
-  private static final String STRING_BUSINESS_STATUS_1 = "OPERATIONAL"; // used for PlaceDetails
-  private static final String STRING_BUSINESS_STATUS_2 = null; // used for PlaceDetails
+  private static final String STRING_BUSINESS_STATUS = null; // used for PlaceDetails
   private static final int MAX_NUM_OF_RADIUS_EXTENSIONS = 4;
 
-  /** Place IDs for valid PlacesSearchResults used in tests. */
+  /** Place IDs and names for valid PlacesSearchResults used in tests. */
   private static final String PLACEID_1 = "ChIJN1t_tDeuEmsRUsoyG83frY4";
   private static final String PLACEID_2 = "ChIJ02qnq0KuEmsRHUJF4zo1x4I";
-
-  /** Valid Place objects. */
-  private static final Place.Builder PLACE_1_BUILDER =
-      Place.builder()
-      .setName("name1")
-      .setWebsiteUrl(PLACE_WEBSITE)
-      .setPhone(PHONE)
-      .setRating(RATING)
-      .setPriceLevel(PRICE_LEVEL_INT)
-      .setLocation(LOCATION)
-      .setGoogleUrl(PLACE_GOOGLE_URL)
-      .setPlaceId(PLACEID_1)
-      .setBusinessStatus(BUSINESS_STATUS_1);
-
-  private static final Place.Builder PLACE_2_BUILDER =
-      Place.builder()
-      .setName("name2")
-      .setWebsiteUrl(PLACE_WEBSITE)
-      .setPhone(PHONE)
-      .setRating(RATING)
-      .setPriceLevel(PRICE_LEVEL_INT)
-      .setLocation(LOCATION)
-      .setGoogleUrl(PLACE_GOOGLE_URL)
-      .setPlaceId(PLACEID_2)
-      .setBusinessStatus(BUSINESS_STATUS_2);
+  private static final String NAME_1 = "name1";
+  private static final String NAME_2 = "name2";
 
   /** Valid UserPreferences builder. */
    private static final UserPreferences.Builder PREFERENCES_BUILDER =
@@ -121,12 +95,12 @@ public final class PlacesFetcherTest {
   /** Valid PlaceDetails. */
   private static final PlaceDetails PLACE_DETAILS_1 =
       createTestPlaceDetails(
-          "name1", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
-          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, STRING_BUSINESS_STATUS_1);
+          NAME_1, PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_1, STRING_BUSINESS_STATUS);
   private static final PlaceDetails PLACE_DETAILS_2 =
       createTestPlaceDetails(
-          "name2", PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
-          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_2, STRING_BUSINESS_STATUS_2);
+          NAME_2, PLACE_DETAILS_WEBSITE, PHONE, RATING, PRICE_LEVEL,
+          LOCATION, PLACE_DETAILS_GOOGLE_URL, PLACEID_2, STRING_BUSINESS_STATUS);
 
   private static URL createTestURL(String s) {
     try {
@@ -153,6 +127,23 @@ public final class PlacesFetcherTest {
     placeDetails.businessStatus = status;
     return placeDetails;
   }
+
+  private static Place createValidPlace(
+        String name, String placeId, ImmutableSet<String> cuisines) {
+    return Place.builder()
+    .setName(name)
+    .setWebsiteUrl(PLACE_WEBSITE)
+    .setPhone(PHONE)
+    .setRating(RATING)
+    .setPriceLevel(PRICE_LEVEL_INT)
+    .setLocation(LOCATION)
+    .setGoogleUrl(PLACE_GOOGLE_URL)
+    .setPlaceId(placeId)
+    .setBusinessStatus(BUSINESS_STATUS)
+    .setCuisines(cuisines)
+    .build();
+  }
+
 
   private static PlacesSearchResult createTestPlacesSearchResult(String placeId) {
     PlacesSearchResult searchResult = new PlacesSearchResult();
@@ -193,8 +184,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_validSearchResults_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    Place place1 = PLACE_1_BUILDER.setCuisines(ImmutableSet.of("asian", "sushi")).build();
-    Place place2 = PLACE_2_BUILDER.setCuisines(ImmutableSet.of("hamburger")).build();
+    Place place1 = createValidPlace(NAME_1, PLACEID_1, ImmutableSet.of("sushi", "asian"));
+    Place place2 = createValidPlace(NAME_2, PLACEID_2, ImmutableSet.of("hamburger"));
     UserPreferences userPrefs =
         PREFERENCES_BUILDER.setCuisines(ImmutableList.of("sushi", "asian", "hamburger")).build();
     doReturn(PLACE_DETAILS_1)
@@ -219,8 +210,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_noPreferedCuisines_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    Place place1 = PLACE_1_BUILDER.setCuisines(ImmutableSet.of("sushi")).build();
-    Place place2 = PLACE_2_BUILDER.setCuisines(ImmutableSet.of("sushi")).build();
+    Place place1 = createValidPlace(NAME_1, PLACEID_1, ImmutableSet.of("sushi"));
+    Place place2 = createValidPlace(NAME_2, PLACEID_2, ImmutableSet.of("sushi"));
     UserPreferences prefsNoCuisines = PREFERENCES_BUILDER.setCuisines(ImmutableList.of()).build();
     doReturn(PLACE_DETAILS_1)
       .when(spiedFetcher)
@@ -245,8 +236,8 @@ public final class PlacesFetcherTest {
   @Test
   public void fetch_noOpenNowPreference_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
-    Place place1 = PLACE_1_BUILDER.setCuisines(CUISINES_SET).build();
-    Place place2 = PLACE_2_BUILDER.setCuisines(CUISINES_SET).build();
+    Place place1 = createValidPlace(NAME_1, PLACEID_1, CUISINES_SET);
+    Place place2 = createValidPlace(NAME_2, PLACEID_2, CUISINES_SET);
     UserPreferences userPrefs =
         PREFERENCES_BUILDER.setCuisines(CUISINES_LIST).setOpenNow(false).build();
     doReturn(PLACE_DETAILS_1)
@@ -313,7 +304,7 @@ public final class PlacesFetcherTest {
   public void fetch_resultsOnlyAfterRadiusExtension_returnsListOfPlaces() throws Exception {
     PlacesFetcher spiedFetcher = spy(placesFetcher);
     UserPreferences userPrefs = PREFERENCES_BUILDER.setCuisines(CUISINES_LIST).setOpenNow(true).build();
-    Place place1 = PLACE_1_BUILDER.setCuisines(CUISINES_SET).build();
+    Place place1 = createValidPlace(NAME_1, PLACEID_1, CUISINES_SET);
     doReturn(new PlacesSearchResult[0])
       .doReturn(new PlacesSearchResult[] {SEARCH_RESULT_1 })
       .when(spiedFetcher)
