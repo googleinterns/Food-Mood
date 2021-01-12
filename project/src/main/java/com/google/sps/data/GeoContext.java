@@ -36,7 +36,7 @@ public final class GeoContext {
             synchronized (GeoContext.class) {
                 if (singleContextInstance == null) {
                     singleContextInstance = new GeoApiContext.Builder()
-                        .apiKey("AIza..")
+                    .apiKey(System.getenv("API_KEY"))
                         .build();
                 }
             }

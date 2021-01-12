@@ -50,10 +50,6 @@ public final class QueryServlet extends HttpServlet {
 
   @VisibleForTesting
   static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
-  static final SearchRequestGenerator SEARCH_REQUEST_GENERATOR =
-      new SearchRequestGeneratorImpl(GeoContext.getGeoApiContext());
-  static final PlaceDetailsRequestGenerator PLACE_DETAILS_REQUEST_GENERATOR =
-      new PlaceDetailsRequestGeneratorImpl(GeoContext.getGeoApiContext());
   private PlacesFetcher fetcher;
   private PlacesScorerFactory scorerFactory;
   private UserVerifier userVerifier;
@@ -61,8 +57,8 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher(SEARCH_REQUEST_GENERATOR, PLACE_DETAILS_REQUEST_GENERATOR);
-    userVerifier = UserVerifier.create("");
+    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+    userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
     dataAccessor = new DataAccessor();
     scorerFactory =
         new PlacesScorerFactory(GeoContext.getGeoApiContext(), userVerifier, dataAccessor);

@@ -50,6 +50,15 @@ import com.google.sps.data.UserVerifier;
 @RunWith(JUnit4.class)
 public final class QueryServletTest {
 
+  private static final String RATING = "4";
+  private static final String PRICE_LEVEL = "3";
+  private static final String OPEN_NOW_STRING = "1";
+  private static final Boolean OPEN_NOW = true;
+  private static final String LOCATION_STRING = "30.30,35.35";
+  private static final LatLng LOCATION = new LatLng(30.30, 35.35);
+  private static final String CUISINES_STRING = "sushi,hamburger";
+  private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "hamburger");
+  private static final String VALID_ID_TOKEN = "token";
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
@@ -163,18 +172,7 @@ public final class QueryServletTest {
   // parameters. The crucial point of the test is that the strings that are given as parameters
   // match the expect user preferences.
   public void postRequest_userPreferencesForwardedToFetcher() throws Exception {
-    when(REQUEST.getParameter("rating")).thenReturn("4");
-    when(REQUEST.getParameter("price")).thenReturn("3");
-    when(REQUEST.getParameter("open")).thenReturn("1");
-    when(REQUEST.getParameter("location")).thenReturn("35.35000000,30.00000000");
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
-    UserPreferences expectedUserPrefs = UserPreferences.builder()
-        .setMinRating(4)
-        .setMaxPriceLevel(3)
-        .setOpenNow(true)
-        .setLocation(new LatLng(35.35000000, 30.00000000))
-        .setCuisines(ImmutableList.of("sushi", "hamburger"))
-        .build();
+    UserPreferences expectedUserPrefs = createUserPreferences();
 
     servlet.doPost(REQUEST, RESPONSE);
 
@@ -197,21 +195,9 @@ public final class QueryServletTest {
   // This test checks that storeUserPreferences is called with the expected parameters
   // when the servlet gets a valid ID token
   public void postRequest_validIdToken_userIdAndPreferencesForwardedForStoring() throws Exception {
-    when(REQUEST.getParameter("rating")).thenReturn("4");
-    when(REQUEST.getParameter("price")).thenReturn("3");
-    when(REQUEST.getParameter("open")).thenReturn("1");
-    when(REQUEST.getParameter("location")).thenReturn("35.35000000,30.00000000");
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
-    when(REQUEST.getParameter("idToken")).thenReturn("token");
     when(FETCHER.fetch(any(UserPreferences.class))).thenReturn(ImmutableList.of());
-    when(USER_VERIFIER.getUserIdByToken("token")).thenReturn(Optional.of("userId"));
-    UserPreferences expectedUserPrefs = UserPreferences.builder()
-        .setMinRating(4)
-        .setMaxPriceLevel(3)
-        .setOpenNow(true)
-        .setLocation(new LatLng(35.35000000, 30.00000000))
-        .setCuisines(ImmutableList.of("sushi", "hamburger"))
-        .build();
+    when(USER_VERIFIER.getUserIdByToken(VALID_ID_TOKEN)).thenReturn(Optional.of("userId"));
+    UserPreferences expectedUserPrefs = createUserPreferences();
 
     servlet.doPost(REQUEST, RESPONSE);
 
@@ -274,11 +260,21 @@ public final class QueryServletTest {
 
   // Initialize the parameters for the mocked http request, with constant valid values.
   private void initializeRequestParameters() {
-    when(REQUEST.getParameter("rating")).thenReturn("4");
-    when(REQUEST.getParameter("price")).thenReturn("3");
-    when(REQUEST.getParameter("open")).thenReturn("1");
-    when(REQUEST.getParameter("location")).thenReturn("30.30,35.35");
-    when(REQUEST.getParameter("cuisines")).thenReturn("sushi,hamburger");
-    when(REQUEST.getParameter("idToken")).thenReturn("token");
+    when(REQUEST.getParameter("rating")).thenReturn(RATING);
+    when(REQUEST.getParameter("price")).thenReturn(PRICE_LEVEL);
+    when(REQUEST.getParameter("open")).thenReturn(OPEN_NOW_STRING);
+    when(REQUEST.getParameter("location")).thenReturn(LOCATION_STRING);
+    when(REQUEST.getParameter("cuisines")).thenReturn(CUISINES_STRING);
+    when(REQUEST.getParameter("idToken")).thenReturn(VALID_ID_TOKEN);
+  }
+
+  private static UserPreferences createUserPreferences() {
+    return UserPreferences.builder()
+      .setMinRating(Float.parseFloat(RATING))
+      .setMaxPriceLevel(Integer.parseInt(PRICE_LEVEL))
+      .setOpenNow(OPEN_NOW)
+      .setLocation(LOCATION)
+      .setCuisines(CUISINES)
+      .build();
   }
 }
