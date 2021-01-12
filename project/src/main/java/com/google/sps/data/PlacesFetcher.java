@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 
 public class PlacesFetcher {
@@ -113,14 +114,20 @@ public class PlacesFetcher {
             (preferences.cuisines().isEmpty())
                 ? ImmutableList.<String>builder().addAll(CUISINE_TO_SEARCH_WORDS.keySet()).build()
                     : preferences.cuisines();
-        int attemptsCounter = 0;
+        AtomicInteger attemptsCounter = new AtomicInteger(0);
         do {
-            for (String cuisine: cuisines) {
-                attemptsCounter++;
-                try {
-                    cuisineResults = getPlacesSearchResults(generateTextSearchRequest(
-                        preferences, INIT_SEARCH_RADIUS_M * attemptsCounter, cuisine));
-                } catch (ApiException
+            try {
+                placesSearchResults = cuisines.stream()
+                    .map(cuisine -> {
+                        attemptsCounter.getAndIncrement();
+                        getPlacesSearchResults(generateTextSearchRequest(
+                            preferences,
+                            INIT_SEARCH_RADIUS_M * attemptsCounter.intValue(),
+                            cuisine)
+                            );
+                        })
+                    .collect
+              } catch (ApiException
                         | InterruptedException
                         | IOException
                         | IllegalStateException e) {
