@@ -16,11 +16,7 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
     private static final double CUISINES_WEIGHT = 0.2;
 
     // The maximum possible rating as defined by the Google Places API.
-    private static final double MAX_RATING = 5; // ################### Move this to interface? To factory and then pass it to each constructor?
-
-    // The maximum durations in seconds, so that any duration higher than that
-    // will not contribute to the place's score.
-    private static final double MAX_DURATION_SECONDS = 40 * 60; // ################ Move this to interface? To factory and then pass it to each constructor?
+    private static final double MAX_RATING = 5; // Consult where this should be
 
     // A duratoins techer used for calculating driving durations.
     private DurationsFetcher durationsFetcher;
@@ -53,14 +49,14 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
     @Override
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
-        ImmutableMap<Place, Long> durations;
-        ImmutableMap<String, Long> historicalCuisinesPreferences =
-            dataAccessor.getPreferredCuisines(userId);
+        ImmutableMap<Place, Double> durations;
+        ImmutableMap<Place, Double> historicalCuisinesPreferences =
+            calculatePreferenceFrequencyForPlace(places);
         try {
             durations =
-                durationsFetcher.getDurations(places, userLocation, (long) MAX_DURATION_SECONDS);
+                durationsFetcher.getDurations(places, userLocation);
         } catch (ApiException | InterruptedException | IOException e) {
-            return scoreByRating(places); // TODO(Tal): log error
+            return scoreByRatingandCuisines(places, historicalCuisinesPreferences);
         }
         ImmutableMap.Builder<Place, Double> scores = new ImmutableMap.Builder<>();
         for (Place place : places) {
@@ -73,23 +69,39 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
     // Calculates a score for place,
     // score calculated by the place's rating and driving duration to the user's location.
     private double calculatePlaceScore(
-            ImmutableMap<Place, Long> durations,
+            ImmutableMap<Place, Double> durations,
             Place place,
-            ImmutableMap<String, Long> cuisinesPreferencesHistory) {
-        double totalPreferences =
-            cuisinesPreferencesHistory.values().stream().mapToDouble(Long::doubleValue).sum();
-        double frequencyOfMostPreferedCuisine = place.cuisines().stream()
-            .map(cuisine -> cuisinesPreferencesHistory.get(cuisine))
-            .max(Comparator.comparing(Long::valueOf)).get() / totalPreferences ;
+            ImmutableMap<Place, Double> cuisinesPreferencesHistory) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
-            + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0)
-            + CUISINES_WEIGHT * frequencyOfMostPreferedCuisine;
+            + DURATION_WEIGHT * Math.max(1 - (durations.get(place)), 0)
+            + CUISINES_WEIGHT * cuisinesPreferencesHistory.get(place);
     }
 
-    // Scores places by their rating only, used in case of errors in durations calculation.
-    private ImmutableMap<Place, Double> scoreByRating(ImmutableList<Place> places) {
+    // Creates a map between a place and the relative frequency the user
+    // preferred the place's most preferred cuisine.
+    private ImmutableMap<Place, Double> calculatePreferenceFrequencyForPlace(
+            ImmutableList<Place> places) {
+        ImmutableMap<String, Long> cuisinesPreferencesHistory =
+            dataAccessor.getPreferredCuisines(userId);
+        double totalPreferences =
+            cuisinesPreferencesHistory.values().stream().mapToDouble(Long::doubleValue).sum();
+            return places.stream().collect(
+                ImmutableMap.toImmutableMap(
+                    place -> place,
+                    place ->
+                        place.cuisines().stream()
+                        .map(cuisine -> cuisinesPreferencesHistory.get(cuisine))
+                        .max(Comparator.comparing(Long::valueOf)).get() / totalPreferences));
+    }
+
+    // Scores places by their rating and cuisines only, used in case of errors in durations calculation.
+    private ImmutableMap<Place, Double> scoreByRatingandCuisines(
+            ImmutableList<Place> places,
+            ImmutableMap<Place, Double> cuisinesPreferencesHistory) {
         return places.stream().collect(
-            ImmutableMap.toImmutableMap(place -> place, place -> place.rating() / MAX_RATING));
+            ImmutableMap.toImmutableMap(place -> place,
+            place ->
+                0.5 * place.rating() / MAX_RATING + 0.5 * cuisinesPreferencesHistory.get(place)));
     }
 }

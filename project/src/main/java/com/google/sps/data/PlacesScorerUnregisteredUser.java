@@ -1,6 +1,8 @@
 package com.google.sps.data;
 
 import java.io.IOException;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.maps.GeoApiContext;
@@ -16,10 +18,6 @@ public class PlacesScorerUnregisteredUser implements PlacesScorer {
     // The maximum possible rating as defined by the Google Places API.
     private static final double MAX_RATING = 5;
 
-    // The maximum durations in seconds, so that any duration higher than that
-    // will not contribute to the place's score.
-    private static final double MAX_DURATION_SECONDS = 40 * 60;
-
     // A duratoins techer used for calculating driving durations.
     private DurationsFetcher durationsFetcher;
 
@@ -33,6 +31,17 @@ public class PlacesScorerUnregisteredUser implements PlacesScorer {
     }
 
     /**
+     * PlacesScorerRegisteredUser constructor used for tests.
+     *
+     * @param durationsFetcher
+     *     used for fetching the driving durations from each place to the user's location
+     */
+    @VisibleForTesting
+    PlacesScorerUnregisteredUser(DurationsFetcher inputDurationsFetcher) {
+        this.durationsFetcher = inputDurationsFetcher;
+    }
+
+    /**
      * {@inheritDoc}
      *
      * Calculates scores based on driving duration to the user’s location and rating
@@ -40,10 +49,10 @@ public class PlacesScorerUnregisteredUser implements PlacesScorer {
     @Override
     public ImmutableMap<Place, Double> getScores(
             ImmutableList<Place> places, LatLng userLocation) {
-        ImmutableMap<Place, Long> durations;
+        ImmutableMap<Place, Double> durations;
         try {
             durations =
-                durationsFetcher.getDurations(places, userLocation, (long) MAX_DURATION_SECONDS);
+                durationsFetcher.getDurations(places, userLocation);
         } catch (ApiException | InterruptedException | IOException e) {
             return scoreByRating(places); // TODO(Tal): log error
         }
@@ -56,10 +65,10 @@ public class PlacesScorerUnregisteredUser implements PlacesScorer {
 
     // Calculates a score for place,
     // score calculated by the place's rating and driving duration to the user's location.
-    private double calculatePlaceScore(ImmutableMap<Place, Long> durations, Place place) {
+    private double calculatePlaceScore(ImmutableMap<Place, Double> durations, Place place) {
         return
             RATING_WEIGHT * (place.rating() / MAX_RATING)
-            + DURATION_WEIGHT * Math.max(1 - (durations.get(place) / MAX_DURATION_SECONDS), 0);
+            + DURATION_WEIGHT * Math.max(1 - (durations.get(place)), 0);
     }
 
     // Scores places by their rating only, used in case of errors in durations calculation.

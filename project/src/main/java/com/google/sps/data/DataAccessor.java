@@ -33,7 +33,6 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.repackaged.com.google.api.client.util.Strings;
 import com.google.common.collect.ImmutableMap;
 
 public class DataAccessor {
@@ -148,7 +147,7 @@ public class DataAccessor {
     if (!userPreferences.cuisines().isEmpty()) {
       Entity prefsEntity = new Entity(PREFERNCES_ENTITY_KIND);
       prefsEntity.setProperty("userId", userId);
-      prefsEntity.setProperty("date", new Date()); // TODO(Tal): Deal with try again sessions
+      prefsEntity.setProperty("date", new Date());
       prefsEntity.setProperty("preferedCuisines", userPreferences.cuisines());
       datastoreService.put(prefsEntity);
     }
@@ -161,6 +160,7 @@ public class DataAccessor {
    */
   @SuppressWarnings("unchecked")
   public ImmutableMap<String, Long> getPreferredCuisines(String userId) {
+    checkArgument(!isNullOrEmpty(userId), INVALID_USER_MSG);
     Filter userIdFilter = new Query.FilterPredicate("userId", FilterOperator.EQUAL, userId);
     Query query = new Query(DataAccessor.PREFERNCES_ENTITY_KIND).setFilter(userIdFilter);
     List<Entity> results =

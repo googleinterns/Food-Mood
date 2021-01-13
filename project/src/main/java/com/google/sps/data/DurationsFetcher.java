@@ -16,6 +16,10 @@ import com.google.maps.model.TravelMode;
 
 public class DurationsFetcher {
 
+    // The maximum durations in seconds, so that any duration higher than that
+    // will not contribute to the place's score.
+    private static final double MAX_DURATION_SECONDS = 40 * 60;
+
     // The entry point for a Google GEO API request.
     private GeoApiContext context;
 
@@ -29,20 +33,19 @@ public class DurationsFetcher {
     }
 
     /**
-     * Gets driving duration from each place to the destination using Google Distance Matrix API.
+     * Gets the driving duration from each place to the destination using Google Distance Matrix API,
+     * relative to Max Duration.
      *
      * @param places a list of places do get durations from
      * @param destination the destination to calculate durations to
-     * @param maxDurations the durations used in case of an error
-     * @return the duration in seconds from each place on places list to the destination
+     * @return the relative duration from each place on places list to the destination
      * @throws IOException Thrown when an I/O exception of some sort has occurred
      * @throws InterruptedException Thrown when a thread is occupied and interrupted
      * @throws ApiException Thrown if the API returned result is an error
      */
-    public ImmutableMap<Place, Long> getDurations(
-            ImmutableList<Place> places, LatLng destination, long defaultDurations)
+    public ImmutableMap<Place, Double> getDurations(ImmutableList<Place> places, LatLng destination)
             throws ApiException, InterruptedException, IOException {
-        ImmutableMap.Builder<Place, Long> durations = new ImmutableMap.Builder<>();
+        ImmutableMap.Builder<Place, Double> durations = new ImmutableMap.Builder<>();
         LatLng[] origins = places.stream()
             .map(place -> place.location()).toArray(LatLng[]::new);
         DistanceMatrixApiRequest distanceRequest =
@@ -54,9 +57,9 @@ public class DurationsFetcher {
         for (int i = 0; i < places.size(); i++) {
             DistanceMatrixElement element = distanceMatrix.rows[i].elements[0];
             if (element.status == DistanceMatrixElementStatus.OK) {
-                durations.put(places.get(i), element.duration.inSeconds);
+                durations.put(places.get(i), element.duration.inSeconds / MAX_DURATION_SECONDS);
             } else { // TODO(Tal): decide if this place should be filtered out
-                durations.put(places.get(i), defaultDurations);
+                durations.put(places.get(i), 1D);
             }
         }
         return durations.build();
