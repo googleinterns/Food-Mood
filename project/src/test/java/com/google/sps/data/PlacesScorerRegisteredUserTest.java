@@ -14,8 +14,10 @@
 
 package com.google.sps.data;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -126,16 +128,12 @@ public class PlacesScorerRegisteredUserTest {
             createPlaceByRatingAndCuisines("place1", 3F, ImmutableList.of("sushi"));
         Place placeWithRating5 =
             createPlaceByRatingAndCuisines("place2", 5F, ImmutableList.of("hamburger"));
-        when(DURATIONS_FETCHER.getDurations(
-            ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION))
-            .thenThrow(new IOException());
+        ImmutableList<Place> places = ImmutableList.of(placeWithRating3, placeWithRating5);
         when(DATA_ACCESSOR.getPreferredCuisines(USER_ID)).thenReturn(ImmutableMap.of());
 
-        ImmutableMap<Place, Double> result =
-            scorer.getScores(
-                ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION);
+        scorer.getScores(ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION);
 
-        // Validate!!
+        verify(any(PlacesScorerUnregisteredUser.class)).getScores(places, USER_LOCATION);
     }
 
     private static final Place createPlaceByRatingAndCuisines(
