@@ -2,10 +2,8 @@ package com.google.sps.data;
 
 import java.io.IOException;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.maps.GeoApiContext;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.LatLng;
 
@@ -18,26 +16,16 @@ public class PlacesScorerUnregisteredUser implements PlacesScorer {
     // The maximum possible rating as defined by the Google Places API.
     private static final double MAX_RATING = 5;
 
-    // A duratoins techer used for calculating driving durations.
+    // A duratoins fetcher used for calculating driving durations.
     private DurationsFetcher durationsFetcher;
 
     /**
      * PlacesScorerUnregisteredUser constructor.
      *
-     * @param geoApiContext the GeoApiContext used for all Google GEO API requests
-     */
-    public PlacesScorerUnregisteredUser(GeoApiContext geoApiContext) {
-        this.durationsFetcher = new DurationsFetcher(geoApiContext);
-    }
-
-    /**
-     * PlacesScorerRegisteredUser constructor used for tests.
-     *
      * @param durationsFetcher
      *     used for fetching the driving durations from each place to the user's location
      */
-    @VisibleForTesting
-    PlacesScorerUnregisteredUser(DurationsFetcher inputDurationsFetcher) {
+    public PlacesScorerUnregisteredUser(DurationsFetcher inputDurationsFetcher) {
         this.durationsFetcher = inputDurationsFetcher;
     }
 

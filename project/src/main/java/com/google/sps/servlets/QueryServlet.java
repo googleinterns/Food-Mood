@@ -33,10 +33,6 @@ import com.google.sps.data.PlacesFetcher;
 import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.UserPreferences;
 import com.google.sps.data.PlacesScorerFactory;
-import com.google.sps.data.SearchRequestGenerator;
-import com.google.sps.data.SearchRequestGeneratorImpl;
-import com.google.sps.data.PlaceDetailsRequestGenerator;
-import com.google.sps.data.PlaceDetailsRequestGeneratorImpl;
 import com.google.sps.data.DataAccessor;
 import com.google.sps.data.UserVerifier;
 

@@ -15,6 +15,9 @@ public class PlacesScorerFactory {
     // The DataAccessor passed to the PlacesScorerRegisteredUser constructor.
     private DataAccessor dataAccessor;
 
+    // The DurationsFetcher used for calculating driving durations.
+    private DurationsFetcher durationsFetcher;
+
     /**
      * PlacesScorerFactory constructor.
      *
@@ -27,6 +30,7 @@ public class PlacesScorerFactory {
         this.context = geoApiContext;
         this.userVerifier = verifier;
         this.dataAccessor = accessor;
+        this.durationsFetcher = new DurationsFetcher(geoApiContext);
     }
 
     /**
@@ -39,9 +43,10 @@ public class PlacesScorerFactory {
     public PlacesScorer create(String userIdToken) {
         Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
         if (optionalUserId.isPresent()) {
-            return new PlacesScorerRegisteredUser(context, optionalUserId.get(), dataAccessor);
+            return new PlacesScorerRegisteredUser(
+                optionalUserId.get(), dataAccessor, durationsFetcher);
         } else {
-            return new PlacesScorerUnregisteredUser(context);
+            return new PlacesScorerUnregisteredUser(durationsFetcher);
         }
     }
 }
