@@ -44,7 +44,10 @@ public class PlacesScorerFactory {
         Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
         if (optionalUserId.isPresent()) {
             return new PlacesScorerRegisteredUser(
-                optionalUserId.get(), dataAccessor, durationsFetcher);
+                optionalUserId.get(),
+                dataAccessor,
+                durationsFetcher,
+                new PlacesScorerUnregisteredUser(durationsFetcher));
         } else {
             return new PlacesScorerUnregisteredUser(durationsFetcher);
         }

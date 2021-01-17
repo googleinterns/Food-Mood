@@ -28,6 +28,9 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
     // A data accessor used for retrieving data from the user's data base.
     private DataAccessor dataAccessor;
 
+    // A data accessor used for retrieving data from the user's data base.
+    private PlacesScorerUnregisteredUser scorerUnregisteredUser;
+
     /**
      * PlacesScorerRegisteredUser constructor.
      *
@@ -35,14 +38,17 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
      * @param userId the ID of the user the scores are calculated for
      * @param durationsFetcher
      *     used for fetching the driving durations from each place to the user's location
+     * @param inputScorerUnregistered used for scoring if there is no date stored for the user
      */
     public PlacesScorerRegisteredUser(
             String inputUserId,
             DataAccessor inputDataAccessor,
-            DurationsFetcher inputDurationsFetcher) {
+            DurationsFetcher inputDurationsFetcher,
+            PlacesScorerUnregisteredUser inputScorerUnregistered) {
         this.userId = inputUserId;
         this.dataAccessor = inputDataAccessor;
         this.durationsFetcher = inputDurationsFetcher;
+        this.scorerUnregisteredUser = inputScorerUnregistered;
     }
 
     /**
@@ -57,8 +63,7 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
         ImmutableMap<Place, Double> historicalCuisinesPreferences =
             calculatePreferenceFrequencyForPlace(places);
         if(historicalCuisinesPreferences.isEmpty()) {
-            return new PlacesScorerUnregisteredUser(durationsFetcher)
-                .getScores(places, userLocation);
+            return scorerUnregisteredUser.getScores(places, userLocation);
         }
         ImmutableMap<Place, Double> durations;
         try {
@@ -106,7 +111,7 @@ public class PlacesScorerRegisteredUser implements PlacesScorer {
                     place -> place,
                     place ->
                         place.cuisines().stream()
-                        .map(cuisine -> cuisinesPreferencesHistory.get(cuisine))
+                        .map(cuisine -> cuisinesPreferencesHistory.getOrDefault(cuisine, 0L))
                         .max(Comparator.comparing(Long::valueOf)).get() / totalPreferences));
     }
 

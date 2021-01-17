@@ -14,12 +14,11 @@
 
 package com.google.sps.data;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import org.junit.Before;
@@ -35,18 +34,20 @@ public class PlacesScorerRegisteredUserTest {
 
     // Used for double comparasions to avoid differences resulting from double representations.
     private static final double DELTA = 0.0001;
-
     private static final LatLng USER_LOCATION = new LatLng(33.12, 34.56);
     private static final String USER_ID = "userId";
     private static final DataAccessor DATA_ACCESSOR = mock(DataAccessor.class);
     private static final DurationsFetcher DURATIONS_FETCHER = mock(DurationsFetcher.class);
+    private static final PlacesScorerUnregisteredUser UNREGISTERED_SCORER =
+        mock(PlacesScorerUnregisteredUser.class);
 
     PlacesScorerRegisteredUser scorer;
 
     @Before
     public void setUp() throws Exception {
-        scorer = new PlacesScorerRegisteredUser(USER_ID, DATA_ACCESSOR, DURATIONS_FETCHER);
         clearInvocations(DURATIONS_FETCHER);
+        scorer = new PlacesScorerRegisteredUser(
+            USER_ID, DATA_ACCESSOR, DURATIONS_FETCHER, UNREGISTERED_SCORER);
     }
 
     @Test
@@ -83,7 +84,7 @@ public class PlacesScorerRegisteredUserTest {
 
     @Test
     public void getScores_emptyPlaceList_returnsEmptyMap() throws Exception {
-        when(DURATIONS_FETCHER.getDurations(ImmutableList.of(), USER_LOCATION))
+        when((UNREGISTERED_SCORER).getScores(ImmutableList.of(), USER_LOCATION))
             .thenReturn(ImmutableMap.of());
         when(DATA_ACCESSOR.getPreferredCuisines(USER_ID))
             .thenReturn(ImmutableMap.of("hamburger", 1L));
@@ -129,11 +130,12 @@ public class PlacesScorerRegisteredUserTest {
         Place placeWithRating5 =
             createPlaceByRatingAndCuisines("place2", 5F, ImmutableList.of("hamburger"));
         ImmutableList<Place> places = ImmutableList.of(placeWithRating3, placeWithRating5);
-        when(DATA_ACCESSOR.getPreferredCuisines(USER_ID)).thenReturn(ImmutableMap.of());
+        when(DATA_ACCESSOR.getPreferredCuisines(USER_ID))
+            .thenReturn(ImmutableMap.of());
 
-        scorer.getScores(ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION);
+        scorer.getScores(places, USER_LOCATION);
 
-        verify(any(PlacesScorerUnregisteredUser.class)).getScores(places, USER_LOCATION);
+        verify(UNREGISTERED_SCORER).getScores(places, USER_LOCATION);
     }
 
     private static final Place createPlaceByRatingAndCuisines(
