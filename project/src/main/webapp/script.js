@@ -21,6 +21,9 @@ let globalUserMap;
 // The current Google user.
 let googleUser = null;
 
+// The current places that were recommended to the user.
+let recommendedPlaces = null;
+
 /**
  * Fetches recommended places from the 'query' servlet, and switches from the query form to the
  * results elements in order to display them to the user.
@@ -48,6 +51,7 @@ function fetchFromQuery() {
   fetch('/query?' + params, {method: 'POST'})
       .then(response => response.json())
       .then((places) => {
+        recommendedPlaces = places;
         places.forEach((singlePlace) => {
           placesDiv.appendChild(createPlaceElement(singlePlace));
           addPlaceMarker(map, singlePlace)
@@ -211,13 +215,13 @@ function addRatingStarsToElement(element, rating) {
  * Displays the query form to the user and hides the results, so that the user can try to get new
  * results.
  */
-function tryAgain() {
+function tryAgainAndSendFeedback() {
   document.getElementById('user-input').style.display = 'block';
   document.getElementById('results').style.display = 'none';
   document.getElementById('waiting-message').style.display = 'block'
-  document.getElementById('place').innerText = '';
-  document.getElementById('map-error-container').innerText = '';
-  document.getElementById('input-error-container').innerText = '';
+  clearAllMessages();
+
+  postUserFeedback(null /** place user chose */, true /** user tried again */)
 }
 
 /** Clears all the messages that are displayed to the user during the user session. */
@@ -226,6 +230,7 @@ function clearAllMessages() {
   document.getElementById('map-error-container').innerText = '';
   document.getElementById('input-error-container').innerText = '';
   document.getElementById('problem-message-container').innerText = '';
+  document.getElementById('user-feedback-container').innerText = '';
 }
 
 /**
@@ -407,6 +412,7 @@ function onSignIn(user) {
   registerUserByToken();
   document.getElementById('sign-out-button').style.display = 'inline-block';
   document.getElementById('old-new-form').style.display = 'block';
+  document.getElementById('feedback-box').style.display = 'inline-block';
 }
 
 /** Called when a user signs out of a Google account, updates the screen and the global user. */
@@ -417,6 +423,7 @@ function signOut() {
   googleUser = null;
   document.getElementById('sign-out-button').style.display = 'none';
   document.getElementById('old-new-form').style.display = 'none';
+  document.getElementById('feedback-box').style.display = 'none';
 }
 
 /** Registers the logged in user, using the registration servlet. */
@@ -425,4 +432,33 @@ function registerUserByToken() {
     return;
   }
   fetch('/register?idToken=' + googleUser.getAuthResponse().id_token, {method: 'POST'});
+}
+
+/** Sends feedback that includes the place the user chose. */
+function sendUserChoiceAsFeedback() {
+  let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
+      'Please select the place that you chose.');
+  if (indexOfPlaceUserChose <= recommendedPlaces.length) {
+    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
+        false /** user tried again */)
+  }
+}
+
+/** Sends the user feedback to the feedback servlet, and clears the recommendedPlaces variable. */
+function postUserFeedback(chosenPlaceId, tryAgain) {
+  if (!googleUser) {
+    return;
+  }
+  let recommendedPlacesIdArr = [];
+  recommendedPlaces.forEach((place) => recommendedPlacesIdArr.push(place.placeId));
+  let params = [
+    `idToken=${getUserIdToken()}`,
+    `recommendedPlaces=${recommendedPlacesIdArr.join(',')}`,
+    `chosenPlace=${chosenPlaceId}`,
+    `tryAgain=${tryAgain}`
+  ].join('&');
+  fetch('/feedback?' + params, {method: 'POST'});
+  document.getElementById('user-feedback-container').innerText =
+      'Thank you, your feedback was received!';
+  recommendedPlaces = null
 }

@@ -14,20 +14,24 @@
 
 package com.google.sps.servlets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import java.io.IOException;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import com.google.sps.data.DataAccessor;
+import com.google.sps.data.UserFeedback;
 import com.google.sps.data.UserVerifier;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 
-/** A servlet that registers a user, according to a given token. */
-@WebServlet("/register")
+/** A servlet that is responsible on storing users' feedback. */
+@WebServlet("/feedback")
 @SuppressWarnings("serial")
-public final class RegistrationServlet extends HttpServlet {
+public final class FeedbackServlet extends HttpServlet {
 
   private UserVerifier userVerifier;
   private DataAccessor dataAccessor;
@@ -47,12 +51,23 @@ public final class RegistrationServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Optional<String> optionalUserId = TokenValidator.validateAndGetId(
-          request, response, userVerifier, "registartion" /* validationPurpose */);
-    if (optionalUserId.isPresent()) {
-      String finalUserId = optionalUserId.get();
-      if (!dataAccessor.isRegistered(finalUserId)) {
-        dataAccessor.registerUser(finalUserId);
+          request, response, userVerifier, "store user feedback" /* validationPurpose */);
+    if (!optionalUserId.isPresent()) {
+      return;
+    }
+    try {
+      UserFeedback.Builder feedback = UserFeedback.builder()
+          .setUserId(optionalUserId.get())
+          .setRecommendedPlaces(
+              ImmutableList.copyOf(request.getParameter("recommendedPlaces").split(",")))
+          .setUserTriedAgain(request.getParameter("tryAgain").equals("true"));
+      String chosenPlace = request.getParameter("chosenPlace");
+      if (!isNullOrEmpty(chosenPlace)) {
+        feedback.setChosenPlace(chosenPlace);
       }
+      dataAccessor.updateUserFeedback(feedback.build());
+    } catch (IllegalArgumentException e) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user feedback input.");
     }
   }
 }
