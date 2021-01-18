@@ -29,7 +29,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 /** A servlet that registers a user, according to a given token. */
-@WebServlet("/register")
+@WebServlet("/feedback")
 @SuppressWarnings("serial")
 public final class FeedbackServlet extends HttpServlet {
 
