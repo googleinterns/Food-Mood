@@ -427,7 +427,7 @@ function updateUserFeedback(chosenPlaceId, tryAgain) {
   }
   let params = [
     `idToken=${googleUser.getAuthResponse().id_token}`,
-    `recommendedPlaces=${recommendedPlaces}`,
+    `recommendedPlaces=${recommendedPlaces.join(',')}`,
     `chosenPlace=${chosenPlaceId}`,
     `tryAgain=${tryAgain}`
   ].join('&');
