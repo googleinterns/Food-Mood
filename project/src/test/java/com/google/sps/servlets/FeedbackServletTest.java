@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.ArgumentMatcher;
 
 @RunWith(JUnit4.class)
 public class FeedbackServletTest {
@@ -69,9 +68,9 @@ public class FeedbackServletTest {
     verify(mockDataAccessor).updateUserFeedback(argThat(feedback -> {
       return feedback != null
           && feedback.userId().equals(USER_ID)
-          && feedback.recommendedPlaces().equals(ImmutableList.of("place1","place2","place3"))
+          && feedback.recommendedPlaces().equals(ImmutableList.of("place1", "place2", "place3"))
           && feedback.chosenPlace().equals(Optional.of("place1"))
-          && feedback.userTriedAgain() == false;
+          && !feedback.userTriedAgain();
     }));
   }
 
@@ -84,7 +83,7 @@ public class FeedbackServletTest {
 
     verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
     verify(RESPONSE)
-        .sendError(HttpServletResponse.SC_BAD_REQUEST,FeedbackServlet.INVALID_TOKEN_MSG);
+        .sendError(HttpServletResponse.SC_BAD_REQUEST, FeedbackServlet.INVALID_TOKEN_MSG);
   }
 
   @Test
@@ -123,7 +122,7 @@ public class FeedbackServletTest {
   }
 
   private void mockValidRequestParams(String idToken, String recommendedPlaces, String chosenPlace,
-      String tryAgain ) {
+      String tryAgain) {
     when(REQUEST.getParameter("idToken")).thenReturn(idToken);
     when(REQUEST.getParameter("recommendedPlaces")).thenReturn(recommendedPlaces);
     when(REQUEST.getParameter("chosenPlace")).thenReturn(chosenPlace);
