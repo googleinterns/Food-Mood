@@ -153,8 +153,8 @@ function createPlaceElement(place) {
   placeElement.appendChild(name);
   placeElement.appendChild(document.createElement('br'));
   // Add link to website
-  let hasWebUrl = place.websiteUrl;
-  let hasGoogleUrl = place.googleUrl;
+  let hasWebUrl = place.websiteUrl != null;
+  let hasGoogleUrl = place.googleUrl != null;
   if (!hasWebUrl && !hasGoogleUrl) {
     placeElement.appendChild(document.createTextNode(
         'We don\'t have a link to the restaurant\'s website.'));
@@ -197,7 +197,7 @@ function addRatingStarsToElement(element, rating) {
   const roundedRating = Math.round(ratingPercentage / 10) * 10; // Round by 10%
   let outerStars = document.createElement('div');
   outerStars.classList.add('stars-outer');
-  outerStars.content = "\f006 \f006 \f006 \f006 \f006";
+  outerStars.content = "\f006 \f006 \f006 \f006 \f006"; // \f006 is a star icon
 
   let innerStars = document.createElement('div');
   innerStars.classList.add('stars-inner');
