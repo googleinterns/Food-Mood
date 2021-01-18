@@ -9,8 +9,8 @@
   font-size: 20px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   white-space: nowrap;
-  background-color: #f8c4a9;
-  background-image: linear-gradient(62deg, #f8c4a9 0%, #fae1a4 91%);
+  background-color: #FF857F;
+  background-image: linear-gradient(62deg, #FF857F 0%, #FCDAD8 91%);
 }
 
 li {
@@ -207,6 +207,7 @@ h2 {
 
 .stars-outer::before {
   content: "\f006 \f006 \f006 \f006 \f006";
+  color: #f8ce0b;
 }
 
 .stars-inner {

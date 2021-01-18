@@ -197,7 +197,6 @@ function addRatingStarsToElement(element, rating) {
   const roundedRating = Math.round(ratingPercentage / 10) * 10; // Round by 10%
   let outerStars = document.createElement('div');
   outerStars.classList.add('stars-outer');
-  outerStars.content = "\f006 \f006 \f006 \f006 \f006"; // \f006 is a star icon
 
   let innerStars = document.createElement('div');
   innerStars.classList.add('stars-inner');
