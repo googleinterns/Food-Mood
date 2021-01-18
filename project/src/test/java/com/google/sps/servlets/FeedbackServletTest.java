@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.ArgumentMatcher;
 
 @RunWith(JUnit4.class)
 public class FeedbackServletTest {
@@ -66,13 +67,10 @@ public class FeedbackServletTest {
 
     // The parameters here must match those that are mocked in the request.
     // We can't compare instances of UserFeedback, because of the "feedbackTimeInMillis" attribute.
-    verify(mockDataAccessor).updateUserFeedback(argThat(feedback -> {
-      return feedback != null
-          && feedback.userId().equals(USER_ID)
-          && feedback.recommendedPlaces().equals(ImmutableList.of("place1", "place2", "place3"))
-          && feedback.chosenPlace().equals(Optional.of("place1"))
-          && !feedback.userTriedAgain();
-    }));
+    verify(mockDataAccessor).updateUserFeedback(argThat(
+        matchesUserFeedback(USER_ID, ImmutableList.of("place1", "place2", "place3"),
+            Optional.of("place1"), false /* triedAgain */)
+    ));
   }
 
   @Test
@@ -87,13 +85,10 @@ public class FeedbackServletTest {
 
     // The parameters here must match those that are mocked in the request.
     // We can't compare instances of UserFeedback, because of the "feedbackTimeInMillis" attribute.
-    verify(mockDataAccessor).updateUserFeedback(argThat(feedback -> {
-      return feedback != null
-          && feedback.userId().equals(USER_ID)
-          && feedback.recommendedPlaces().equals(ImmutableList.of("place1", "place2", "place3"))
-          && feedback.chosenPlace().equals(Optional.empty())
-          && feedback.userTriedAgain();
-    }));
+    verify(mockDataAccessor).updateUserFeedback(argThat(
+        matchesUserFeedback(USER_ID, ImmutableList.of("place1", "place2", "place3"),
+            Optional.empty(), true /* triedAgain */)
+    ));
   }
 
   @Test
@@ -149,5 +144,16 @@ public class FeedbackServletTest {
     when(REQUEST.getParameter("recommendedPlaces")).thenReturn(recommendedPlaces);
     when(REQUEST.getParameter("chosenPlace")).thenReturn(chosenPlace);
     when(REQUEST.getParameter("tryAgain")).thenReturn(tryAgain);
+  }
+
+  private static ArgumentMatcher<UserFeedback> matchesUserFeedback(final String userId,
+      final ImmutableList<String> recommendedPlaces, final Optional<String> chosenPlace,
+      final boolean triedAgain) {
+    return feedback ->
+       feedback != null
+          && feedback.userId().equals(userId)
+          && feedback.recommendedPlaces().equals(recommendedPlaces)
+          && feedback.chosenPlace().equals(chosenPlace)
+          && feedback.userTriedAgain() == triedAgain;
   }
 }
