@@ -9,8 +9,8 @@
   font-size: 20px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   white-space: nowrap;
-  background-color: #FF857F;
-  background-image: linear-gradient(62deg, #FF857F 0%, #FCDAD8 91%);
+  background-color: #ff857f;
+  background-image: linear-gradient(62deg, #ff857f 0%, #fcdad8 91%);
 }
 
 li {
