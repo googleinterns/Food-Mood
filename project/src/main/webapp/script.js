@@ -230,7 +230,6 @@ function clearAllMessages() {
   document.getElementById('map-error-container').innerText = '';
   document.getElementById('input-error-container').innerText = '';
   document.getElementById('problem-message-container').innerText = '';
-  document.getElementById('user-feedback-container').innerText = '';
 }
 
 /**
@@ -424,6 +423,7 @@ function signOut() {
   document.getElementById('sign-out-button').style.display = 'none';
   document.getElementById('old-new-form').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
+  document.getElementById('user-feedback-container').style.display = 'none';
 }
 
 /** Registers the logged in user, using the registration servlet. */
@@ -442,6 +442,8 @@ function sendUserChoiceAsFeedback() {
     postUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
         false /** user tried again */)
   }
+  document.getElementById('user-feedback-container').style.display = 'inline-block';
+  document.getElementById('feedback-box').style.display = 'none';
 }
 
 /** Sends the user feedback to the feedback servlet, and clears the recommendedPlaces variable. */

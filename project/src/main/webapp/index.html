@@ -121,22 +121,23 @@
         </div>
         <div id="results-map-container"> </div>
       </div>
-      <div id="feedback-box" style="display: none">
-        <label for="liking-feedback">Like these options?<br> Let us know what you chose: <br></label>
+      <div id="user-feedback-container" class="feedback-box" style="display: none">
+      Thank you, we received your Feedback!
+      </div>
+      <div id="feedback-box" class="feedback-box" style="display: none">
+        <p>Like these options?<br> Let us know what you chose: <br></p>
         <form id="chosen-place-form" class="form-element-toolbar">
-          <input type="radio" id="option-1" value="1" checked="checked">
-          <label for="option-1">First option</label>
-          <input type="radio" id="option-2" value="2">
-          <label for="option-2">Second option</label>
-          <input type="radio" id="option-3" value="3">
-          <label for="option-3">Third option</label>
+          <input type="radio" id="option-1" name="user-feedback" value="1" checked="checked">
+          <label for="option-1">First Option</label>
+          <input type="radio" id="option-2" name="user-feedback" value="2">
+          <label for="option-2">Second Option</label>
+          <input type="radio" id="option-3" name="user-feedback" value="3">
+          <label for="option-3">Third Option</label>
         </form>
-        <input type="submit" value="Submit" style="font-weight: bold"
-            onclick="sendUserChoiceAsFeedback()">
+        <button onclick="sendUserChoiceAsFeedback()"><strong>Submit</strong></button>
         <br><br>
-        <div id="user-feedback-container"> </div>
-        <label for="disliking-feedback">Don't like these options? <br></label>
-        <button onclick="tryAgainAndSendFeedback()"><b>Try again</b></button>
+        <p>Don't like these options? <br></p>
+        <button onclick="tryAgainAndSendFeedback()"><strong>Try again</strong></button>
       </div>
     </div>
   </body>
