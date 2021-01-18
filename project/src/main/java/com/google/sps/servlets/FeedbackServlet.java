@@ -28,7 +28,7 @@ import com.google.sps.data.UserVerifier;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
-/** A servlet that registers a user, according to a given token. */
+/** A servlet that is responsible on storing users' feedback. */
 @WebServlet("/feedback")
 @SuppressWarnings("serial")
 public final class FeedbackServlet extends HttpServlet {

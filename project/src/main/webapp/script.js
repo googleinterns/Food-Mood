@@ -419,17 +419,20 @@ function sendUserChoiceAsFeedback() {
 }
 
 /** Stores user feedback in the database, by using the feedback servlet. */
-function storeUserFeedback(recommendedPlaces, chosenPlaceId, tryAgain) {
+function storeUserFeedback(chosenPlaceId, tryAgain) {
   if (!googleUser) {
     return;
   }
+  let recommendedPlacesIdArr = [];
+  recommendedPlaces.forEach((place) => recommendedPlacesIdArr.push(place.placeId));
   let params = [
     `idToken=${getUserIdToken()}`,
-    `recommendedPlaces=${recommendedPlaces}`,
+    `recommendedPlaces=${recommendedPlacesIdArr.join(',')}`,
     `chosenPlace=${chosenPlaceId}`,
     `tryAgain=${tryAgain}`
   ].join('&');
   fetch('/feedback?' + params, {method: 'POST'});
   document.getElementById('user-feedback-container').innerText =
-      'Thank you, your Feedback was received!';
+      'Thank you, your feedback was received!';
+  recommendedPlaces = null
 }
