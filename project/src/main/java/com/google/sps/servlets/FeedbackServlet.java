@@ -35,14 +35,6 @@ public final class FeedbackServlet extends HttpServlet {
 
   private UserVerifier userVerifier;
   private DataAccessor dataAccessor;
-  @VisibleForTesting // Applies to the following variables
-  static final String INVALID_TOKEN_MSG =
-      "No user ID token was received, so can't process user feedback.";
-  static final String NO_USER_TOKEN_MSG =
-      "Didn't manage to get data for given user ID token, so can't process user feedback.";
-  static final String INVALID_USER_FEEDBACK_MSG =
-      "The user feedback input was invalid.";
-
 
   @Override
   public void init() {
@@ -51,34 +43,31 @@ public final class FeedbackServlet extends HttpServlet {
   }
 
   @VisibleForTesting
-  void init(UserVerifier inUserVerifier, DataAccessor inDataAccessor) {
-    this.userVerifier = inUserVerifier;
-    this.dataAccessor = inDataAccessor;
+  void init(UserVerifier verifier, DataAccessor accessor) {
+    this.userVerifier = verifier;
+    this.dataAccessor = accessor;
   }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String userIdToken = request.getParameter("idToken");
-    if (isNullOrEmpty(userIdToken)) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, INVALID_TOKEN_MSG);
-      return;
-    }
-    Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
+    Optional<String> optionalUserId = TokenValidator.validateAndGetId(
+          request, response, userVerifier, "store user feedback" /* validationPurpose */);
     if (!optionalUserId.isPresent()) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND, NO_USER_TOKEN_MSG);
       return;
     }
     try {
-      UserFeedback feedback = UserFeedback.builder()
+      UserFeedback.Builder feedback = UserFeedback.builder()
           .setUserId(optionalUserId.get())
           .setRecommendedPlaces(
               ImmutableList.copyOf(request.getParameter("recommendedPlaces").split(",")))
-          .setChosenPlace(request.getParameter("chosenPlace"))
-          .setUserTriedAgain(request.getParameter("tryAgain").equals("true"))
-          .build();
-      dataAccessor.updateUserFeedback(feedback);
+          .setUserTriedAgain(request.getParameter("tryAgain").equals("true"));
+      String chosenPlace = request.getParameter("chosenPlace");
+      if (!isNullOrEmpty(chosenPlace)) {
+        feedback.setChosenPlace(chosenPlace);
+      }
+      dataAccessor.updateUserFeedback(feedback.build());
     } catch (IllegalArgumentException e) {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, INVALID_USER_FEEDBACK_MSG);
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user feedback input.");
     }
   }
 }

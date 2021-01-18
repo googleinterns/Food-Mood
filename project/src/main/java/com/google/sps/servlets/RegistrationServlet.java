@@ -14,8 +14,6 @@
 
 package com.google.sps.servlets;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,28 +39,20 @@ public final class RegistrationServlet extends HttpServlet {
   }
 
   @VisibleForTesting
-  void init(UserVerifier inUserVerifier, DataAccessor inDataAccessor) {
-    this.userVerifier = inUserVerifier;
-    this.dataAccessor = inDataAccessor;
+  void init(UserVerifier verifier, DataAccessor accessor) {
+    this.userVerifier = verifier;
+    this.dataAccessor = accessor;
   }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String userIdToken = request.getParameter("idToken");
-    if (isNullOrEmpty(userIdToken)) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-          "No user ID token was received, so can't register user.");
-      return;
-    }
-    Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
-    if (!optionalUserId.isPresent()) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND,
-          "Didn't manage to get data for given user ID token.");
-      return;
-    }
-    String finalUserId = optionalUserId.get();
-    if (!dataAccessor.isRegistered(finalUserId)) {
-      dataAccessor.registerUser(finalUserId);
+    Optional<String> optionalUserId = TokenValidator.validateAndGetId(
+          request, response, userVerifier, "registartion" /* validationPurpose */);
+    if (optionalUserId.isPresent()) {
+      String finalUserId = optionalUserId.get();
+      if (!dataAccessor.isRegistered(finalUserId)) {
+        dataAccessor.registerUser(finalUserId);
+      }
     }
   }
 }

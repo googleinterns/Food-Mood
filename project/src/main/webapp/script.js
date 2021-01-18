@@ -199,7 +199,7 @@ function tryAgainAndSendFeedback() {
   document.getElementById('waiting-message').style.display = 'block'
   clearAllMessages();
 
-  storeUserFeedback(null /** place user chose */, true /** user tried again */)
+  postUserFeedback(null /** place user chose */, true /** user tried again */)
 }
 
 /** Clears all the messages that are displayed to the user during the user session. */
@@ -413,13 +413,13 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    storeUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
+    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
         false /** user tried again */)
   }
 }
 
-/** Stores user feedback in the database, by using the feedback servlet. */
-function storeUserFeedback(chosenPlaceId, tryAgain) {
+/** Sends the user feedback to the feedback servlet, and clears the recommendedPlaces variable. */
+function postUserFeedback(chosenPlaceId, tryAgain) {
   if (!googleUser) {
     return;
   }

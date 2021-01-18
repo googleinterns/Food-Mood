@@ -16,6 +16,7 @@ package com.google.sps.servlets;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -54,7 +55,7 @@ public class FeedbackServletTest {
   }
 
   @Test
-  public void doPost_validToken_updatesFeedback() throws Exception {
+  public void doPost_validFeedbackChoosePlace_updatesFeedback() throws Exception {
     mockValidRequestParams(ID_TOKEN,
         "place1,place2,place3" /* recommendedPlaces */,
         "place1" /* chosenPlace */,
@@ -75,6 +76,27 @@ public class FeedbackServletTest {
   }
 
   @Test
+  public void doPost_validFeedbackTryAgain_updatesFeedback() throws Exception {
+    mockValidRequestParams(ID_TOKEN,
+        "place1,place2,place3" /* recommendedPlaces */,
+        null /* chosenPlace */,
+        "true" /* tryAgain */);
+    when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
+
+    servlet.doPost(REQUEST, RESPONSE);
+
+    // The parameters here must match those that are mocked in the request.
+    // We can't compare instances of UserFeedback, because of the "feedbackTimeInMillis" attribute.
+    verify(mockDataAccessor).updateUserFeedback(argThat(feedback -> {
+      return feedback != null
+          && feedback.userId().equals(USER_ID)
+          && feedback.recommendedPlaces().equals(ImmutableList.of("place1", "place2", "place3"))
+          && feedback.chosenPlace().equals(Optional.empty())
+          && feedback.userTriedAgain();
+    }));
+  }
+
+  @Test
   public void doPost_invalidToken_badRequestResponseSent() throws Exception {
     mockValidRequestParams();
     when(REQUEST.getParameter("idToken")).thenReturn(null);
@@ -83,7 +105,7 @@ public class FeedbackServletTest {
 
     verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
     verify(RESPONSE)
-        .sendError(HttpServletResponse.SC_BAD_REQUEST, FeedbackServlet.INVALID_TOKEN_MSG);
+        .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), any(String.class));
   }
 
   @Test
@@ -95,7 +117,7 @@ public class FeedbackServletTest {
 
     verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
     verify(RESPONSE, atLeastOnce())
-        .sendError(HttpServletResponse.SC_NOT_FOUND, FeedbackServlet.NO_USER_TOKEN_MSG);
+        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), any(String.class));
   }
 
   @Test
@@ -111,7 +133,7 @@ public class FeedbackServletTest {
 
     verify(mockDataAccessor, never()).updateUserFeedback(any(UserFeedback.class));
     verify(RESPONSE, atLeastOnce())
-        .sendError(HttpServletResponse.SC_BAD_REQUEST, FeedbackServlet.INVALID_USER_FEEDBACK_MSG);
+        .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), any(String.class));
   }
 
   private void mockValidRequestParams() {
