@@ -1,11 +1,13 @@
 {
     "sushi": ["sushi"],
-    "italian": ["italian", "pasta"],
+    "italian": ["italian", "italy", "pasta"],
     "asian": ["asian", "noodles", "thai"],
     "hamburger": ["burger", "hamburger"],
     "salad": ["salad"],
     "homemade": ["homemade", "home"],
     "hummus": ["hummus"],
     "pizza": ["pizza"],
-    "mexican": ["mexican"]
+    "mexican": ["mexican", "taco", "tacos", "nachos"],
+    "sandwich": ["sandwich"],
+    "indian": ["indian", "india"]
 }
