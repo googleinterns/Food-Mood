@@ -199,7 +199,7 @@ function tryAgainAndSendFeedback() {
   document.getElementById('waiting-message').style.display = 'block'
   clearAllMessages();
 
-  storeUserFeedback(recommendedPlaces, null /** place user chose */, true /** user tried again */)
+  storeUserFeedback(null /** place user chose */, true /** user tried again */)
 }
 
 /** Clears all the messages that are displayed to the user during the user session. */
@@ -413,7 +413,7 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    storeUserFeedback(recommendedPlaces, recommendedPlaces[indexOfPlaceUserChose].placeId,
+    storeUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
         false /** user tried again */)
   }
 }
