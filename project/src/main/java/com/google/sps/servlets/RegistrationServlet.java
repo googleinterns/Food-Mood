@@ -34,7 +34,7 @@ public final class RegistrationServlet extends HttpServlet {
 
   @Override
   public void init() {
-    this.userVerifier = UserVerifier.create(System.getenv("CLIENT_ID")));
+    this.userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
     this.dataAccessor = new DataAccessor();
   }
 

@@ -58,9 +58,6 @@ public class UserVerifier {
    * @return an Optional with the verified user ID in case of success (and an empty optional else)
    */
   public Optional<String> getUserIdByToken(String idToken) {
-    // if (idToken.isEmpty()) {
-    //   return Optional.empty();
-    // }
     GoogleIdToken googleIdToken;
     try {
       googleIdToken = verifier.verify(idToken);
