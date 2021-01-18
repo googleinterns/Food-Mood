@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableMap;
 import com.google.maps.model.LatLng;
 
@@ -60,9 +61,9 @@ public class PlacesScorerRegisteredUserTest {
         //    number of times the user preferred the place's most preffered cuisine /
         //    total user's historical preferences
         Place placeWithRating3 =
-            createPlaceByRatingAndCuisines("place1", 3F, ImmutableList.of("sushi", "asian"));
+            createPlaceByRatingAndCuisines("place1", 3F, ImmutableSet.of("sushi", "asian"));
         Place placeWithRating5 =
-            createPlaceByRatingAndCuisines("place2", 5F, ImmutableList.of("hamburger"));
+            createPlaceByRatingAndCuisines("place2", 5F, ImmutableSet.of("hamburger"));
         when(DURATIONS_FETCHER.getDurations(
             ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION))
             .thenReturn(ImmutableMap.of(
@@ -103,9 +104,9 @@ public class PlacesScorerRegisteredUserTest {
         //    number of times the user preferred the place's most preffered cuisine /
         //    total user's historical preferences
         Place placeWithRating3 =
-            createPlaceByRatingAndCuisines("place1", 3F, ImmutableList.of("sushi"));
+            createPlaceByRatingAndCuisines("place1", 3F, ImmutableSet.of("sushi"));
         Place placeWithRating5 =
-            createPlaceByRatingAndCuisines("place2", 5F, ImmutableList.of("hamburger"));
+            createPlaceByRatingAndCuisines("place2", 5F, ImmutableSet.of("hamburger"));
         when(DURATIONS_FETCHER.getDurations(
             ImmutableList.of(placeWithRating3, placeWithRating5), USER_LOCATION))
             .thenThrow(new IOException());
@@ -126,9 +127,9 @@ public class PlacesScorerRegisteredUserTest {
     public void getScores_noHistoricalPreferences_scoresWithPlacesScorerUnregisreredUser()
             throws Exception {
         Place placeWithRating3 =
-            createPlaceByRatingAndCuisines("place1", 3F, ImmutableList.of("sushi"));
+            createPlaceByRatingAndCuisines("place1", 3F, ImmutableSet.of("sushi"));
         Place placeWithRating5 =
-            createPlaceByRatingAndCuisines("place2", 5F, ImmutableList.of("hamburger"));
+            createPlaceByRatingAndCuisines("place2", 5F, ImmutableSet.of("hamburger"));
         ImmutableList<Place> places = ImmutableList.of(placeWithRating3, placeWithRating5);
         when(DATA_ACCESSOR.getPreferredCuisines(USER_ID))
             .thenReturn(ImmutableMap.of());
@@ -139,7 +140,7 @@ public class PlacesScorerRegisteredUserTest {
     }
 
     private static final Place createPlaceByRatingAndCuisines(
-            String placesId, Float rating, ImmutableList<String> cuisines) {
+            String placesId, Float rating, ImmutableSet<String> cuisines) {
         return Place.builder()
         .setPlaceId(placesId)
         .setWebsiteUrl("place.com")

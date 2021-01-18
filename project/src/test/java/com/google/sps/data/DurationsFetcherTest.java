@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.maps.DistanceMatrixApiRequest;
 import com.google.maps.model.DistanceMatrix;
 import com.google.maps.model.DistanceMatrixElement;
@@ -73,7 +74,7 @@ public final class DurationsFetcherTest {
         .setGoogleUrl("google.com")
         .setName("name")
         .setBusinessStatus(BusinessStatus.OPERATIONAL)
-        .setCuisines(ImmutableList.of("sushi", "hamburger"))
+        .setCuisines(ImmutableSet.of("sushi", "hamburger"))
         .setRating(4)
         .build();
     }

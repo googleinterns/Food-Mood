@@ -14,16 +14,15 @@
 
 package com.google.sps.data;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import com.google.maps.model.LatLng;
-import com.google.common.collect.ImmutableList;
-
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import com.google.maps.model.LatLng;
+import com.google.common.collect.ImmutableSet;
 
 @RunWith(JUnit4.class)
 public final class PlaceTest {
@@ -37,8 +36,8 @@ public final class PlaceTest {
   private static final String GOOGLE_URL = "googleurl.com";
   private static final String PLACE_ID = "ChIJN1t_tDeuEmsRUsoyG83frY4";
   private static final BusinessStatus BUSINESS_STATUS = BusinessStatus.OPERATIONAL;
-  private static final ImmutableList<String> CUISINES =
-      ImmutableList.of("sushi", "hamburger");
+  private static final ImmutableSet<String> CUISINES =
+      ImmutableSet.of("sushi", "hamburger");
 
   @Test
   public void build_invalidLowRating_throwsIllegalArgumentException() {
@@ -105,6 +104,6 @@ public final class PlaceTest {
         .setGoogleUrl(GOOGLE_URL)
         .setPlaceId(PLACE_ID)
         .setBusinessStatus(BUSINESS_STATUS)
-        .setCuisines(ImmutableList.of("sushi", "hamburger"));
+        .setCuisines(CUISINES);
   }
 }
