@@ -51,15 +51,13 @@ public class RegistrationServletTest {
 
   @Test
   public void doPost_validToken_registersUser() throws Exception {
-    String idToken = "abcde";
-    String userId = "12345";
-    when(REQUEST.getParameter("idToken")).thenReturn(idToken);
-    when(mockUserVerifier.getUserIdByToken(idToken)).thenReturn(Optional.of(userId));
-    when(mockDataAccessor.isRegistered(userId)).thenReturn(false);
+    when(REQUEST.getParameter("idToken")).thenReturn(ID_TOKEN);
+    when(mockUserVerifier.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
+    when(mockDataAccessor.isRegistered(USER_ID)).thenReturn(false);
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    verify(mockDataAccessor).registerUser(userId);
+    verify(mockDataAccessor).registerUser(USER_ID);
   }
 
   @Test
