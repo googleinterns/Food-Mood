@@ -28,13 +28,17 @@ import java.util.Optional;
 public final class TokenValidator {
 
   /**
+   * This function is meant for validating HTTP servlet requests that require using the user's
+   * ID token (request parameter "idToken"). It verifies the token and returns the matching user ID.
+   * If the token isn't valid, the given response parameter is modified in order to send an error.
+   *
    * @param request the HttpServletRequest that we want to check
    * @param response the HttpServletResponse that is updated in case of invalidity
    * @param userVerifier the verifier that is used for verifing the user token
    * @param validationPurpose the reason for turning the token to user ID
    * @throws IllegalArgumentException if the given request has missing inputs (no token)
    * @throws IOException if updating the response encounters a problem
-   * @return An Optional with the valid ID if the token is valid, an empty Optional else
+   * @return An Optional with the valid ID if the token is valid, an empty Optional otherwise
    */
   public static Optional<String> validateAndGetId(HttpServletRequest request, HttpServletResponse
       response, UserVerifier userVerifier, String validationPurpose)
