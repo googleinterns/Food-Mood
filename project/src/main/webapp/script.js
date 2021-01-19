@@ -415,8 +415,8 @@ function onSignIn(user) {
   googleUser = user;
   registerUserByToken();
   document.getElementById('sign-out-button').style.display = 'inline-block';
-  document.getElementById('old-new-form').style.display = 'block';
   document.getElementById('feedback-box').style.display = 'inline-block';
+  document.getElementById('old-new-form').style.display = 'block';
 }
 
 /** Called when a user signs out of a Google account, updates the screen and the global user. */
