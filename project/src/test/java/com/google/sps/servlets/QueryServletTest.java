@@ -39,6 +39,7 @@ import com.google.sps.data.PlacesScorer;
 import com.google.sps.data.Place;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.maps.model.LatLng;
@@ -244,7 +245,8 @@ public final class QueryServletTest {
           .setLocation(new LatLng(35.35, 30.30))
           .setBusinessStatus(BusinessStatus.OPERATIONAL)
           .setGoogleUrl("google.com")
-          .setPlaceId("placeId");
+          .setPlaceId("placeId")
+          .setCuisines(ImmutableSet.of("sushi", "hamburger"));
   }
 
   // Returns the number of json elements in the servlet's response

@@ -14,6 +14,8 @@
 
 package com.google.sps.servlets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -118,7 +120,7 @@ public final class QueryServlet extends HttpServlet {
 
   // Store the user's preferences in the database, only if the user is signed in.
   private void storePreferences(String userIdToken, UserPreferences userPrefs) {
-    if (!userIdToken.isEmpty()) {
+    if (!isNullOrEmpty(userIdToken)) {
       Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
       if (optionalUserId.isPresent()) {
         String userId = optionalUserId.get();

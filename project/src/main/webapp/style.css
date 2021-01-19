@@ -1,3 +1,7 @@
+:root {
+  --special-font: 'FontAwesome';
+}
+
 .text-content {
   margin-left: auto;
   margin-right: auto;
@@ -5,14 +9,24 @@
   font-size: 20px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   white-space: nowrap;
-  background-color: #f8c4a9;
-  background-image: linear-gradient(62deg, #f8c4a9 0%, #fae1a4 91%);
+  background-color: #ff857f;
+  background-image: linear-gradient(62deg, #ff857f 0%, #fcdad8 91%);
 }
 
 li {
   margin-top: 10px;
   font-size: 30px;
   margin-bottom: -15px;
+}
+
+p {
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
+}
+
+h2 {
+  margin-block-start: 0; /* no unit */
+  margin-block-end: 0; /* no unit */
 }
 
 .place-container {
@@ -35,7 +49,6 @@ li {
   width: 150px;
   padding: 5px;
   background-color: rgb(228 231 232);
-  margin-top: 10px;
 }
 
 .form-element-toolbar {
@@ -184,4 +197,28 @@ li {
 
 #sign-out-button:hover {
   cursor: pointer;
+}
+
+.stars-outer {
+  display: inline-block;
+  position: relative;
+  font-family: var(--special-font);
+}
+
+.stars-outer::before {
+  content: "\f006 \f006 \f006 \f006 \f006";
+  color: #f8ce0b;
+}
+
+.stars-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.stars-inner::before {
+  content: "\f005 \f005 \f005 \f005 \f005";
+  color: #f8ce0b;
 }
