@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.maps.model.LatLng;
@@ -67,7 +66,6 @@ public final class Places {
     return ImmutableList.copyOf(mutablePlaces);
   }
 
-
   /**
    * Filters the given list of places according to the given parameters.
    * @param places the list we want to filter.
@@ -98,7 +96,6 @@ public final class Places {
     }
     return result;
   }
-
 
   /**
    * Filters the given list to keep only places that weren't previously recommended to the user, as
