@@ -47,7 +47,7 @@ function fetchFromQuery() {
   const placesDiv = document.getElementById('place');
   displayResultsPage();
   const userCoords = JSON.parse(localStorage.getItem('userLocation'));
-  const map = createMap({lat: userCoords.lat, lng: userCoords.lng});
+  const map = createUserResultsMap({lat: userCoords.lat, lng: userCoords.lng});
   fetch('/query?' + params, {method: 'POST'})
       .then(response => response.json())
       .then((places) => {
@@ -115,7 +115,6 @@ function getCheckedValueByElementId(elementId, errorMessage) {
 /** Gets that user location that was kept in the local storage. */
 function getUserLocationFromUi() {
   const coords = JSON.parse(localStorage.getItem('userLocation'));
-  console.log(coords.lat + "," + coords.lng);
   return coords.lat + "," + coords.lng;
 }
 
@@ -156,17 +155,23 @@ function createPlaceElement(place) {
   const name = document.createElement('li');
   name.innerText = place.name;
   placeElement.appendChild(name);
+  placeElement.appendChild(document.createElement('br'));
   // Add link to website
-  if (place.websiteUrl) {
-    addLinkToPlaceElement(placeElement, place.websiteUrl, 'Website');
-  }
-  if (place.googleUrl) {
-    addLinkToPlaceElement(placeElement, place.googleUrl, 'Google Maps link');
-  }
-  if (!place.websiteUrl && !place.googleUrl) {
-    placeElement.appendChild(document.createElement('br'));
+  let hasWebUrl = place.websiteUrl != null;
+  let hasGoogleUrl = place.googleUrl != null;
+  if (!hasWebUrl && !hasGoogleUrl) {
     placeElement.appendChild(document.createTextNode(
         'We don\'t have a link to the restaurant\'s website.'));
+  } else {
+    if (hasWebUrl) {
+      addLinkToPlaceElement(placeElement, place.websiteUrl, 'Website');
+    }
+    if (hasWebUrl && hasGoogleUrl) {
+      placeElement.appendChild(document.createTextNode(', '));
+    }
+    if (hasGoogleUrl) {
+      addLinkToPlaceElement(placeElement, place.googleUrl, 'Google Maps link');
+    }
   }
   placeElement.appendChild(document.createElement('br'));
   // Add phone number
@@ -175,18 +180,35 @@ function createPlaceElement(place) {
     placeElement.appendChild(phone);
     placeElement.appendChild(document.createElement('br'));
   }
+  // Add rating stars
+  addRatingStarsToElement(placeElement, place.rating);
+  placeElement.appendChild(document.createElement('br'));
   return placeElement;
 }
 
-/**
- * Returns a link that represents the given url and shows the given text.
- */
+/** Adds a link that represents the given url and shows the given text. */
 function addLinkToPlaceElement(placeElement, url, linkText) {
-  placeElement.appendChild(document.createElement('br'));
   const link = document.createElement('a');
   link.href = url;
   link.innerText = linkText;
   placeElement.appendChild(link);
+}
+
+/** Adds stars that represent a place's rating. */
+function addRatingStarsToElement(element, rating) {
+  const MAX_RATING = 5;
+  const ratingPercentage = (rating / MAX_RATING) * 100; // Turn to percetage
+  const roundedRating = Math.round(ratingPercentage / 10) * 10; // Round by 10%
+  let outerStars = document.createElement('div');
+  outerStars.classList.add('stars-outer');
+
+  let innerStars = document.createElement('div');
+  innerStars.classList.add('stars-inner');
+  innerStars.style.width = roundedRating.toString() + "%";
+
+  outerStars.appendChild(innerStars);
+  element.appendChild(outerStars);
+  element.appendChild(document.createTextNode(" ("+ rating +")"));
 }
 
 /**
@@ -298,7 +320,7 @@ function addMapWithSearchBox() {
 function getDeviceLocationAndShowOnMap() {
   document.getElementById('map-error-container').innerText = '';
   const FIVE_SECONDS = 5000;
-  const HIGH_ZOOM_LEVEL = 13;
+  const ZOOM_IN = 13;
 
   if (!navigator.geolocation) { // Browser doesn't support Geolocation
     displayGeolocationError('Your browser doesn\'t support geolocation');
@@ -313,7 +335,7 @@ function getDeviceLocationAndShowOnMap() {
         lng: position.coords.longitude,
       };
       map.setCenter(userPosition);
-      map.setZoom(HIGH_ZOOM_LEVEL);
+      map.setZoom(ZOOM_IN);
       localStorage.setItem('userLocation', JSON.stringify(userPosition));
       // Add marker with info window to display user location.
       const infoWindow = new window.google.maps.InfoWindow({content: 'My location'});
@@ -337,7 +359,7 @@ function displayGeolocationError(errorText) {
 /**
  *  Creates a map and adds it to the page.
  */
-function createMap(userLocation) {
+function createUserResultsMap(userLocation) {
   const ZOOM_OUT = 12;
   const map = new window.google.maps.Map(
     document.getElementById('results-map-container'), {
@@ -345,18 +367,20 @@ function createMap(userLocation) {
         zoom: ZOOM_OUT,
     }
   );
-  new window.google.maps.Marker({
+  const marker = new window.google.maps.Marker({
     title: "Me!",
     position: userLocation,
     map: map,
     icon: "https://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png"
   });
+  const infoWindow = new window.google.maps.InfoWindow({content: 'Me!'});
+  marker.addListener("click", () => infoWindow.open(map, marker));
   return map;
 }
 
 /** Adds to the map a marker for the given place. */
 function addPlaceMarker(map, place) {
-  const ZOOM_IN = 15;
+  const ZOOM_IN = 14;
   let marker = new window.google.maps.Marker({
       title: place.name,
       position: place.location,
@@ -388,6 +412,7 @@ function onSignIn(user) {
   registerUserByToken();
   document.getElementById('sign-out-button').style.display = 'inline-block';
   document.getElementById('feedback-box').style.display = 'inline-block';
+  document.getElementById('old-new-form').style.display = 'block';
 }
 
 /** Called when a user signs out of a Google account, updates the screen and the global user. */
@@ -398,6 +423,7 @@ function signOut() {
   googleUser = null;
   document.getElementById('sign-out-button').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
+  document.getElementById('old-new-form').style.display = 'none';
 }
 
 /** Registers the logged in user, using the registration servlet. */
