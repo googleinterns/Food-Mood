@@ -32,6 +32,9 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import java.util.Date;
 import java.util.List;
 import com.google.maps.model.LatLng;
 import org.junit.After;
@@ -259,6 +262,44 @@ public final class DataAccessorTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> dataAccessor.storeUserPreferences("", userPrefs));
+  }
+
+  @Test
+  public void getPreferredCuisines_emptyUser_throwIllegalArgumentException() {
+    String userId = "";
+
+    assertThrows(IllegalArgumentException.class,
+        () -> dataAccessor.getPreferredCuisines(userId));
+  }
+
+  @Test
+  public void getPreferredCuisines_noPreferencesStoredForUser_returnEmptyMap() {
+    ImmutableMap<String, Long> result =
+        dataAccessor.getPreferredCuisines(USER_ID);
+
+    assertEquals(ImmutableMap.of(), result);
+  }
+
+  @Test
+  public void getPreferredCuisines_preferencesStoredForUser_returnMapOfCuisinesCounts() {
+    datastoreService.put(createUserPreferenceEntity(USER_ID, ImmutableList.of("sushi", "asian")));
+    datastoreService.put(createUserPreferenceEntity(USER_ID, ImmutableList.of("hamburger", "sushi")));
+
+    ImmutableMap<String, Long> result = dataAccessor.getPreferredCuisines(USER_ID);
+
+    ImmutableMap<String, Long> expectedResult = ImmutableMap.of(
+        "sushi", 2L,
+        "asian", 1L,
+        "hamburger", 1L);
+    assertEquals(expectedResult, result);
+  }
+
+  private Entity createUserPreferenceEntity(String userId, ImmutableList<String> cuisines) {
+    Entity preferencesEntity = new Entity(DataAccessor.PREFERNCES_ENTITY_KIND);
+    preferencesEntity.setProperty("userId", userId);
+    preferencesEntity.setProperty("date", new Date());
+    preferencesEntity.setProperty("preferedCuisines", cuisines);
+    return preferencesEntity;
   }
 
   private Entity createRecommendationEntity(String userId, String placeId, boolean chosen,
