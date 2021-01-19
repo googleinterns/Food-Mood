@@ -38,7 +38,8 @@ function fetchFromQuery() {
       `price=${getUserPriceFromUi()}`,
       `open=${getUserOpenNowFromUi()}`,
       `location=${getUserLocationFromUi()}`,
-      `idToken=${getUserIdToken()}`
+      `idToken=${getUserIdToken()}`,
+      `newPlaces=${getUserNewPlacesFromUi()}`
     ].join('&');
   } catch (error) {
     document.getElementById('input-error-container').innerText = 'ERROR: ' + error.message;
@@ -99,6 +100,10 @@ function getUserPriceFromUi() {
 function getUserOpenNowFromUi() {
   return getCheckedValueByElementId('open-now-form',
       'Choose if the place should be open now or you don\'t mind.');
+}
+
+function getUserNewPlacesFromUi() {
+  return getCheckedValueByElementId('old-new-form', 'Choose whether to receive mainly new places.');
 }
 
 /** Gets an element that has several options and returns the checked option. */

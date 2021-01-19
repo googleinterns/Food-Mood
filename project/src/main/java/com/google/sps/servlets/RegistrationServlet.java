@@ -46,8 +46,8 @@ public final class RegistrationServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Optional<String> optionalUserId = TokenValidator.validateAndGetId(
-          request, response, userVerifier, "registartion" /* validationPurpose */);
+    Optional<String> optionalUserId = TokenValidator.validateAndGetId(request, response,
+        userVerifier, "registartion" /* validationPurpose */, true /* sendErrors*/);
     if (optionalUserId.isPresent()) {
       String finalUserId = optionalUserId.get();
       if (!dataAccessor.isRegistered(finalUserId)) {

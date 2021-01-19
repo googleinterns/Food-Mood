@@ -50,8 +50,8 @@ public final class FeedbackServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Optional<String> optionalUserId = TokenValidator.validateAndGetId(
-          request, response, userVerifier, "store user feedback" /* validationPurpose */);
+    Optional<String> optionalUserId = TokenValidator.validateAndGetId(request, response,
+        userVerifier, "store user feedback" /* validationPurpose */, true /* sendErrors*/);
     if (!optionalUserId.isPresent()) {
       return;
     }
