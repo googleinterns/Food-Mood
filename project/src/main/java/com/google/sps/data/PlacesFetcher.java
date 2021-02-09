@@ -114,8 +114,8 @@ public class PlacesFetcher {
                     : preferences.cuisines();
         int attemptsCounter = 0;
         do {
+            attemptsCounter++;
             for (String cuisine: cuisines) {
-                attemptsCounter++;
                 try {
                     cuisineResults = getPlacesSearchResults(generateTextSearchRequest(
                         preferences, INIT_SEARCH_RADIUS_M * attemptsCounter, cuisine));
