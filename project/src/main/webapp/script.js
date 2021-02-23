@@ -446,7 +446,7 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
+    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose-1].placeId,
         false /** user tried again */)
   }
   document.getElementById('user-feedback-container').style.display = 'inline-block';
