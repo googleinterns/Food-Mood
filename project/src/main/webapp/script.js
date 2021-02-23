@@ -235,6 +235,7 @@ function clearAllMessages() {
   document.getElementById('map-error-container').innerText = '';
   document.getElementById('input-error-container').innerText = '';
   document.getElementById('problem-message-container').innerText = '';
+  document.getElementById('user-feedback-container').innerText = '';
 }
 
 /**
@@ -429,6 +430,7 @@ function signOut() {
   document.getElementById('old-new-form').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
   document.getElementById('user-feedback-container').style.display = 'none';
+  document.getElementById('old-new-form').style.display = 'none';
 }
 
 /** Registers the logged in user, using the registration servlet. */
@@ -448,6 +450,8 @@ function sendUserChoiceAsFeedback() {
         false /** user tried again */)
   }
   document.getElementById('user-feedback-container').style.display = 'inline-block';
+  document.getElementById('user-feedback-container').innerText =
+      'Thank you, your feedback was received!';
   document.getElementById('feedback-box').style.display = 'none';
 }
 
@@ -465,7 +469,5 @@ function postUserFeedback(chosenPlaceId, tryAgain) {
     `tryAgain=${tryAgain}`
   ].join('&');
   fetch('/feedback?' + params, {method: 'POST'});
-  document.getElementById('user-feedback-container').innerText =
-      'Thank you, your feedback was received!';
   recommendedPlaces = null
 }

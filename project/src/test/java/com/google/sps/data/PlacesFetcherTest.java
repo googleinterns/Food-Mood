@@ -176,7 +176,7 @@ public final class PlacesFetcherTest {
       .when(spiedFetcher)
       .getPlacesSearchResults(any(TextSearchRequest.class));
     ImmutableList<Place> output = spiedFetcher.fetch(PREFERENCES_BUILDER.build());
-    verify(spiedFetcher, times(MAX_NUM_OF_RADIUS_EXTENSIONS))
+    verify(spiedFetcher, times(MAX_NUM_OF_RADIUS_EXTENSIONS * CUISINES_LIST.size()))
       .getPlacesSearchResults(any(TextSearchRequest.class));
     assertEquals(ImmutableList.of(), output);
   }
