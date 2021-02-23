@@ -444,10 +444,11 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
+    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose-1].placeId,
         false /** user tried again */)
   }
   document.getElementById('user-feedback-container').style.display = 'inline-block';
+  document.getElementById('user-feedback-container').innerText = 'Thank you, we received your Feedback!';
   document.getElementById('feedback-box').style.display = 'none';
 }
 
@@ -465,7 +466,5 @@ function postUserFeedback(chosenPlaceId, tryAgain) {
     `tryAgain=${tryAgain}`
   ].join('&');
   fetch('/feedback?' + params, {method: 'POST'});
-  document.getElementById('user-feedback-container').innerText =
-      'Thank you, your feedback was received!';
   recommendedPlaces = null
 }
