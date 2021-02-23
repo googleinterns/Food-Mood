@@ -61,7 +61,8 @@ public class TokenValidatorTest {
     when(MOCK_USER_VERIFIER.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.of(USER_ID));
 
     assertEquals(Optional.of(USER_ID),
-        TokenValidator.validateAndGetId(MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test"));
+        TokenValidator.validateAndGetId(
+            MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test", true));
   }
 
   @Test
@@ -69,7 +70,8 @@ public class TokenValidatorTest {
     when(MOCK_REQUEST.getParameter("idToken")).thenReturn(null);
 
     assertEquals(Optional.empty(),
-        TokenValidator.validateAndGetId(MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test"));
+        TokenValidator.validateAndGetId(
+            MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test", true));
     verify(MOCK_RESPONSE).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), any(String.class));
   }
 
@@ -78,7 +80,8 @@ public class TokenValidatorTest {
     when(MOCK_REQUEST.getParameter("idToken")).thenReturn("");
 
     assertEquals(Optional.empty(),
-        TokenValidator.validateAndGetId(MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test"));
+        TokenValidator.validateAndGetId(
+            MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test", true));
     verify(MOCK_RESPONSE).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), any(String.class));
   }
 
@@ -88,7 +91,8 @@ public class TokenValidatorTest {
     when(MOCK_USER_VERIFIER.getUserIdByToken(ID_TOKEN)).thenReturn(Optional.empty());
 
     assertEquals(Optional.empty(),
-        TokenValidator.validateAndGetId(MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test"));
+        TokenValidator.validateAndGetId(
+            MOCK_REQUEST, MOCK_RESPONSE, MOCK_USER_VERIFIER, "test", true));
     verify(MOCK_RESPONSE).sendError(eq(HttpServletResponse.SC_NOT_FOUND), any(String.class));
   }
 }
