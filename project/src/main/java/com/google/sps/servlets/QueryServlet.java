@@ -47,7 +47,7 @@ import com.google.sps.data.UserVerifier;
 public final class QueryServlet extends HttpServlet {
 
   @VisibleForTesting
-  static final int MAX_NUM_PLACES_TO_RECOMMEND = 3;
+  static final int DESIRED_NUM_PLACES_TO_RECOMMEND = 3;
   private PlacesFetcher fetcher;
   private PlacesScorer scorer;
   private UserVerifier userVerifier;
@@ -55,10 +55,10 @@ public final class QueryServlet extends HttpServlet {
 
   @Override
   public void init() {
-    fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
-    scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
-    userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
-    dataAccessor = new DataAccessor();
+    this.fetcher = new PlacesFetcher(GeoContext.getGeoApiContext());
+    this.scorer = new PlacesScorerImpl(GeoContext.getGeoApiContext());
+    this.userVerifier = UserVerifier.create(System.getenv("CLIENT_ID"));
+    this.dataAccessor = new DataAccessor();
   }
 
   void init(
@@ -66,14 +66,16 @@ public final class QueryServlet extends HttpServlet {
       PlacesScorer inputScorer,
       UserVerifier inputUserVerifier,
       DataAccessor inputDataAccessor) {
-    fetcher = inputFetcher;
-    scorer = inputScorer;
-    userVerifier = inputUserVerifier;
-    dataAccessor = inputDataAccessor;
+    this.fetcher = inputFetcher;
+    this.scorer = inputScorer;
+    this.userVerifier = inputUserVerifier;
+    this.dataAccessor = inputDataAccessor;
   }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Optional<String> optionalUserId = TokenValidator.validateAndGetId(request, response,
+        userVerifier, "query" /* validationPurpose */, false /* sendErrors*/);
     ImmutableList<Place> filteredPlaces;
     UserPreferences userPrefs;
     String cuisines = request.getParameter("cuisines");
@@ -95,6 +97,10 @@ public final class QueryServlet extends HttpServlet {
           true /* filter if no website */,
           true /* filter branches of same place */
       );
+      if (optionalUserId.isPresent() && Integer.parseInt(request.getParameter("newPlaces")) == 1) {
+        filteredPlaces = Places.keepOnlyNewPlaces(filteredPlaces, optionalUserId.get(),
+            dataAccessor, DESIRED_NUM_PLACES_TO_RECOMMEND);
+      }
     } catch (FetcherException e) {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "Fetching from Google Places API encountered a problem");
@@ -108,7 +114,7 @@ public final class QueryServlet extends HttpServlet {
     response.getWriter().write(new Gson().toJson(
       Places.scoreSort(filteredPlaces, userPrefs.location(), scorer)
           .stream()
-          .limit(MAX_NUM_PLACES_TO_RECOMMEND)
+          .limit(DESIRED_NUM_PLACES_TO_RECOMMEND)
           .collect(Collectors.toList())
     ));
   }

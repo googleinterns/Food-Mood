@@ -38,7 +38,8 @@ function fetchFromQuery() {
       `price=${getUserPriceFromUi()}`,
       `open=${getUserOpenNowFromUi()}`,
       `location=${getUserLocationFromUi()}`,
-      `idToken=${getUserIdToken()}`
+      `idToken=${getUserIdToken()}`,
+      `newPlaces=${getUserNewPlacesFromUi()}`
     ].join('&');
   } catch (error) {
     document.getElementById('input-error-container').innerText = 'ERROR: ' + error.message;
@@ -99,6 +100,10 @@ function getUserPriceFromUi() {
 function getUserOpenNowFromUi() {
   return getCheckedValueByElementId('open-now-form',
       'Choose if the place should be open now or you don\'t mind.');
+}
+
+function getUserNewPlacesFromUi() {
+  return getCheckedValueByElementId('old-new-form', 'Choose whether to receive mainly new places.');
 }
 
 /** Gets an element that has several options and returns the checked option. */
@@ -422,6 +427,7 @@ function signOut() {
       'You are currently not logged in with a Google account.';
   googleUser = null;
   document.getElementById('sign-out-button').style.display = 'none';
+  document.getElementById('old-new-form').style.display = 'none';
   document.getElementById('feedback-box').style.display = 'none';
   document.getElementById('user-feedback-container').style.display = 'none';
   document.getElementById('old-new-form').style.display = 'none';
@@ -440,10 +446,12 @@ function sendUserChoiceAsFeedback() {
   let indexOfPlaceUserChose = getCheckedValueByElementId('chosen-place-form',
       'Please select the place that you chose.');
   if (indexOfPlaceUserChose <= recommendedPlaces.length) {
-    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose].placeId,
+    postUserFeedback(recommendedPlaces[indexOfPlaceUserChose-1].placeId,
         false /** user tried again */)
   }
   document.getElementById('user-feedback-container').style.display = 'inline-block';
+  document.getElementById('user-feedback-container').innerText =
+      'Thank you, your feedback was received!';
   document.getElementById('feedback-box').style.display = 'none';
 }
 

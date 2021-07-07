@@ -15,7 +15,10 @@
 package com.google.sps.data;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,9 +29,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.maps.model.LatLng;
+import java.util.stream.Stream;
 
 @RunWith(JUnit4.class)
 public final class PlacesTest {
+
+  private static final DataAccessor MOCK_DATA_ACCESSOR = mock(DataAccessor.class);
 
   @Test
   public void randomSort_keepsAllItems() {
@@ -190,8 +196,9 @@ public final class PlacesTest {
 
   @Test
   public void filter_filterByStatus() {
-    Place placeToKeep = createValidPlaceBuilderByName("name1")
-        .setBusinessStatus(BusinessStatus.OPERATIONAL).build();
+    Place placeToKeep =
+        createValidPlaceBuilderByName("name1")
+            .setBusinessStatus(BusinessStatus.OPERATIONAL).build();
     ImmutableList<Place> placesToFilter = ImmutableList.of(
         createValidPlaceBuilderByName("name2")
             .setBusinessStatus(BusinessStatus.CLOSED_TEMPORARILY).build(),
@@ -211,6 +218,76 @@ public final class PlacesTest {
 
     assertEquals(result, ImmutableList.of(placeToKeep));
   }
+
+  @Test
+  public void keepOnlyNewPlaces_valid_filterPlaces() {
+    String userId = "12345";
+    int minNumPlacesThresh = 2; // Smaller or equal to size of "newPlaces"
+    ImmutableList<Place> newPlaces =
+        buildMultiplePlacesWithIdsByRange(1 /* firstPlaceId */, 3 /* LastPlaceId */);
+    ImmutableList<Place> oldPlaces =
+        buildMultiplePlacesWithIdsByRange(4 /* firstPlaceId */, 5 /* LastPlaceId */);
+    ImmutableList<Place> placesToFilter = Stream.concat(newPlaces.stream(), oldPlaces.stream())
+        .collect(ImmutableList.toImmutableList());
+    when(MOCK_DATA_ACCESSOR.getPlacesRecommendedToUser(eq(userId), any(Boolean.class)))
+        .thenReturn(ImmutableList.of("4","5"));
+
+    assertEquals(newPlaces,
+        Places.keepOnlyNewPlaces(placesToFilter, userId, MOCK_DATA_ACCESSOR, minNumPlacesThresh));
+  }
+
+  @Test
+  public void keepOnlyNewPlaces_tooFewFilteredPlaces_dontFilter() {
+    String userId = "12345";
+    int minNumPlacesThresh = 4; // bigger than size of "newPlaces"
+    ImmutableList<Place> newPlaces =
+        buildMultiplePlacesWithIdsByRange(1 /* firstPlaceId */, 3 /* LastPlaceId */);
+    ImmutableList<Place> oldPlaces =
+        buildMultiplePlacesWithIdsByRange(4 /* firstPlaceId */, 5 /* LastPlaceId */);
+    ImmutableList<Place> placesToFilter = Stream.concat(newPlaces.stream(), oldPlaces.stream())
+        .collect(ImmutableList.toImmutableList());
+    when(MOCK_DATA_ACCESSOR.getPlacesRecommendedToUser(eq(userId), any(Boolean.class)))
+        .thenReturn(ImmutableList.of("4","5"));
+
+    assertEquals(placesToFilter,
+        Places.keepOnlyNewPlaces(placesToFilter, userId, MOCK_DATA_ACCESSOR, minNumPlacesThresh));
+  }
+
+  @Test
+  public void keepOnlyNewPlaces_nullUser_throwIllegalArgumentException() {
+    int minNumPlacesThresh = 2;
+    ImmutableList<Place> placesToFilter =
+        buildMultiplePlacesWithIdsByRange(1 /* firstPlaceId */, 3 /* LastPlaceId */);
+
+    assertThrows(IllegalArgumentException.class,
+        () -> Places.keepOnlyNewPlaces(
+            placesToFilter, null, MOCK_DATA_ACCESSOR, minNumPlacesThresh
+        ));
+  }
+
+  @Test
+  public void keepOnlyNewPlaces_emptyUser_throwIllegalArgumentException() {
+    int minNumPlacesThresh = 2;
+    ImmutableList<Place> placesToFilter =
+        buildMultiplePlacesWithIdsByRange(1 /* firstPlaceId */, 3 /* LastPlaceId */);
+    assertThrows(IllegalArgumentException.class,
+        () -> Places.keepOnlyNewPlaces(placesToFilter, "", MOCK_DATA_ACCESSOR, minNumPlacesThresh));
+  }
+
+  // Returns a list of places that are built with IDs that match the given range.
+  private static ImmutableList<Place> buildMultiplePlacesWithIdsByRange(int firstPlaceId, int LastPlaceId) {
+    ImmutableList.Builder<Place> places = ImmutableList.builder();
+    for (int i = firstPlaceId; i <= LastPlaceId; ++i) {
+      String currNumAsString = String.valueOf(i);
+      places.add(
+          createValidPlaceBuilderByName("name" + currNumAsString)
+              .setPlaceId(currNumAsString)
+              .build()
+      );
+    }
+    return places.build();
+  }
+
 
   // Returns a Place builder that has valid values of all attributes.
   private static Place.Builder createValidPlaceBuilderByName(String name) {

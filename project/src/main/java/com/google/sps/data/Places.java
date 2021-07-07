@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
@@ -64,7 +66,6 @@ public final class Places {
     return ImmutableList.copyOf(mutablePlaces);
   }
 
-
   /**
    * Filters the given list of places according to the given parameters.
    * @param places the list we want to filter.
@@ -94,6 +95,32 @@ public final class Places {
       );
     }
     return result;
+  }
+
+  /**
+   * Filters the given list to keep only places that weren't previously recommended to the user, as
+   * long as the result's size is bigger than the given thresh (or equal to it).
+   * @param places the list we want to filter.
+   * @param userId The Id of the user whose places we want to filter.
+   * @param dataAccessor the accessor we use to get information about the user's history.
+   * @param minNumPlacesThresh the minimal number of places that we require to have after this
+   * function's filter. If the filteres result is smaller that the thresh, th function retrieves the
+   * original list.
+   * @return the filtered list.
+   */
+  public static ImmutableList<Place> keepOnlyNewPlaces(ImmutableList<Place> places,
+      String userId, DataAccessor dataAccessor, int minNumPlacesThresh) {
+    checkArgument(!isNullOrEmpty(userId), "User ID cannot be empty.");
+    if (places.size() <= minNumPlacesThresh) {
+      return places; // The list is not long enough to filter
+    }
+    ImmutableList<String> placesRecommendedToUser =
+        dataAccessor.getPlacesRecommendedToUser(userId, false /* getOnlyPlacesUserChose */);
+    ImmutableList<Place> result =
+        places.stream()
+        .filter(p -> !placesRecommendedToUser.contains(p.placeId()))
+        .collect(ImmutableList.toImmutableList());
+    return result.size() >= minNumPlacesThresh ? result : places;
   }
 
   private static boolean placeHasNoWebsiteLink(Place place) {

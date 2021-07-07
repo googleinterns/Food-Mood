@@ -36,23 +36,28 @@ public final class TokenValidator {
    * @param response the HttpServletResponse that is updated in case of invalidity
    * @param userVerifier the verifier that is used for verifing the user token
    * @param validationPurpose the reason for turning the token to user ID
+   * @param sendErrors whether should the function send response errors if unsuccessful
    * @throws IllegalArgumentException if the given request has missing inputs (no token)
    * @throws IOException if updating the response encounters a problem
    * @return An Optional with the valid ID if the token is valid, an empty Optional otherwise
    */
   public static Optional<String> validateAndGetId(HttpServletRequest request, HttpServletResponse
-      response, UserVerifier userVerifier, String validationPurpose)
+      response, UserVerifier userVerifier, String validationPurpose, boolean sendErrors)
       throws IllegalArgumentException, IOException {
     String userIdToken = request.getParameter("idToken");
     if (isNullOrEmpty(userIdToken)) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-          "No user token was received (" + validationPurpose + ")");
+      if (sendErrors) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+            "No user token was received (" + validationPurpose + ")");
+      }
       return Optional.empty();
     }
     Optional<String> optionalUserId = userVerifier.getUserIdByToken(userIdToken);
     if (!optionalUserId.isPresent()) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND,
-          "Couldn't verify user token (" + validationPurpose + ")");
+      if (sendErrors) {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND,
+            "Couldn't verify user token (" + validationPurpose + ")");
+      }
       return Optional.empty();
     }
     return optionalUserId;

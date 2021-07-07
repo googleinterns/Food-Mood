@@ -59,6 +59,7 @@ public final class QueryServletTest {
   private static final String CUISINES_STRING = "sushi,hamburger";
   private static final ImmutableList<String> CUISINES = ImmutableList.of("sushi", "hamburger");
   private static final String VALID_ID_TOKEN = "token";
+  private static final String FALSE_USER_INPUT = "0";
   private static final HttpServletRequest REQUEST = mock(HttpServletRequest.class);
   private static final HttpServletResponse RESPONSE = mock(HttpServletResponse.class);
   private static final PlacesFetcher FETCHER = mock(PlacesFetcher.class);
@@ -84,7 +85,7 @@ public final class QueryServletTest {
   @Test
   public void postRequest_fetchedMoreThanMaxNumPlaces_respondMaxNumPlaces() throws Exception {
     ImmutableList<Place> placesListWithMoreThanMaxNum =
-        createPlacesListBySize(QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND + 1);
+        createPlacesListBySize(QueryServlet.DESIRED_NUM_PLACES_TO_RECOMMEND + 1);
     when(FETCHER.fetch(any(UserPreferences.class)))
         .thenReturn(placesListWithMoreThanMaxNum);
     when(SCORER.getScores(eq(placesListWithMoreThanMaxNum), any(LatLng.class)))
@@ -92,12 +93,12 @@ public final class QueryServletTest {
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    assertEquals(getPlacesAmountInResponse(), QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND);
+    assertEquals(QueryServlet.DESIRED_NUM_PLACES_TO_RECOMMEND, getPlacesAmountInResponse());
   }
 
   @Test
   public void postRequest_fetchedLessThanMaxNumPlaces_respondAllFetchedPlaces() throws Exception {
-    int numOfFetchedPlaces = QueryServlet.MAX_NUM_PLACES_TO_RECOMMEND - 1;
+    int numOfFetchedPlaces = QueryServlet.DESIRED_NUM_PLACES_TO_RECOMMEND - 1;
     ImmutableList<Place> placesListWithLessThanMaxNum = createPlacesListBySize(numOfFetchedPlaces);
     when(FETCHER.fetch(any(UserPreferences.class)))
         .thenReturn(placesListWithLessThanMaxNum);
@@ -106,7 +107,7 @@ public final class QueryServletTest {
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    assertEquals(getPlacesAmountInResponse(), numOfFetchedPlaces);
+    assertEquals(numOfFetchedPlaces, getPlacesAmountInResponse());
   }
 
   @Test
@@ -133,14 +134,14 @@ public final class QueryServletTest {
 
     servlet.doPost(REQUEST, RESPONSE);
 
-    assertEquals(getPlacesAmountInResponse(), 1);
-    assertEquals(
+    assertEquals(1, getPlacesAmountInResponse());
+    assertEquals("validPlace",
         new Gson().fromJson(responseStringWriter.getBuffer().toString(), JsonArray.class)
             .get(0) // The first element in the array (first place)
             .getAsJsonObject()
             .get("name")
-            .getAsString(),
-        "validPlace");
+            .getAsString()
+    );
   }
 
   @Test
@@ -264,6 +265,7 @@ public final class QueryServletTest {
     when(REQUEST.getParameter("location")).thenReturn(LOCATION_STRING);
     when(REQUEST.getParameter("cuisines")).thenReturn(CUISINES_STRING);
     when(REQUEST.getParameter("idToken")).thenReturn(VALID_ID_TOKEN);
+    when(REQUEST.getParameter("newPlaces")).thenReturn(FALSE_USER_INPUT);
   }
 
   private static UserPreferences createUserPreferences() {
